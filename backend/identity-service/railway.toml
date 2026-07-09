@@ -1,0 +1,7 @@
+[build]
+builder = "nixpacks"
+
+[deploy]
+healthcheckPath = "/actuator/health"
+healthcheckTimeout = 180
+restartPolicyType = "ON_FAILURE"

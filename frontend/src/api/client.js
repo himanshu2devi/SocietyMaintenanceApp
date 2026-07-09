@@ -1,15 +1,16 @@
 import axios from 'axios'
 
-const IDENTITY_URL = import.meta.env.VITE_IDENTITY_URL || 'http://localhost:8081'
-const CORE_URL = import.meta.env.VITE_CORE_URL || 'http://localhost:8082'
+// API base URLs include /api/v1 (see .env.example)
+const IDENTITY_URL =
+  import.meta.env.VITE_IDENTITY_URL || 'http://localhost:8081/api/v1'
+const CORE_URL =
+  import.meta.env.VITE_CORE_URL || 'http://localhost:8082/api/v1'
 
 export const TOKEN_KEY = 'society_token'
 
-// Two axios instances, one per microservice.
-export const identityApi = axios.create({ baseURL: `${IDENTITY_URL}/api/v1` })
-export const coreApi = axios.create({ baseURL: `${CORE_URL}/api/v1` })
+export const identityApi = axios.create({ baseURL: IDENTITY_URL })
+export const coreApi = axios.create({ baseURL: CORE_URL })
 
-// Attach JWT to every request from a single source of truth.
 function attachToken(config) {
   const token = localStorage.getItem(TOKEN_KEY)
   if (token) {
@@ -21,7 +22,6 @@ function attachToken(config) {
 identityApi.interceptors.request.use(attachToken)
 coreApi.interceptors.request.use(attachToken)
 
-// Global 401 handling: clear session and bounce to login.
 function handle401(error) {
   if (error.response && error.response.status === 401) {
     localStorage.removeItem(TOKEN_KEY)
