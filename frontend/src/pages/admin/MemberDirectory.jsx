@@ -1,10 +1,13 @@
 import { useEffect, useState } from 'react'
 import { MemberService } from '../../api/services'
 import { Alert, SectionTitle } from '../../components/ui/Feedback'
+import { useToast } from '../../context/ToastContext'
+import { getApiErrorMessage } from '../../utils/apiError'
 
 const emptyForm = { fullName: '', flatNumber: '', mobile: '', email: '' }
 
 export default function MemberDirectory() {
+  const toast = useToast()
   const [members, setMembers] = useState([])
   const [form, setForm] = useState(emptyForm)
   const [error, setError] = useState('')
@@ -13,8 +16,8 @@ export default function MemberDirectory() {
   async function load() {
     try {
       setMembers(await MemberService.list())
-    } catch {
-      setError('Could not load members.')
+    } catch (err) {
+      setError(getApiErrorMessage(err, 'Could not load members.'))
     }
   }
 
@@ -31,11 +34,16 @@ export default function MemberDirectory() {
     setError('')
     setBusy(true)
     try {
-      await MemberService.add(form)
+      const payload = {
+        ...form,
+        email: form.email.trim() ? form.email.trim() : null,
+      }
+      await MemberService.add(payload)
       setForm(emptyForm)
+      toast.success('Member added successfully.')
       await load()
     } catch (err) {
-      setError(err.response?.data?.message || 'Could not add member.')
+      setError(getApiErrorMessage(err, 'Could not add member.'))
     } finally {
       setBusy(false)
     }
@@ -62,13 +70,13 @@ export default function MemberDirectory() {
             </div>
             <div>
               <label className="label">Email (optional)</label>
-              <input name="email" type="email" className="input" value={form.email} onChange={update} />
+              <input name="email" type="email" className="input" value={form.email} onChange={update} placeholder="Leave blank if not available" />
             </div>
             <button className="btn-primary w-full" disabled={busy}>
               {busy ? 'Adding…' : 'Add Member'}
             </button>
             <p className="text-xs text-gray-400">
-              Default login password is the member's mobile number.
+              Default login password is the member's mobile number. Email is optional.
             </p>
           </form>
         </div>

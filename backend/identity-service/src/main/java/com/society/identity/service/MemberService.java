@@ -25,19 +25,28 @@ public class MemberService {
 
     @Transactional
     public MemberResponse addMember(UUID societyId, AddMemberRequest req) {
-        if (req.email() != null && !req.email().isBlank() && userRepository.existsByEmail(req.email())) {
-            throw new ConflictException("Email already in use");
+        String mobile = normalizeRequired(req.mobile(), "Mobile");
+        String email = normalizeOptionalEmail(req.email());
+
+        if (userRepository.existsBySocietyIdAndMobile(societyId, mobile)) {
+            throw new ConflictException("A member with this mobile number already exists in your society.");
         }
+        if (email != null && userRepository.existsBySocietyIdAndEmail(societyId, email)) {
+            throw new ConflictException("A member with this email already exists in your society.");
+        }
+        if (email != null && userRepository.existsByEmail(email)) {
+            throw new ConflictException("This email is already registered. Use a different email or leave it blank.");
+        }
+
         User member = new User();
         member.setSocietyId(societyId);
-        member.setFullName(req.fullName());
-        member.setFlatNumber(req.flatNumber());
-        member.setMobile(req.mobile());
-        member.setEmail(req.email());
+        member.setFullName(normalizeRequired(req.fullName(), "Name"));
+        member.setFlatNumber(normalizeRequired(req.flatNumber(), "Flat number"));
+        member.setMobile(mobile);
+        member.setEmail(email); // null when optional email is blank — avoids unique '' collisions
         member.setRole(Role.MEMBER);
-        // Default password = mobile number if none provided (member changes on first login)
         String rawPassword = (req.password() == null || req.password().isBlank())
-                ? req.mobile() : req.password();
+                ? mobile : req.password();
         member.setPasswordHash(passwordEncoder.encode(rawPassword));
         member = userRepository.save(member);
         return toResponse(member);
@@ -58,6 +67,24 @@ public class MemberService {
         }
         member.setActive(false);
         userRepository.save(member);
+    }
+
+    /** Blank optional email must be NULL in PostgreSQL, not "" (unique constraint). */
+    static String normalizeOptionalEmail(String email) {
+        if (email == null) return null;
+        String trimmed = email.trim();
+        if (trimmed.isEmpty()) return null;
+        if (!trimmed.contains("@") || trimmed.startsWith("@") || trimmed.endsWith("@")) {
+            throw new BadRequestException("Enter a valid email or leave it blank.");
+        }
+        return trimmed.toLowerCase();
+    }
+
+    static String normalizeRequired(String value, String field) {
+        if (value == null || value.isBlank()) {
+            throw new BadRequestException(field + " is required");
+        }
+        return value.trim();
     }
 
     public static MemberResponse toResponse(User u) {

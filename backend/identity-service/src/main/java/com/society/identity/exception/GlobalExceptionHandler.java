@@ -1,5 +1,6 @@
 package com.society.identity.exception;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -41,6 +42,20 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ApiExceptions.UnauthorizedException.class)
     public ResponseEntity<Object> handleUnauthorized(ApiExceptions.UnauthorizedException ex) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(body(HttpStatus.UNAUTHORIZED, ex.getMessage()));
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<Object> handleDataIntegrity(DataIntegrityViolationException ex) {
+        String raw = ex.getMostSpecificCause() != null ? ex.getMostSpecificCause().getMessage() : ex.getMessage();
+        String message = "This member conflicts with an existing record.";
+        if (raw != null) {
+            if (raw.contains("uq_users_society_email")) {
+                message = "A member with this email already exists (or leave email blank).";
+            } else if (raw.contains("uq_users_society_mobile")) {
+                message = "A member with this mobile number already exists in your society.";
+            }
+        }
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(body(HttpStatus.CONFLICT, message));
     }
 
     @ExceptionHandler(AccessDeniedException.class)
