@@ -3,3 +3,6 @@
 .env.production
 frontend/node_modules/
 frontend/dist/
+backend/neon.local.env
+backend/*/data/
+backend/*/target/

@@ -1,5 +1,6 @@
--- Run once in Neon SQL Editor (https://console.neon.tech)
--- Creates separate databases for each microservice.
-
-CREATE DATABASE identity_db;
-CREATE DATABASE core_db;
+-- Neon free tier: use ONE database (Societywale).
+-- Do NOT create identity_db / core_db on free plans.
+--
+-- Your app tables should already exist from the schema SQL files you ran.
+-- Both Spring Boot services connect to the same database:
+--   jdbc:postgresql://HOST/Societywale?sslmode=require
