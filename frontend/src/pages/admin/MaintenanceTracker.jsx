@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
-import { MaintenanceService, MemberService } from '../../api/services'
+import { MaintenanceRateService, MaintenanceService, MemberService } from '../../api/services'
 import { Alert, SectionTitle, StatusBadge } from '../../components/ui/Feedback'
 import { useToast } from '../../context/ToastContext'
 import { getApiErrorMessage } from '../../utils/apiError'
-import { monthName } from '../../utils/share'
+import { inr, monthName } from '../../utils/share'
 
 const now = new Date()
 const emptyForm = {
@@ -17,6 +17,19 @@ const emptyForm = {
 
 function normalizeFlat(value) {
   return String(value || '').trim().toLowerCase()
+}
+
+function periodKey(year, month) {
+  return Number(year) * 100 + Number(month)
+}
+
+/** Latest rate whose effective-from is on or before the target period. */
+function effectiveAmountFor(rates, year, month) {
+  const target = periodKey(year, month)
+  const applicable = rates
+    .filter((r) => periodKey(r.effectiveFromYear, r.effectiveFromMonth) <= target)
+    .sort((a, b) => periodKey(b.effectiveFromYear, b.effectiveFromMonth) - periodKey(a.effectiveFromYear, a.effectiveFromMonth))
+  return applicable[0] || null
 }
 
 function memberLabel(m) {
@@ -34,17 +47,26 @@ export default function MaintenanceTracker() {
   const [busy, setBusy] = useState(false)
   const [trackerYear, setTrackerYear] = useState(now.getFullYear())
   const [trackerMonth, setTrackerMonth] = useState(now.getMonth() + 1)
-  const [trackerDefaultAmount, setTrackerDefaultAmount] = useState('')
   const [trackerBusyKey, setTrackerBusyKey] = useState('')
+  const [rates, setRates] = useState([])
+  const [rateForm, setRateForm] = useState({
+    amount: '',
+    effectiveFromYear: now.getFullYear(),
+    effectiveFromMonth: now.getMonth() + 1,
+    notes: '',
+  })
+  const [rateBusy, setRateBusy] = useState(false)
 
   async function load() {
     try {
-      const [chargeList, memberList] = await Promise.all([
+      const [chargeList, memberList, rateList] = await Promise.all([
         MaintenanceService.list(),
         MemberService.list(),
+        MaintenanceRateService.list(),
       ])
       setCharges(chargeList)
       setMembers(memberList.filter((m) => m.active !== false))
+      setRates(rateList)
     } catch (err) {
       setError(getApiErrorMessage(err, 'Could not load maintenance records.'))
     }
@@ -129,9 +151,15 @@ export default function MaintenanceTracker() {
   }, [filtered])
 
   /** One row per registered member for the selected tracker month/year. */
+  const periodRate = useMemo(
+    () => effectiveAmountFor(rates, trackerYear, trackerMonth),
+    [rates, trackerYear, trackerMonth],
+  )
+
   const periodRows = useMemo(() => {
     const year = Number(trackerYear)
     const month = Number(trackerMonth)
+    const scheduledAmount = periodRate ? Number(periodRate.amount) : 0
     return members
       .slice()
       .sort((a, b) => String(a.flatNumber).localeCompare(String(b.flatNumber)) || a.fullName.localeCompare(b.fullName))
@@ -145,9 +173,6 @@ export default function MaintenanceTracker() {
               || normalizeFlat(c.flatNumber) === normalizeFlat(member.flatNumber)
             ),
         )
-        const fallbackAmount = charges
-          .filter((c) => normalizeFlat(c.flatNumber) === normalizeFlat(member.flatNumber))
-          .sort((a, b) => (b.billingYear - a.billingYear) || (b.billingMonth - a.billingMonth))[0]?.amount
 
         return {
           key: member.id,
@@ -159,13 +184,15 @@ export default function MaintenanceTracker() {
           billingYear: year,
           billingMonth: month,
           chargeId: charge?.id || null,
-          amount: charge ? Number(charge.amount) : Number(trackerDefaultAmount || fallbackAmount || 0),
+          // Recorded charges keep historical amount; unrecorded rows use timeline rate.
+          amount: charge ? Number(charge.amount) : scheduledAmount,
           status: charge?.status || 'PENDING',
           notes: charge?.notes || '',
           isVirtual: !charge,
+          usesSchedule: !charge,
         }
       })
-  }, [members, charges, trackerYear, trackerMonth, trackerDefaultAmount])
+  }, [members, charges, trackerYear, trackerMonth, periodRate])
 
   const periodStats = useMemo(() => {
     const paid = periodRows.filter((r) => r.status === 'PAID').length
@@ -244,9 +271,29 @@ export default function MaintenanceTracker() {
     }
   }
 
+  async function saveSocietyRate(e) {
+    e.preventDefault()
+    setRateBusy(true)
+    try {
+      await MaintenanceRateService.setRate({
+        amount: Number(rateForm.amount),
+        effectiveFromYear: Number(rateForm.effectiveFromYear),
+        effectiveFromMonth: Number(rateForm.effectiveFromMonth),
+        notes: rateForm.notes || null,
+      })
+      toast.success(`Maintenance amount ${inr(rateForm.amount)} set from ${monthName(rateForm.effectiveFromMonth)} ${rateForm.effectiveFromYear}.`)
+      setRateForm((prev) => ({ ...prev, amount: '', notes: '' }))
+      await load()
+    } catch (err) {
+      toast.error(getApiErrorMessage(err, 'Could not save maintenance amount.'))
+    } finally {
+      setRateBusy(false)
+    }
+  }
+
   async function togglePeriodStatus(row) {
     if (!row.amount || Number(row.amount) <= 0) {
-      toast.error('Set a default amount above (or record amount once) before updating status.')
+      toast.error('Set the society maintenance amount above for this month first.')
       return
     }
     setTrackerBusyKey(row.key)
@@ -286,6 +333,88 @@ export default function MaintenanceTracker() {
 
   return (
     <div className="space-y-6">
+      <div className="card border-orange-100 bg-gradient-to-br from-white to-orange-50/40">
+        <SectionTitle
+          title="Society maintenance amount"
+          subtitle="Same amount for every flat. Set from a start month — past recorded payments stay unchanged."
+        />
+        <form onSubmit={saveSocietyRate} className="mt-3 grid gap-3 md:grid-cols-[1fr_1fr_1fr_auto] md:items-end">
+          <div>
+            <label className="label">Monthly amount (₹)</label>
+            <input
+              type="number"
+              className="input"
+              required
+              min="1"
+              step="1"
+              placeholder="e.g. 3000"
+              value={rateForm.amount}
+              onChange={(e) => setRateForm({ ...rateForm, amount: e.target.value })}
+            />
+          </div>
+          <div>
+            <label className="label">Starts from month</label>
+            <select
+              className="input"
+              value={rateForm.effectiveFromMonth}
+              onChange={(e) => setRateForm({ ...rateForm, effectiveFromMonth: Number(e.target.value) })}
+            >
+              {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
+                <option key={m} value={m}>{monthName(m)}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="label">Starts from year</label>
+            <input
+              type="number"
+              className="input"
+              required
+              value={rateForm.effectiveFromYear}
+              onChange={(e) => setRateForm({ ...rateForm, effectiveFromYear: Number(e.target.value) })}
+            />
+          </div>
+          <button className="btn-primary !bg-orange-500 hover:!bg-orange-600" disabled={rateBusy}>
+            {rateBusy ? 'Saving…' : 'Save amount'}
+          </button>
+        </form>
+        <div className="mt-4 flex flex-wrap gap-3 text-sm">
+          {periodRate ? (
+            <p className="rounded-xl bg-white px-3 py-2 font-semibold text-slate-800 shadow-sm">
+              Effective for {monthName(trackerMonth)} {trackerYear}: {inr(periodRate.amount)}
+              <span className="ml-2 font-normal text-slate-500">
+                (from {monthName(periodRate.effectiveFromMonth)} {periodRate.effectiveFromYear})
+              </span>
+            </p>
+          ) : (
+            <p className="rounded-xl bg-amber-50 px-3 py-2 text-amber-800">
+              No society amount covers {monthName(trackerMonth)} {trackerYear} yet. Set one above.
+            </p>
+          )}
+        </div>
+        {rates.length > 0 && (
+          <div className="mt-4 overflow-x-auto">
+            <p className="mb-2 text-xs font-bold uppercase tracking-[.12em] text-slate-400">Amount timeline</p>
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b text-left text-gray-500">
+                  <th className="py-2 pr-4">Effective from</th>
+                  <th className="py-2 pr-4">Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                {rates.map((r) => (
+                  <tr key={r.id} className="border-b last:border-0">
+                    <td className="py-2 pr-4">{monthName(r.effectiveFromMonth)} {r.effectiveFromYear}</td>
+                    <td className="py-2 pr-4 font-semibold">{inr(r.amount)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-1">
           <div className="card">
@@ -329,6 +458,18 @@ export default function MaintenanceTracker() {
               <div>
                 <label className="label">Amount (₹)</label>
                 <input name="amount" type="number" className="input" value={form.amount} onChange={update} required />
+                {effectiveAmountFor(rates, form.billingYear, form.billingMonth) && (
+                  <button
+                    type="button"
+                    className="mt-1 text-xs font-semibold text-orange-600"
+                    onClick={() => setForm({
+                      ...form,
+                      amount: String(effectiveAmountFor(rates, form.billingYear, form.billingMonth).amount),
+                    })}
+                  >
+                    Use society rate ({inr(effectiveAmountFor(rates, form.billingYear, form.billingMonth).amount)})
+                  </button>
+                )}
               </div>
               <div>
                 <label className="label">Notes (optional)</label>
@@ -341,7 +482,6 @@ export default function MaintenanceTracker() {
             </form>
           </div>
         </div>
-
         <div className="lg:col-span-2 space-y-6">
           <div className="card">
             <SectionTitle
@@ -418,23 +558,14 @@ export default function MaintenanceTracker() {
                       onChange={(e) => setTrackerYear(Number(e.target.value))}
                     />
                   </div>
-                  <div>
-                    <label className="label !mb-1">Default amount (₹)</label>
-                    <input
-                      type="number"
-                      className="input w-32"
-                      placeholder="e.g. 3000"
-                      value={trackerDefaultAmount}
-                      onChange={(e) => setTrackerDefaultAmount(e.target.value)}
-                    />
-                  </div>
                 </div>
               }
             />
             <p className="mb-4 text-sm text-slate-500">
-              All registered members appear for the selected month. Default status is <span className="font-semibold text-amber-700">not paid</span> until you mark them paid.
-            </p>
-            <div className="overflow-x-auto">
+              All members for {monthName(trackerMonth)} {trackerYear}. Amount comes from the society timeline
+              {periodRate ? ` (${inr(periodRate.amount)})` : ''}. Already recorded payments keep their original amount.
+              Default status is <span className="font-semibold text-amber-700">not paid</span> until marked paid.
+            </p>            <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b text-left text-gray-500">

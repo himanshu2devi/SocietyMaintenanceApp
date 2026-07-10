@@ -21,6 +21,13 @@ export const MaintenanceService = {
   markPaid: (chargeId) => coreApi.patch(`/maintenance/${chargeId}/paid`).then((r) => r.data),
 }
 
+export const MaintenanceRateService = {
+  list: () => coreApi.get('/maintenance-rates').then((r) => r.data),
+  effective: (year, month) =>
+    coreApi.get('/maintenance-rates/effective', { params: { year, month } }).then((r) => r.data),
+  setRate: (payload) => coreApi.post('/maintenance-rates', payload).then((r) => r.data),
+}
+
 export const ExpenseService = {
   list: () => coreApi.get('/expenses').then((r) => r.data),
   create: (payload) => coreApi.post('/expenses', payload).then((r) => r.data),
