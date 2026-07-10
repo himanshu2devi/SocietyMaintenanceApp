@@ -1,14 +1,19 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import { identityApi, TOKEN_KEY } from '../api/client'
+import { clearSession, getValidToken, USER_KEY } from '../auth/token'
 
 const AuthContext = createContext(null)
 
-const USER_KEY = 'society_user'
-
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
+    if (!getValidToken()) return null
     const raw = localStorage.getItem(USER_KEY)
-    return raw ? JSON.parse(raw) : null
+    try {
+      return raw ? JSON.parse(raw) : null
+    } catch {
+      clearSession()
+      return null
+    }
   })
   const [loading, setLoading] = useState(false)
 
@@ -45,7 +50,7 @@ export function AuthProvider({ children }) {
   }
 
   function logout() {
-    localStorage.removeItem(TOKEN_KEY)
+    clearSession()
     setUser(null)
   }
 
@@ -53,7 +58,7 @@ export function AuthProvider({ children }) {
     () => ({
       user,
       loading,
-      isAuthenticated: !!user,
+      isAuthenticated: !!user && !!getValidToken(),
       isAdmin: user?.role === 'ADMIN',
       login,
       registerSociety,

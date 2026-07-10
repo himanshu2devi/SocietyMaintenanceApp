@@ -1,6 +1,7 @@
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import ProtectedRoute from './components/ProtectedRoute'
+import Footer from './components/Footer'
 
 import Home from './pages/public/Home'
 import About from './pages/public/About'
@@ -12,10 +13,13 @@ import MemberDashboard from './pages/member/MemberDashboard'
 import FinancialReports from './pages/reports/FinancialReports'
 
 export default function App() {
+  const location = useLocation()
+  const isMarketingPage = ['/', '/about', '/contact'].includes(location.pathname)
+
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900">
+    <div className="flex min-h-screen flex-col bg-slate-50 text-slate-900">
       <Navbar />
-      <main className="mx-auto max-w-7xl px-4 py-6">
+      <main className={`flex-1 ${isMarketingPage ? '' : 'mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:py-8'}`}>
         <Routes>
           {/* Public */}
           <Route path="/" element={<Home />} />
@@ -57,6 +61,7 @@ export default function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
+      {isMarketingPage && <Footer />}
     </div>
   )
 }

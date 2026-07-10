@@ -16,10 +16,13 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+
+    private static final Set<String> ALLOWED_ROLES = Set.of("ADMIN", "MEMBER");
 
     private final JwtService jwtService;
 
@@ -34,14 +37,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         String header = request.getHeader("Authorization");
-        if (header != null && header.startsWith("Bearer ")) {
+        if (SecurityContextHolder.getContext().getAuthentication() == null
+                && header != null && header.startsWith("Bearer ")) {
             String token = header.substring(7);
             try {
                 Claims claims = jwtService.parse(token);
+                String role = claims.get("role", String.class);
+                if (!ALLOWED_ROLES.contains(role)) {
+                    SecurityContextHolder.clearContext();
+                    filterChain.doFilter(request, response);
+                    return;
+                }
                 AuthenticatedUser principal = new AuthenticatedUser(
                         UUID.fromString(claims.getSubject()),
                         UUID.fromString(claims.get("societyId", String.class)),
-                        claims.get("role", String.class),
+                        role,
                         claims.get("name", String.class)
                 );
                 var authority = new SimpleGrantedAuthority("ROLE_" + principal.role());

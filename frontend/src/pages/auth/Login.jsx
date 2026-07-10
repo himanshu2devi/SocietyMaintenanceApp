@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { Alert } from '../../components/ui/Feedback'
+import AuthShell from '../../components/AuthShell'
 
 export default function Login() {
   const { login, loading } = useAuth()
@@ -20,23 +21,22 @@ export default function Login() {
       const user = await login(form.email, form.password)
       navigate(user.role === 'ADMIN' ? '/admin' : '/member')
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed. Check your credentials.')
+      if (!err.response) {
+        setError('The authentication service is offline. Start the Identity Service on port 8081, then try again.')
+      } else {
+        setError(err.response.data?.message || 'Login failed. Check your email and password.')
+      }
     }
   }
 
   return (
-    <div className="mx-auto max-w-md">
-      <div className="card space-y-5">
-        <div>
-          <h1 className="text-2xl font-bold">Welcome back</h1>
-          <p className="text-sm text-gray-500">Log in to your society account.</p>
-        </div>
-
+    <AuthShell title="Welcome back" description="Sign in to manage your society workspace or view your member updates.">
+      <div className="space-y-5">
         <Alert type="error">{error}</Alert>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="label">Email</label>
+            <label className="label">Email address</label>
             <input
               name="email"
               type="email"
@@ -44,7 +44,7 @@ export default function Login() {
               value={form.email}
               onChange={update}
               required
-              placeholder="admin@society.com"
+              placeholder="you@example.com"
             />
           </div>
           <div>
@@ -59,18 +59,18 @@ export default function Login() {
               placeholder="••••••••"
             />
           </div>
-          <button className="btn-primary w-full" disabled={loading}>
+          <button className="btn-primary w-full !bg-orange-500 !py-3 hover:!bg-orange-600" disabled={loading}>
             {loading ? 'Signing in…' : 'Sign In'}
           </button>
         </form>
 
-        <p className="text-center text-sm text-gray-500">
-          New society?{' '}
-          <Link to="/register" className="font-medium text-brand-600">
-            Register here
+        <p className="border-t border-slate-100 pt-5 text-center text-sm text-slate-500">
+          Setting up a new society?{' '}
+          <Link to="/register" className="font-bold text-orange-600 hover:text-orange-700">
+            Create your workspace
           </Link>
         </p>
       </div>
-    </div>
+    </AuthShell>
   )
 }
