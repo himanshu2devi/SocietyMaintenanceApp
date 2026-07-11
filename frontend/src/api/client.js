@@ -3,7 +3,7 @@ import { clearSession, getValidToken, TOKEN_KEY } from '../auth/token'
 
 /**
  * Normalize API base URL so Vercel env mistakes like omitting /api/v1 still work.
- * Expected: https://societywale-identity.onrender.com/api/v1
+ * Expected: https://identity.societywale.in/api/v1
  */
 function apiBase(envValue, fallback) {
   let url = (envValue || fallback || '').trim().replace(/\/+$/, '')
@@ -14,14 +14,27 @@ function apiBase(envValue, fallback) {
   return url
 }
 
-const IDENTITY_URL = apiBase(
+let identityCandidate = apiBase(
   import.meta.env.VITE_IDENTITY_URL,
   'http://localhost:8081/api/v1',
 )
-const CORE_URL = apiBase(
+let coreCandidate = apiBase(
   import.meta.env.VITE_CORE_URL,
   'http://localhost:8082/api/v1',
 )
+
+// Guard against swapped Vercel env values (login would hit core and return
+// "Authentication is required" instead of reaching /auth/login).
+const identityLooksLikeCore = /\/\/core\./i.test(identityCandidate)
+const coreLooksLikeIdentity = /\/\/identity\./i.test(coreCandidate)
+if (identityLooksLikeCore && coreLooksLikeIdentity) {
+  const swapped = identityCandidate
+  identityCandidate = coreCandidate
+  coreCandidate = swapped
+}
+
+const IDENTITY_URL = identityCandidate
+const CORE_URL = coreCandidate
 
 export { TOKEN_KEY }
 
