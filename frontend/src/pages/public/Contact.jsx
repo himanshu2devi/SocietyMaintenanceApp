@@ -13,7 +13,7 @@ export default function Contact() {
     <div className="mx-auto max-w-xl space-y-6">
       <h1 className="text-3xl font-bold">Contact Us</h1>
       <p className="text-gray-600">
-        Have a question about SocietyHub? Send us a message and we'll get back to you.
+        Have a question about SocietyWale? Send us a message and we'll get back to you.
       </p>
 
       {sent && <Alert type="success">Thanks! Your message has been received.</Alert>}

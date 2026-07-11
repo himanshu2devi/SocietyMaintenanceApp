@@ -8,9 +8,9 @@ export default function Footer() {
         <div>
           <Brand />
           <p className="mt-4 max-w-sm text-sm leading-6 text-slate-500">
-            Practical digital operations for housing societies in Satara — built for clearer communication, collections and accountability.
+            Practical digital operations for housing societies in Indian. Built for clearer communication, collections and accountability.
           </p>
-          <p className="mt-5 text-sm font-semibold text-slate-700">Made for society committees.</p>
+          <p className="mt-5 text-sm font-semibold text-slate-700">Made for Indian societies with love ❤️</p>
         </div>
         <FooterColumn title="Product" links={[['Features', '/#features'], ['For committees', '/#committees'], ['Sign in', '/login'], ['Create society', '/register']]} />
         <FooterColumn title="Company" links={[['About SocietyWale', '/about'], ['Contact us', '/contact']]} />

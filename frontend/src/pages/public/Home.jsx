@@ -16,7 +16,7 @@ export default function Home() {
         <div className="absolute inset-x-0 top-0 -z-10 h-full bg-[radial-gradient(circle_at_90%_15%,rgba(255,122,69,.17),transparent_28%),radial-gradient(circle_at_5%_60%,rgba(15,157,138,.09),transparent_26%)]" />
         <div className="mx-auto grid max-w-7xl gap-12 px-4 pb-20 pt-16 sm:px-6 lg:grid-cols-[1.05fr_.95fr] lg:items-center lg:pb-28 lg:pt-24">
           <div>
-            <p className="eyebrow">Built for Satara’s society communities</p>
+            <p className="eyebrow">Built for Indian societies</p>
             <h1 className="mt-6 max-w-3xl text-4xl font-extrabold leading-[1.08] tracking-tight text-slate-950 sm:text-5xl lg:text-6xl">
               Society management that feels <span className="text-orange-500">clear, calm and in control.</span>
             </h1>

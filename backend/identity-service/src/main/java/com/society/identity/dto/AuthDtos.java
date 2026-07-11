@@ -35,6 +35,20 @@ public class AuthDtos {
             @NotBlank @Size(min = 6, message = "Password must be at least 6 characters") String password
     ) {}
 
+    /**
+     * Self-service password reset without email SMTP.
+     * Verifies society code + email + mobile + flat number, then sets a new password.
+     */
+    public record ForgotPasswordRequest(
+            @NotBlank String societyCode,
+            @NotBlank @Email String email,
+            @NotBlank String mobile,
+            @NotBlank String flatNumber,
+            @NotBlank @Size(min = 6, message = "Password must be at least 6 characters") String newPassword
+    ) {}
+
+    public record MessageResponse(String message) {}
+
     public record AuthResponse(
             String token,
             String tokenType,

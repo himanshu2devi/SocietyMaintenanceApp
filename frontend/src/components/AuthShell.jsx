@@ -22,7 +22,7 @@ export default function AuthShell({ children, title, description, step }) {
             <div className="mt-10 space-y-5 border-l border-white/15 pl-5 text-sm leading-6 text-slate-300">
               <p><b className="text-white">For committees.</b> Keep collection, expenses and updates organised.</p>
               <p><b className="text-white">For members.</b> Give residents simple access to what matters.</p>
-              <p><b className="text-white">For Satara societies.</b> Local-first support, built to be easy to adopt.</p>
+              <p><b className="text-white">For Indian societies.</b> Local-first support, built to be easy to adopt.</p>
             </div>
           </div>
           <p className="text-xs text-slate-500">Secure account access · Role-based workspace</p>

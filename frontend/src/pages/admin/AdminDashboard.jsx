@@ -1,7 +1,9 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Navigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
+import { useToast } from '../../context/ToastContext'
 import { getValidToken } from '../../auth/token'
+import { PaymentClaimService } from '../../api/services'
 import MemberDirectory from './MemberDirectory'
 import MaintenanceTracker from './MaintenanceTracker'
 import ExpenseLogger from './ExpenseLogger'
@@ -25,7 +27,35 @@ const tabs = [
 
 export default function AdminDashboard() {
   const { user } = useAuth()
+  const toast = useToast()
   const [active, setActive] = useState('overview')
+  const [pendingClaims, setPendingClaims] = useState(0)
+  const knownCount = useRef(null)
+
+  async function refreshClaimBadge() {
+    try {
+      const list = await PaymentClaimService.list('SUBMITTED')
+      const count = list.length
+      if (knownCount.current !== null && count > knownCount.current) {
+        const added = count - knownCount.current
+        toast.info(`${added} new payment claim${added === 1 ? '' : 's'} from members — review in Payment claims.`)
+      }
+      knownCount.current = count
+      setPendingClaims(count)
+    } catch {
+      // Keep last known badge if refresh fails
+    }
+  }
+
+  useEffect(() => {
+    refreshClaimBadge()
+    const id = window.setInterval(refreshClaimBadge, 30000)
+    return () => window.clearInterval(id)
+  }, [])
+
+  useEffect(() => {
+    if (active === 'claims') refreshClaimBadge()
+  }, [active])
 
   if (!getValidToken()) return <Navigate to="/login" replace />
   if (user?.role !== 'ADMIN') return <Navigate to="/member" replace />
@@ -42,9 +72,20 @@ export default function AdminDashboard() {
         </div>
         <nav className="mt-3 grid gap-1">
           {tabs.map((tab) => (
-            <button key={tab.id} onClick={() => setActive(tab.id)} className={`flex items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-semibold transition ${active === tab.id ? 'bg-orange-50 text-orange-700' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-950'}`}>
+            <button
+              key={tab.id}
+              onClick={() => setActive(tab.id)}
+              className={`flex items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-semibold transition ${
+                active === tab.id ? 'bg-orange-50 text-orange-700' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-950'
+              }`}
+            >
               <span className="grid h-7 w-7 place-items-center rounded-lg bg-white text-base shadow-sm">{tab.icon}</span>
-              {tab.label}
+              <span className="flex-1">{tab.label}</span>
+              {tab.id === 'claims' && pendingClaims > 0 && (
+                <span className="rounded-full bg-orange-600 px-2 py-0.5 text-[11px] font-bold text-white">
+                  {pendingClaims}
+                </span>
+              )}
             </button>
           ))}
         </nav>
@@ -57,13 +98,17 @@ export default function AdminDashboard() {
           </div>
           <p className="text-sm text-slate-500">Members can view. Only admins can create or change records.</p>
         </div>
-        <ActiveComponent onNavigate={setActive} />
+        <ActiveComponent
+          onNavigate={setActive}
+          pendingClaims={pendingClaims}
+          onClaimsChanged={refreshClaimBadge}
+        />
       </section>
     </div>
   )
 }
 
-function Overview({ onNavigate }) {
+function Overview({ onNavigate, pendingClaims = 0 }) {
   const steps = [
     ['1', 'Publish committee', 'Add chairman, secretary and treasurer contacts.', 'committee'],
     ['2', 'Add bank account', 'Members need account details to pay maintenance.', 'accounts'],
@@ -72,6 +117,22 @@ function Overview({ onNavigate }) {
 
   return (
     <div className="space-y-6">
+      {pendingClaims > 0 && (
+        <div className="flex flex-col gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="font-bold text-amber-950">
+              {pendingClaims} payment claim{pendingClaims === 1 ? '' : 's'} waiting for verification
+            </p>
+            <p className="mt-1 text-sm text-amber-800/90">
+              Members notified after paying. Approve to mark Maintenance paid and keep both views in sync.
+            </p>
+          </div>
+          <button type="button" className="btn-primary shrink-0" onClick={() => onNavigate('claims')}>
+            Review claims
+          </button>
+        </div>
+      )}
+
       <div className="rounded-3xl bg-[linear-gradient(135deg,#102A43_0%,#173e62_55%,#0f766e_150%)] p-7 text-white sm:p-9">
         <p className="text-xs font-bold uppercase tracking-[.15em] text-orange-300">Committee control</p>
         <h2 className="mt-3 max-w-xl text-2xl font-extrabold leading-tight sm:text-3xl">Admins manage. Members view, download and notify payments.</h2>

@@ -51,7 +51,8 @@ public class MaintenanceController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<MaintenanceChargeResponse> markPaid(
             @AuthenticationPrincipal AuthenticatedUser user,
-            @PathVariable UUID chargeId) {
-        return ResponseEntity.ok(service.markPaidById(user.societyId(), chargeId));
+            @PathVariable UUID chargeId,
+            @RequestParam String paymentMode) {
+        return ResponseEntity.ok(service.markPaidById(user.societyId(), chargeId, paymentMode));
     }
 }

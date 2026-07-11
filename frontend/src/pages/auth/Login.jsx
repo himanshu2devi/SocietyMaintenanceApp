@@ -58,6 +58,11 @@ export default function Login() {
               required
               placeholder="••••••••"
             />
+            <p className="mt-2 text-right text-sm">
+              <Link to="/forgot-password" className="font-semibold text-orange-600 hover:text-orange-700">
+                Forget/Reset Password?
+              </Link>
+            </p>
           </div>
           <button className="btn-primary w-full !bg-orange-500 !py-3 hover:!bg-orange-600" disabled={loading}>
             {loading ? 'Signing in…' : 'Sign In'}

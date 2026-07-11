@@ -57,7 +57,7 @@ export default function RegisterSociety() {
             </div>
             <div>
               <label className="label">Society Code</label>
-              <input name="societyCode" className="input" value={form.societyCode} onChange={update} required placeholder="SGR-SATARA" />
+              <input name="societyCode" className="input" value={form.societyCode} onChange={update} required placeholder="SGR-PUNE" />
             </div>
             <div>
               <label className="label">Address</label>

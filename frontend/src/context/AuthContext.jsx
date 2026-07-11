@@ -1,29 +1,18 @@
-import { createContext, useContext, useEffect, useMemo, useState } from 'react'
-import { identityApi, TOKEN_KEY } from '../api/client'
-import { clearSession, getValidToken, USER_KEY } from '../auth/token'
+import { createContext, useContext, useMemo, useState } from 'react'
+import { identityApi } from '../api/client'
+import { clearSession, getStoredUser, getValidToken, setSession } from '../auth/token'
 
 const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
     if (!getValidToken()) return null
-    const raw = localStorage.getItem(USER_KEY)
-    try {
-      return raw ? JSON.parse(raw) : null
-    } catch {
-      clearSession()
-      return null
-    }
+    return getStoredUser()
   })
   const [loading, setLoading] = useState(false)
 
-  useEffect(() => {
-    if (user) localStorage.setItem(USER_KEY, JSON.stringify(user))
-    else localStorage.removeItem(USER_KEY)
-  }, [user])
-
   function persistSession(data) {
-    localStorage.setItem(TOKEN_KEY, data.token)
+    setSession(data.token, data.user)
     setUser(data.user)
   }
 

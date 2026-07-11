@@ -12,7 +12,15 @@ const emptyForm = {
   billingYear: now.getFullYear(),
   billingMonth: now.getMonth() + 1,
   amount: '',
-  notes: '',
+  paymentMode: 'CASH',
+}
+
+function formatPaymentMode(mode) {
+  if (!mode) return ''
+  const value = String(mode).toUpperCase()
+  if (value === 'CASH') return 'Cash'
+  if (value === 'ONLINE') return 'Online'
+  return mode
 }
 
 function normalizeFlat(value) {
@@ -48,6 +56,7 @@ export default function MaintenanceTracker() {
   const [trackerYear, setTrackerYear] = useState(now.getFullYear())
   const [trackerMonth, setTrackerMonth] = useState(now.getMonth() + 1)
   const [trackerBusyKey, setTrackerBusyKey] = useState('')
+  const [trackerPaymentMode, setTrackerPaymentMode] = useState('CASH')
   const [rates, setRates] = useState([])
   const [rateForm, setRateForm] = useState({
     amount: '',
@@ -187,6 +196,7 @@ export default function MaintenanceTracker() {
           // Recorded charges keep historical amount; unrecorded rows use timeline rate.
           amount: charge ? Number(charge.amount) : scheduledAmount,
           status: charge?.status || 'PENDING',
+          paymentMode: charge?.paymentMode || null,
           notes: charge?.notes || '',
           isVirtual: !charge,
           usesSchedule: !charge,
@@ -224,7 +234,7 @@ export default function MaintenanceTracker() {
       billingYear: Number(form.billingYear),
       billingMonth: Number(form.billingMonth),
       amount: Number(form.amount),
-      notes: form.notes,
+      paymentMode: form.paymentMode,
       memberId: form.memberId || null,
     }
   }
@@ -235,11 +245,18 @@ export default function MaintenanceTracker() {
       setError('Select a member or enter a flat number.')
       return
     }
+    if (action === 'PAID' && !form.paymentMode) {
+      setError('Payment mode is required when marking paid.')
+      return
+    }
     setBusy(true)
     try {
       if (action === 'PAID') await MaintenanceService.collect(payload())
-      else await MaintenanceService.markPending(payload())
-      setForm({ ...emptyForm, billingYear: form.billingYear, billingMonth: form.billingMonth })
+      else {
+        const { paymentMode, ...pendingPayload } = payload()
+        await MaintenanceService.markPending(pendingPayload)
+      }
+      setForm({ ...emptyForm, billingYear: form.billingYear, billingMonth: form.billingMonth, paymentMode: form.paymentMode })
       toast.success(action === 'PAID' ? 'Maintenance marked paid.' : 'Maintenance marked pending.')
       await load()
     } catch (err) {
@@ -252,7 +269,7 @@ export default function MaintenanceTracker() {
   async function togglePaid(charge) {
     try {
       if (charge.status === 'PENDING') {
-        await MaintenanceService.markPaid(charge.id)
+        await MaintenanceService.markPaid(charge.id, trackerPaymentMode)
         toast.success(`${charge.memberName} (Flat ${charge.flatNumber}) marked paid.`)
       } else {
         await MaintenanceService.markPending({
@@ -296,11 +313,15 @@ export default function MaintenanceTracker() {
       toast.error('Set the society maintenance amount above for this month first.')
       return
     }
+    if (row.status === 'PENDING' && !trackerPaymentMode) {
+      toast.error('Select payment mode (Cash or Online) before marking paid.')
+      return
+    }
     setTrackerBusyKey(row.key)
     try {
       if (row.status === 'PENDING') {
         if (row.chargeId) {
-          await MaintenanceService.markPaid(row.chargeId)
+          await MaintenanceService.markPaid(row.chargeId, trackerPaymentMode)
         } else {
           await MaintenanceService.collect({
             flatNumber: row.flatNumber,
@@ -308,10 +329,11 @@ export default function MaintenanceTracker() {
             billingMonth: row.billingMonth,
             amount: Number(row.amount),
             memberId: row.memberId,
+            paymentMode: trackerPaymentMode,
             notes: `Marked paid for ${monthName(row.billingMonth)} ${row.billingYear}`,
           })
         }
-        toast.success(`${row.memberName} marked paid for ${monthName(row.billingMonth)} ${row.billingYear}.`)
+        toast.success(`${row.memberName} marked paid (${formatPaymentMode(trackerPaymentMode)}).`)
       } else {
         await MaintenanceService.markPending({
           flatNumber: row.flatNumber,
@@ -472,8 +494,12 @@ export default function MaintenanceTracker() {
                 )}
               </div>
               <div>
-                <label className="label">Notes (optional)</label>
-                <input name="notes" className="input" value={form.notes} onChange={update} />
+                <label className="label">Mode of payment</label>
+                <select name="paymentMode" className="input" value={form.paymentMode} onChange={update} required>
+                  <option value="CASH">Cash</option>
+                  <option value="ONLINE">Online</option>
+                </select>
+                <p className="mt-1 text-xs text-slate-400">Required when marking paid.</p>
               </div>
               <div className="flex gap-2">
                 <button className="btn-success flex-1" disabled={busy} onClick={() => submit('PAID')}>Mark Paid</button>
@@ -558,6 +584,13 @@ export default function MaintenanceTracker() {
                       onChange={(e) => setTrackerYear(Number(e.target.value))}
                     />
                   </div>
+                  <div>
+                    <label className="label !mb-1">Mark paid via</label>
+                    <select className="input w-32" value={trackerPaymentMode} onChange={(e) => setTrackerPaymentMode(e.target.value)}>
+                      <option value="CASH">Cash</option>
+                      <option value="ONLINE">Online</option>
+                    </select>
+                  </div>
                 </div>
               }
             />
@@ -565,7 +598,9 @@ export default function MaintenanceTracker() {
               All members for {monthName(trackerMonth)} {trackerYear}. Amount comes from the society timeline
               {periodRate ? ` (${inr(periodRate.amount)})` : ''}. Already recorded payments keep their original amount.
               Default status is <span className="font-semibold text-amber-700">not paid</span> until marked paid.
-            </p>            <div className="overflow-x-auto">
+              Payment mode appears only for paid members.
+            </p>
+            <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b text-left text-gray-500">
@@ -574,6 +609,7 @@ export default function MaintenanceTracker() {
                     <th className="py-2 pr-4">Period</th>
                     <th className="py-2 pr-4">Amount</th>
                     <th className="py-2 pr-4">Status</th>
+                    <th className="py-2 pr-4">Payment mode</th>
                     <th className="py-2 pr-4">Action</th>
                   </tr>
                 </thead>
@@ -597,6 +633,13 @@ export default function MaintenanceTracker() {
                         )}
                       </td>
                       <td className="py-3 pr-4">
+                        {row.status === 'PAID' ? (
+                          <span className="badge bg-sky-50 text-sky-700">{formatPaymentMode(row.paymentMode) || '—'}</span>
+                        ) : (
+                          <span className="text-slate-300">—</span>
+                        )}
+                      </td>
+                      <td className="py-3 pr-4">
                         <button
                           type="button"
                           disabled={trackerBusyKey === row.key}
@@ -614,7 +657,7 @@ export default function MaintenanceTracker() {
                   ))}
                   {periodRows.length === 0 && (
                     <tr>
-                      <td colSpan="6" className="py-6 text-center text-gray-400">
+                      <td colSpan="7" className="py-6 text-center text-gray-400">
                         No members in directory yet. Add members first.
                       </td>
                     </tr>

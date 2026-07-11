@@ -3,6 +3,7 @@ package com.society.core.service;
 import com.society.core.domain.MaintenanceCharge;
 import com.society.core.domain.MaintenanceStatus;
 import com.society.core.dto.MaintenanceDtos.*;
+import com.society.core.exception.ApiExceptions.BadRequestException;
 import com.society.core.exception.ApiExceptions.NotFoundException;
 import com.society.core.repository.MaintenanceChargeRepository;
 import org.springframework.stereotype.Service;
@@ -10,10 +11,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
 public class MaintenanceService {
+
+    private static final Set<String> PAYMENT_MODES = Set.of("CASH", "ONLINE");
 
     private final MaintenanceChargeRepository repository;
 
@@ -36,7 +41,7 @@ public class MaintenanceService {
         charge.setBillingMonth(req.billingMonth());
         charge.setAmount(req.amount());
         charge.setStatus(MaintenanceStatus.PAID);
-        charge.setPaymentMode(req.paymentMode() == null ? "CASH" : req.paymentMode());
+        charge.setPaymentMode(normalizePaymentMode(req.paymentMode()));
         charge.setPaidAt(Instant.now());
         charge.setNotes(req.notes());
         return toResponse(repository.save(charge));
@@ -64,12 +69,12 @@ public class MaintenanceService {
     }
 
     @Transactional
-    public MaintenanceChargeResponse markPaidById(UUID societyId, UUID chargeId) {
+    public MaintenanceChargeResponse markPaidById(UUID societyId, UUID chargeId, String paymentMode) {
         MaintenanceCharge charge = repository.findByIdAndSocietyId(chargeId, societyId)
                 .orElseThrow(() -> new NotFoundException("Maintenance charge not found"));
         charge.setStatus(MaintenanceStatus.PAID);
         charge.setPaidAt(Instant.now());
-        if (charge.getPaymentMode() == null) charge.setPaymentMode("CASH");
+        charge.setPaymentMode(normalizePaymentMode(paymentMode));
         return toResponse(repository.save(charge));
     }
 
@@ -77,6 +82,17 @@ public class MaintenanceService {
     public List<MaintenanceChargeResponse> list(UUID societyId) {
         return repository.findBySocietyIdOrderByBillingYearDescBillingMonthDesc(societyId)
                 .stream().map(MaintenanceService::toResponse).toList();
+    }
+
+    private static String normalizePaymentMode(String paymentMode) {
+        if (paymentMode == null || paymentMode.isBlank()) {
+            throw new BadRequestException("Payment mode is required. Choose Cash or Online.");
+        }
+        String normalized = paymentMode.trim().toUpperCase(Locale.ROOT);
+        if (!PAYMENT_MODES.contains(normalized)) {
+            throw new BadRequestException("Payment mode must be CASH or ONLINE.");
+        }
+        return normalized;
     }
 
     private static UUID parseMemberId(String memberId) {

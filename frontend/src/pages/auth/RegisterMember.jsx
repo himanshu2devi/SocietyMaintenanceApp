@@ -46,7 +46,7 @@ export default function RegisterMember() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="label">Society code</label>
-            <input name="societyCode" className="input" value={form.societyCode} onChange={update} required placeholder="e.g. SGR-SATARA" />
+            <input name="societyCode" className="input" value={form.societyCode} onChange={update} required placeholder="e.g. SGR-MUMBAI" />
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
@@ -75,10 +75,13 @@ export default function RegisterMember() {
           </button>
         </form>
         <p className="border-t border-slate-100 pt-5 text-center text-sm text-slate-500">
+          Already registered?{' '}
+          <Link to="/login" className="font-bold text-orange-600 hover:text-orange-700">Sign in</Link>
+          {' · '}
+          <Link to="/forgot-password" className="font-bold text-orange-600 hover:text-orange-700">Forgot password</Link>
+          <br />
           Committee admin?{' '}
           <Link to="/register" className="font-bold text-orange-600 hover:text-orange-700">Register a society</Link>
-          {' · '}
-          <Link to="/login" className="font-bold text-orange-600 hover:text-orange-700">Sign in</Link>
         </p>
       </div>
     </AuthShell>

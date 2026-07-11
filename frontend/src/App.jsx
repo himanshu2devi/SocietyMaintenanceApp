@@ -9,6 +9,7 @@ import Contact from './pages/public/Contact'
 import Login from './pages/auth/Login'
 import RegisterSociety from './pages/auth/RegisterSociety'
 import RegisterMember from './pages/auth/RegisterMember'
+import ForgotPassword from './pages/auth/ForgotPassword'
 import AdminDashboard from './pages/admin/AdminDashboard'
 import MemberDashboard from './pages/member/MemberDashboard'
 import FinancialReports from './pages/reports/FinancialReports'
@@ -27,6 +28,7 @@ export default function App() {
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/register" element={<RegisterSociety />} />
           <Route path="/register-member" element={<RegisterMember />} />
 

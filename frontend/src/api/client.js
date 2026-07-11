@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { clearSession, isTokenValid, TOKEN_KEY } from '../auth/token'
+import { clearSession, getValidToken, TOKEN_KEY } from '../auth/token'
 
 // API base URLs include /api/v1 (see .env.example)
 const IDENTITY_URL =
@@ -10,16 +10,14 @@ const CORE_URL =
 export { TOKEN_KEY }
 
 // withCredentials supports a future secure HttpOnly-cookie session. Current
-// login uses a Bearer token in localStorage, attached below.
+// login uses a Bearer token in per-tab sessionStorage, attached below.
 export const identityApi = axios.create({ baseURL: IDENTITY_URL, withCredentials: true })
 export const coreApi = axios.create({ baseURL: CORE_URL, withCredentials: true })
 
 function attachToken(config) {
-  const token = localStorage.getItem(TOKEN_KEY)
-  if (isTokenValid(token)) {
+  const token = getValidToken()
+  if (token) {
     config.headers.Authorization = `Bearer ${token}`
-  } else if (token) {
-    clearSession()
   }
   return config
 }

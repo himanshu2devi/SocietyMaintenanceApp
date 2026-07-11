@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useAuth } from '../../context/AuthContext'
 import { useToast } from '../../context/ToastContext'
 import {
   AuditDocumentService,
   BankAccountService,
   CommitteeService,
+  MaintenanceRateService,
   MaintenanceService,
   NoticeService,
   PaymentClaimService,
@@ -12,25 +13,68 @@ import {
 } from '../../api/services'
 import { Alert, SectionTitle, StatusBadge } from '../../components/ui/Feedback'
 import { getApiErrorMessage } from '../../utils/apiError'
-import { monthName, whatsappLink } from '../../utils/share'
+import { inr, monthName, whatsappLink } from '../../utils/share'
 import { Link } from 'react-router-dom'
+
+const now = new Date()
+
+function formatPaymentMode(mode) {
+  if (!mode) return '—'
+  const value = String(mode).toUpperCase()
+  if (value === 'CASH') return 'Cash'
+  if (value === 'ONLINE' || value === 'BANK_TRANSFER' || value === 'UPI' || value === 'NEFT') return 'Online'
+  return mode
+}
+
+function periodLabel(item) {
+  const month = item.billingMonth
+  const year = item.billingYear
+  if (!month || !year) return '—'
+  return `${monthName(month)} ${year}`
+}
+
+function sameFlat(a, b) {
+  return String(a || '').trim().toLowerCase() === String(b || '').trim().toLowerCase()
+}
+
+function periodKey(year, month) {
+  return Number(year) * 100 + Number(month)
+}
+
+function effectiveAmountFor(rates, year, month) {
+  const target = periodKey(year, month)
+  const applicable = rates
+    .filter((r) => periodKey(r.effectiveFromYear, r.effectiveFromMonth) <= target)
+    .sort((a, b) => periodKey(b.effectiveFromYear, b.effectiveFromMonth) - periodKey(a.effectiveFromYear, a.effectiveFromMonth))
+  return applicable[0] || null
+}
+
+const emptyClaimForm = {
+  billingYear: now.getFullYear(),
+  billingMonth: now.getMonth() + 1,
+  paymentMode: 'ONLINE',
+  referenceNumber: '',
+}
 
 export default function MemberDashboard() {
   const { user } = useAuth()
   const toast = useToast()
   const [charges, setCharges] = useState([])
+  const [rates, setRates] = useState([])
   const [notices, setNotices] = useState([])
   const [rules, setRules] = useState([])
   const [accounts, setAccounts] = useState([])
   const [committee, setCommittee] = useState([])
   const [docs, setDocs] = useState([])
   const [claims, setClaims] = useState([])
-  const [claimForm, setClaimForm] = useState({ chargeId: '', paymentMode: 'BANK_TRANSFER', referenceNumber: '', notes: '' })
+  const [claimForm, setClaimForm] = useState(emptyClaimForm)
+  const [claimBusy, setClaimBusy] = useState(false)
+  const [showClaimForm, setShowClaimForm] = useState(true)
   const [error, setError] = useState('')
 
   async function load() {
     try {
-      const [c, n, r, a, com, d, cl] = await Promise.all([
+      const [c, n, r, a, com, d, cl, rateList] = await Promise.all([
         MaintenanceService.list(),
         NoticeService.list(),
         RuleService.list(),
@@ -38,14 +82,16 @@ export default function MemberDashboard() {
         CommitteeService.list(),
         AuditDocumentService.list(),
         PaymentClaimService.list(),
+        MaintenanceRateService.list(),
       ])
-      setCharges(c.filter((x) => x.flatNumber === user?.flatNumber))
+      setCharges(c.filter((x) => sameFlat(x.flatNumber, user?.flatNumber)))
       setNotices(n)
       setRules(r)
       setAccounts(a)
       setCommittee(com)
       setDocs(d)
       setClaims(cl)
+      setRates(rateList)
     } catch (err) {
       setError(getApiErrorMessage(err, 'Could not load member workspace.'))
     }
@@ -54,17 +100,74 @@ export default function MemberDashboard() {
   useEffect(() => { if (user) load() }, [user])
 
   const pending = charges.filter((c) => c.status === 'PENDING')
+  const submittedPeriods = useMemo(
+    () => new Set(
+      claims
+        .filter((c) => c.status === 'SUBMITTED')
+        .map((c) => `${c.billingYear}-${c.billingMonth}`),
+    ),
+    [claims],
+  )
+  const pendingClaims = claims.filter((c) => c.status === 'SUBMITTED')
+  const selectedRate = effectiveAmountFor(rates, claimForm.billingYear, claimForm.billingMonth)
+  const selectedCharge = charges.find(
+    (c) => Number(c.billingYear) === Number(claimForm.billingYear)
+      && Number(c.billingMonth) === Number(claimForm.billingMonth),
+  )
+  const selectedPeriodKey = `${claimForm.billingYear}-${claimForm.billingMonth}`
+  const alreadyClaimed = submittedPeriods.has(selectedPeriodKey)
+  const alreadyPaid = selectedCharge?.status === 'PAID'
 
   async function submitClaim(e) {
     e.preventDefault()
+    if (!user?.flatNumber) {
+      toast.error('Your profile is missing a flat number. Contact committee.')
+      return
+    }
+    if (!claimForm.paymentMode) {
+      toast.error('Select mode of payment (Cash or Online).')
+      return
+    }
+    if (claimForm.paymentMode === 'ONLINE' && !String(claimForm.referenceNumber || '').trim()) {
+      toast.error('Enter UTR / reference number for online payments.')
+      return
+    }
+    if (alreadyPaid) {
+      toast.error('This period is already marked paid.')
+      return
+    }
+    if (alreadyClaimed) {
+      toast.error('A claim is already awaiting committee review for this period.')
+      return
+    }
+    setClaimBusy(true)
     try {
-      await PaymentClaimService.submit(claimForm)
-      setClaimForm({ chargeId: '', paymentMode: 'BANK_TRANSFER', referenceNumber: '', notes: '' })
-      toast.success('Payment claim sent to committee for verification.')
+      await PaymentClaimService.submit({
+        billingYear: Number(claimForm.billingYear),
+        billingMonth: Number(claimForm.billingMonth),
+        paymentMode: claimForm.paymentMode,
+        referenceNumber: claimForm.referenceNumber?.trim() || null,
+        chargeId: selectedCharge?.id || null,
+      })
+      setClaimForm({ ...emptyClaimForm, paymentMode: claimForm.paymentMode })
+      toast.success('Payment claim sent. Committee will verify and update Maintenance.')
       await load()
     } catch (err) {
       toast.error(getApiErrorMessage(err, 'Could not submit payment claim.'))
+    } finally {
+      setClaimBusy(false)
     }
+  }
+
+  function startClaimForCharge(charge) {
+    setClaimForm({
+      billingYear: charge.billingYear,
+      billingMonth: charge.billingMonth,
+      paymentMode: 'ONLINE',
+      referenceNumber: '',
+    })
+    setShowClaimForm(true)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   function notifyAdminWhatsApp(charge) {
@@ -81,12 +184,123 @@ export default function MemberDashboard() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">Member Dashboard</h1>
-        <p className="text-sm text-gray-500">{user?.fullName} · Flat {user?.flatNumber} · view-only access</p>
+      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm shadow-slate-900/[.03]">
+        <div className="bg-[linear-gradient(135deg,#102A43_0%,#173e62_55%,#0f766e_140%)] px-5 py-5 text-white sm:px-7 sm:py-6">
+          <p className="text-xs font-bold uppercase tracking-[.14em] text-orange-300">My profile</p>
+          <div className="mt-3 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl">{user?.fullName || 'Member'}</h1>
+              <p className="mt-1 text-sm text-slate-200">Resident access · view records and notify payments</p>
+            </div>
+            <span className="inline-flex w-fit rounded-full bg-white/15 px-3 py-1 text-xs font-bold uppercase tracking-wide text-white">
+              Flat {user?.flatNumber || '—'}
+            </span>
+          </div>
+        </div>
+        <div className="grid gap-px bg-slate-100 sm:grid-cols-3">
+          <div className="bg-white px-5 py-4">
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Email</p>
+            <p className="mt-1 text-sm font-semibold text-slate-900">{user?.email || '—'}</p>
+          </div>
+          <div className="bg-white px-5 py-4">
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Mobile</p>
+            <p className="mt-1 text-sm font-semibold text-slate-900">{user?.mobile || '—'}</p>
+          </div>
+          <div className="bg-white px-5 py-4">
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Flat</p>
+            <p className="mt-1 text-sm font-semibold text-slate-900">{user?.flatNumber || '—'}</p>
+          </div>
+        </div>
       </div>
 
       <Alert type="error">{error}</Alert>
+
+      {pendingClaims.length > 0 && (
+        <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+          <p className="font-bold">{pendingClaims.length} payment claim{pendingClaims.length === 1 ? '' : 's'} awaiting committee verification.</p>
+          <p className="mt-1 text-amber-800/80">Maintenance stays pending until the secretary / admin approves your claim.</p>
+        </div>
+      )}
+
+      <div className="card border-orange-100 bg-gradient-to-br from-white to-orange-50/50">
+        <SectionTitle
+          title="Claim payment"
+          subtitle="Tell committee you have paid. They will verify and mark Maintenance paid."
+          action={
+            <button type="button" className="btn-primary" onClick={() => setShowClaimForm((v) => !v)}>
+              {showClaimForm ? 'Hide form' : 'Claim payment'}
+            </button>
+          }
+        />
+        {showClaimForm && (
+          <form onSubmit={submitClaim} className="mt-2 grid gap-3 sm:grid-cols-2">
+            <div>
+              <label className="label">Year</label>
+              <input
+                type="number"
+                className="input"
+                value={claimForm.billingYear}
+                onChange={(e) => setClaimForm({ ...claimForm, billingYear: Number(e.target.value) })}
+                required
+              />
+            </div>
+            <div>
+              <label className="label">Month</label>
+              <select
+                className="input"
+                value={claimForm.billingMonth}
+                onChange={(e) => setClaimForm({ ...claimForm, billingMonth: Number(e.target.value) })}
+                required
+              >
+                {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
+                  <option key={m} value={m}>{monthName(m)}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="label">Mode of payment</label>
+              <select
+                className="input"
+                value={claimForm.paymentMode}
+                onChange={(e) => setClaimForm({ ...claimForm, paymentMode: e.target.value })}
+                required
+              >
+                <option value="CASH">Cash</option>
+                <option value="ONLINE">Online</option>
+              </select>
+            </div>
+            <div>
+              <label className="label">
+                UTR / reference {claimForm.paymentMode === 'ONLINE' ? '' : '(optional)'}
+              </label>
+              <input
+                className="input"
+                placeholder={claimForm.paymentMode === 'ONLINE' ? 'Enter UTR / reference' : 'Optional'}
+                value={claimForm.referenceNumber}
+                onChange={(e) => setClaimForm({ ...claimForm, referenceNumber: e.target.value })}
+                required={claimForm.paymentMode === 'ONLINE'}
+              />
+            </div>
+            <div className="sm:col-span-2 rounded-xl bg-white/80 px-3 py-2 text-sm text-slate-600">
+              {alreadyPaid ? (
+                <span className="font-semibold text-emerald-700">This period is already paid.</span>
+              ) : alreadyClaimed ? (
+                <span className="font-semibold text-amber-700">Claim already submitted — waiting for admin approval.</span>
+              ) : selectedRate ? (
+                <>Amount for {monthName(claimForm.billingMonth)} {claimForm.billingYear}: <strong>{inr(selectedRate.amount)}</strong></>
+              ) : (
+                <span className="text-amber-700">No society rate for this month yet. Ask committee to set maintenance amount first.</span>
+              )}
+            </div>
+            <button
+              className="btn-primary sm:col-span-2"
+              disabled={claimBusy || alreadyPaid || alreadyClaimed || !selectedRate}
+            >
+              {claimBusy ? 'Submitting…' : 'Submit payment claim'}
+            </button>
+          </form>
+        )}
+      </div>
 
       <div className="grid gap-4 sm:grid-cols-3">
         <div className="card"><p className="text-sm text-gray-500">Pending Dues</p><p className="mt-1 text-2xl font-bold text-amber-600">{pending.length}</p></div>
@@ -96,47 +310,51 @@ export default function MemberDashboard() {
 
       <div className="grid gap-6 lg:grid-cols-2">
         <div className="card">
-          <SectionTitle title="My Maintenance" subtitle="Notify committee after you pay" />
+          <SectionTitle title="My Maintenance" subtitle="Status stays in sync after claim approval" />
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b text-left text-gray-500">
                 <th className="py-2 pr-4">Period</th>
                 <th className="py-2 pr-4">Amount</th>
                 <th className="py-2 pr-4">Status</th>
+                <th className="py-2 pr-4">Payment mode</th>
                 <th className="py-2 pr-4">Action</th>
               </tr>
             </thead>
             <tbody>
-              {charges.map((c) => (
-                <tr key={c.id} className="border-b last:border-0">
-                  <td className="py-2 pr-4">{c.billingMonth}/{c.billingYear}</td>
-                  <td className="py-2 pr-4">₹{Number(c.amount).toLocaleString('en-IN')}</td>
-                  <td className="py-2 pr-4"><StatusBadge status={c.status} /></td>
-                  <td className="py-2 pr-4">
-                    {c.status === 'PENDING' && (
-                      <button type="button" className="btn-secondary !py-1.5 !text-xs" onClick={() => notifyAdminWhatsApp(c)}>WhatsApp admin</button>
-                    )}
-                  </td>
-                </tr>
-              ))}
-              {charges.length === 0 && <tr><td colSpan="4" className="py-6 text-center text-gray-400">No maintenance records.</td></tr>}
+              {charges.map((c) => {
+                const claimed = submittedPeriods.has(`${c.billingYear}-${c.billingMonth}`)
+                return (
+                  <tr key={c.id} className="border-b last:border-0">
+                    <td className="py-2 pr-4">{periodLabel(c)}</td>
+                    <td className="py-2 pr-4">₹{Number(c.amount).toLocaleString('en-IN')}</td>
+                    <td className="py-2 pr-4">
+                      <StatusBadge status={c.status} />
+                      {c.status === 'PENDING' && claimed && (
+                        <p className="mt-1 text-[11px] font-medium text-amber-700">Claim submitted</p>
+                      )}
+                    </td>
+                    <td className="py-2 pr-4">
+                      {c.status === 'PAID' ? formatPaymentMode(c.paymentMode) : '—'}
+                    </td>
+                    <td className="py-2 pr-4">
+                      <div className="flex flex-wrap gap-2">
+                        {c.status === 'PENDING' && !claimed && (
+                          <button type="button" className="btn-primary !py-1.5 !text-xs" onClick={() => startClaimForCharge(c)}>
+                            Claim payment
+                          </button>
+                        )}
+                        {c.status === 'PENDING' && (
+                          <button type="button" className="btn-secondary !py-1.5 !text-xs" onClick={() => notifyAdminWhatsApp(c)}>WhatsApp</button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                )
+              })}
+              {charges.length === 0 && <tr><td colSpan="5" className="py-6 text-center text-gray-400">No maintenance records yet. Use Claim payment above for the current month.</td></tr>}
             </tbody>
           </table>
-
-          {pending.length > 0 && (
-            <form onSubmit={submitClaim} className="mt-5 space-y-3 rounded-xl bg-slate-50 p-4">
-              <p className="text-sm font-bold text-slate-900">I have paid — notify committee</p>
-              <select className="input" value={claimForm.chargeId} onChange={(e) => setClaimForm({ ...claimForm, chargeId: e.target.value })} required>
-                <option value="">Select pending charge</option>
-                {pending.map((c) => (
-                  <option key={c.id} value={c.id}>{c.billingMonth}/{c.billingYear} · ₹{Number(c.amount).toLocaleString('en-IN')}</option>
-                ))}
-              </select>
-              <input className="input" placeholder="UTR / reference number" value={claimForm.referenceNumber} onChange={(e) => setClaimForm({ ...claimForm, referenceNumber: e.target.value })} />
-              <input className="input" placeholder="Notes (optional)" value={claimForm.notes} onChange={(e) => setClaimForm({ ...claimForm, notes: e.target.value })} />
-              <button className="btn-primary w-full">Submit payment claim</button>
-            </form>
-          )}
         </div>
 
         <div className="card">
@@ -189,11 +407,16 @@ export default function MemberDashboard() {
       </div>
 
       <div className="card">
-        <SectionTitle title="My payment claims" />
+        <SectionTitle
+          title="My payment claims"
+          subtitle="Submitted to committee · status stays in sync with Maintenance after approval"
+        />
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b text-left text-gray-500">
+              <th className="py-2 pr-4">Period</th>
               <th className="py-2 pr-4">Amount</th>
+              <th className="py-2 pr-4">Mode</th>
               <th className="py-2 pr-4">Reference</th>
               <th className="py-2 pr-4">Status</th>
             </tr>
@@ -201,12 +424,20 @@ export default function MemberDashboard() {
           <tbody>
             {claims.map((c) => (
               <tr key={c.id} className="border-b last:border-0">
+                <td className="py-2 pr-4">{periodLabel(c)}</td>
                 <td className="py-2 pr-4">₹{Number(c.amount).toLocaleString('en-IN')}</td>
+                <td className="py-2 pr-4">{formatPaymentMode(c.paymentMode)}</td>
                 <td className="py-2 pr-4">{c.referenceNumber || '—'}</td>
                 <td className="py-2 pr-4"><StatusBadge status={c.status} /></td>
               </tr>
             ))}
-            {claims.length === 0 && <tr><td colSpan="3" className="py-6 text-center text-gray-400">No claims yet.</td></tr>}
+            {claims.length === 0 && (
+              <tr>
+                <td colSpan="5" className="py-6 text-center text-gray-400">
+                  No claims yet. Use <span className="font-semibold text-slate-600">Claim payment</span> above after you pay.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>

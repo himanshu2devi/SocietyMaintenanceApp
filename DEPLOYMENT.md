@@ -1,4 +1,4 @@
-# Deploy SocietyHub — Vercel + Railway + Neon
+# Deploy SocietyWale — Vercel + Railway + Neon
 
 One **GitHub monorepo**. No separate repos needed.
 
@@ -44,7 +44,7 @@ Save the `JWT_SECRET` — use the **same value** on both Railway services.
 cd C:\Z_Business\society-app\SocietyMaintenanceApp
 git init
 git add .
-git commit -m "SocietyHub MVP - Vercel Railway Neon"
+git commit -m "SocietyWale MVP - Vercel Railway Neon"
 git branch -M main
 git remote add origin https://github.com/YOUR_USERNAME/SocietyMaintenanceApp.git
 git push -u origin main
@@ -55,7 +55,7 @@ git push -u origin main
 ## STEP 2 — Neon PostgreSQL (database)
 
 1. Go to [console.neon.tech](https://console.neon.tech) → **New Project**
-   - Name: `societyhub`
+   - Name: `SocietyWale`
    - Region: pick closest to you (e.g. AWS Asia Pacific)
 
 2. Open **SQL Editor** → paste and run `neon/init.sql`:

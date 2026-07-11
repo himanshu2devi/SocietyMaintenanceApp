@@ -31,6 +31,14 @@ public class MemberController {
                 .body(memberService.addMember(user.societyId(), req));
     }
 
+    @PutMapping("/{memberId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<MemberResponse> update(@AuthenticationPrincipal AuthenticatedUser user,
+                                                 @PathVariable UUID memberId,
+                                                 @Valid @RequestBody UpdateMemberRequest req) {
+        return ResponseEntity.ok(memberService.updateMember(user.societyId(), memberId, req));
+    }
+
     @GetMapping
     public ResponseEntity<List<MemberResponse>> list(@AuthenticationPrincipal AuthenticatedUser user) {
         return ResponseEntity.ok(memberService.listMembers(user.societyId()));
@@ -42,5 +50,24 @@ public class MemberController {
                                            @PathVariable UUID memberId) {
         memberService.deactivateMember(user.societyId(), memberId);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{memberId}/reactivate")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<MemberResponse> reactivate(@AuthenticationPrincipal AuthenticatedUser user,
+                                                     @PathVariable UUID memberId) {
+        return ResponseEntity.ok(memberService.reactivateMember(user.societyId(), memberId));
+    }
+
+    @PostMapping("/{memberId}/reset-password")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ResetMemberPasswordResponse> resetPassword(
+            @AuthenticationPrincipal AuthenticatedUser user,
+            @PathVariable UUID memberId,
+            @RequestBody(required = false) ResetMemberPasswordRequest req) {
+        return ResponseEntity.ok(memberService.resetPassword(
+                user.societyId(),
+                memberId,
+                req == null ? new ResetMemberPasswordRequest(null) : req));
     }
 }

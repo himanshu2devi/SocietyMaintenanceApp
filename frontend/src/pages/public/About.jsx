@@ -10,7 +10,7 @@ export default function About() {
       </section>
       <section className="mx-auto grid max-w-7xl gap-10 px-4 py-20 sm:px-6 lg:grid-cols-2 lg:py-28">
         <div><p className="eyebrow">Why we exist</p><h2 className="section-title mt-5">Local societies deserve more than scattered records and endless follow-ups.</h2></div>
-        <div className="space-y-5 text-base leading-7 text-slate-600"><p>SocietyWale brings everyday operations into one purposeful workspace: member information, maintenance, expenses, notices and reporting.</p><p>We are beginning with society communities in Satara, with a practical product that works for real committees and real residents.</p></div>
+        <div className="space-y-5 text-base leading-7 text-slate-600"><p>SocietyWale brings everyday operations into one purposeful workspace: member information, maintenance, expenses, notices and reporting.</p><p>We are beginning with society communities in India, with a practical product that works for real committees and real residents.</p></div>
       </section>
       <section className="border-y border-slate-200 bg-white">
         <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:py-24">

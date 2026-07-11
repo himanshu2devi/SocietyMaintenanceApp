@@ -9,6 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
@@ -43,7 +44,7 @@ public class MemberService {
         member.setFullName(normalizeRequired(req.fullName(), "Name"));
         member.setFlatNumber(normalizeRequired(req.flatNumber(), "Flat number"));
         member.setMobile(mobile);
-        member.setEmail(email); // null when optional email is blank — avoids unique '' collisions
+        member.setEmail(email);
         member.setRole(Role.MEMBER);
         String rawPassword = (req.password() == null || req.password().isBlank())
                 ? mobile : req.password();
@@ -52,21 +53,86 @@ public class MemberService {
         return toResponse(member);
     }
 
+    @Transactional
+    public MemberResponse updateMember(UUID societyId, UUID memberId, UpdateMemberRequest req) {
+        User member = requireMember(societyId, memberId);
+        String mobile = normalizeRequired(req.mobile(), "Mobile");
+        String email = normalizeOptionalEmail(req.email());
+
+        if (userRepository.existsBySocietyIdAndMobileAndIdNot(societyId, mobile, memberId)) {
+            throw new ConflictException("A member with this mobile number already exists in your society.");
+        }
+        if (email != null && userRepository.existsBySocietyIdAndEmailAndIdNot(societyId, email, memberId)) {
+            throw new ConflictException("A member with this email already exists in your society.");
+        }
+        if (email != null && userRepository.existsByEmailAndIdNot(email, memberId)) {
+            throw new ConflictException("This email is already registered. Use a different email or leave it blank.");
+        }
+
+        member.setFullName(normalizeRequired(req.fullName(), "Name"));
+        member.setFlatNumber(normalizeRequired(req.flatNumber(), "Flat number"));
+        member.setMobile(mobile);
+        member.setEmail(email);
+        return toResponse(userRepository.save(member));
+    }
+
     @Transactional(readOnly = true)
     public List<MemberResponse> listMembers(UUID societyId) {
         return userRepository.findBySocietyIdAndRole(societyId, Role.MEMBER)
-                .stream().map(MemberService::toResponse).toList();
+                .stream()
+                .sorted(Comparator
+                        .comparing(User::isActive).reversed()
+                        .thenComparing(User::getFullName, String.CASE_INSENSITIVE_ORDER))
+                .map(MemberService::toResponse)
+                .toList();
     }
 
     @Transactional
     public void deactivateMember(UUID societyId, UUID memberId) {
-        User member = userRepository.findById(memberId)
-                .orElseThrow(() -> new NotFoundException("Member not found"));
-        if (!member.getSocietyId().equals(societyId)) {
-            throw new NotFoundException("Member not found in this society");
-        }
+        User member = requireMember(societyId, memberId);
         member.setActive(false);
         userRepository.save(member);
+    }
+
+    @Transactional
+    public MemberResponse reactivateMember(UUID societyId, UUID memberId) {
+        User member = requireMember(societyId, memberId);
+        member.setActive(true);
+        return toResponse(userRepository.save(member));
+    }
+
+    @Transactional
+    public ResetMemberPasswordResponse resetPassword(UUID societyId, UUID memberId, ResetMemberPasswordRequest req) {
+        User member = requireMember(societyId, memberId);
+        if (!member.isActive()) {
+            throw new BadRequestException("Reactivate the member before resetting their password.");
+        }
+        String temporary = (req == null || req.newPassword() == null || req.newPassword().isBlank())
+                ? member.getMobile()
+                : req.newPassword().trim();
+        if (temporary.length() < 6) {
+            throw new BadRequestException("Password must be at least 6 characters");
+        }
+        member.setPasswordHash(passwordEncoder.encode(temporary));
+        userRepository.save(member);
+        return new ResetMemberPasswordResponse(
+                member.getId().toString(),
+                member.getFullName(),
+                member.getEmail(),
+                temporary,
+                member.getEmail() == null || member.getEmail().isBlank()
+                        ? "Password reset. Member needs an email on file to sign in — edit and add email."
+                        : "Password reset. Share the temporary password securely with the member."
+        );
+    }
+
+    private User requireMember(UUID societyId, UUID memberId) {
+        User member = userRepository.findById(memberId)
+                .orElseThrow(() -> new NotFoundException("Member not found"));
+        if (!member.getSocietyId().equals(societyId) || member.getRole() != Role.MEMBER) {
+            throw new NotFoundException("Member not found in this society");
+        }
+        return member;
     }
 
     /** Blank optional email must be NULL in PostgreSQL, not "" (unique constraint). */

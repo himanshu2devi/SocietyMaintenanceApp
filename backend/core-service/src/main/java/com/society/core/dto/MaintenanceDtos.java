@@ -13,7 +13,7 @@ public class MaintenanceDtos {
             @NotNull @Min(2000) @Max(2100) Integer billingYear,
             @NotNull @Min(1) @Max(12) Integer billingMonth,
             @NotNull @DecimalMin(value = "0.0", inclusive = false) BigDecimal amount,
-            String paymentMode,
+            @NotBlank String paymentMode,
             String notes,
             String memberId
     ) {}

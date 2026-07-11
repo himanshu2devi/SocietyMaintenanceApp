@@ -64,22 +64,22 @@ public class AuthService {
         Society society = societyRepository.findBySocietyCode(req.societyCode().trim())
                 .orElseThrow(() -> new NotFoundException("Society code not found. Ask your committee for the correct code."));
 
-        if (userRepository.existsBySocietyIdAndEmail(society.getId(), req.email())) {
-            throw new ConflictException("Email already registered for this society");
+        if (userRepository.existsBySocietyIdAndEmail(society.getId(), req.email().trim().toLowerCase())) {
+            throw new ConflictException("Email already registered for this society. Sign in, or use Forgot password.");
         }
-        if (userRepository.existsBySocietyIdAndMobile(society.getId(), req.mobile())) {
-            throw new ConflictException("Mobile already registered for this society");
+        if (userRepository.existsBySocietyIdAndMobile(society.getId(), req.mobile().trim())) {
+            throw new ConflictException("Mobile already registered for this society. Sign in, or ask committee to reset your password.");
         }
-        if (userRepository.existsByEmail(req.email())) {
-            throw new ConflictException("Email already in use");
+        if (userRepository.existsByEmail(req.email().trim().toLowerCase())) {
+            throw new ConflictException("Email already in use. Sign in, or use Forgot password.");
         }
 
         User member = new User();
         member.setSocietyId(society.getId());
-        member.setFullName(req.fullName());
-        member.setEmail(req.email());
-        member.setMobile(req.mobile());
-        member.setFlatNumber(req.flatNumber());
+        member.setFullName(req.fullName().trim());
+        member.setEmail(req.email().trim().toLowerCase());
+        member.setMobile(req.mobile().trim());
+        member.setFlatNumber(req.flatNumber().trim());
         member.setPasswordHash(passwordEncoder.encode(req.password()));
         member.setRole(Role.MEMBER);
         member = userRepository.save(member);
@@ -90,16 +90,49 @@ public class AuthService {
 
     @Transactional(readOnly = true)
     public AuthResponse login(LoginRequest req) {
-        User user = userRepository.findByEmail(req.email())
+        User user = userRepository.findByEmail(req.email().trim().toLowerCase())
                 .orElseThrow(() -> new UnauthorizedException("Invalid email or password"));
         if (!user.isActive()) {
-            throw new UnauthorizedException("Account is inactive");
+            throw new UnauthorizedException("Account is inactive. Contact your society committee.");
         }
         if (!passwordEncoder.matches(req.password(), user.getPasswordHash())) {
             throw new UnauthorizedException("Invalid email or password");
         }
         String token = jwtService.generateToken(user);
         return new AuthResponse(token, "Bearer", toView(user));
+    }
+
+    /**
+     * Password reset without SMTP: caller must know society code, email, mobile and flat.
+     */
+    @Transactional
+    public MessageResponse resetPasswordWithIdentity(ForgotPasswordRequest req) {
+        Society society = societyRepository.findBySocietyCode(req.societyCode().trim())
+                .orElseThrow(() -> new NotFoundException("Society code not found. Ask your committee for the correct code."));
+
+        String email = req.email().trim().toLowerCase();
+        String mobile = req.mobile().trim();
+        String flat = req.flatNumber().trim();
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new BadRequestException("No account found for this email. Check details or contact your committee."));
+
+        if (!user.getSocietyId().equals(society.getId())) {
+            throw new BadRequestException("This email is not registered under that society code.");
+        }
+        if (!user.isActive()) {
+            throw new BadRequestException("Account is inactive. Contact your society committee.");
+        }
+        if (!mobile.equals(user.getMobile())) {
+            throw new BadRequestException("Mobile number does not match our records.");
+        }
+        if (user.getFlatNumber() == null || !flat.equalsIgnoreCase(user.getFlatNumber().trim())) {
+            throw new BadRequestException("Flat number does not match our records.");
+        }
+
+        user.setPasswordHash(passwordEncoder.encode(req.newPassword()));
+        userRepository.save(user);
+        return new MessageResponse("Password updated. You can sign in with your email and new password.");
     }
 
     public static UserView toView(User u) {

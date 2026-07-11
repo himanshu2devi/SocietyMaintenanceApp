@@ -3,7 +3,13 @@ import { identityApi, coreApi } from './client'
 export const MemberService = {
   list: () => identityApi.get('/members').then((r) => r.data),
   add: (payload) => identityApi.post('/members', payload).then((r) => r.data),
+  update: (id, payload) => identityApi.put(`/members/${id}`, payload).then((r) => r.data),
   deactivate: (id) => identityApi.delete(`/members/${id}`).then((r) => r.data),
+  reactivate: (id) => identityApi.post(`/members/${id}/reactivate`).then((r) => r.data),
+}
+
+export const AuthService = {
+  forgotPassword: (payload) => identityApi.post('/auth/forgot-password', payload).then((r) => r.data),
 }
 
 export const CommitteeService = {
@@ -18,7 +24,8 @@ export const MaintenanceService = {
   list: () => coreApi.get('/maintenance').then((r) => r.data),
   collect: (payload) => coreApi.post('/maintenance/collect', payload).then((r) => r.data),
   markPending: (payload) => coreApi.post('/maintenance/pending', payload).then((r) => r.data),
-  markPaid: (chargeId) => coreApi.patch(`/maintenance/${chargeId}/paid`).then((r) => r.data),
+  markPaid: (chargeId, paymentMode) =>
+    coreApi.patch(`/maintenance/${chargeId}/paid`, null, { params: { paymentMode } }).then((r) => r.data),
 }
 
 export const MaintenanceRateService = {
