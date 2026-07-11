@@ -1,11 +1,27 @@
 import axios from 'axios'
 import { clearSession, getValidToken, TOKEN_KEY } from '../auth/token'
 
-// API base URLs include /api/v1 (see .env.example)
-const IDENTITY_URL =
-  import.meta.env.VITE_IDENTITY_URL || 'http://localhost:8081/api/v1'
-const CORE_URL =
-  import.meta.env.VITE_CORE_URL || 'http://localhost:8082/api/v1'
+/**
+ * Normalize API base URL so Vercel env mistakes like omitting /api/v1 still work.
+ * Expected: https://societywale-identity.onrender.com/api/v1
+ */
+function apiBase(envValue, fallback) {
+  let url = (envValue || fallback || '').trim().replace(/\/+$/, '')
+  if (!url) return fallback
+  if (!url.endsWith('/api/v1')) {
+    url = `${url}/api/v1`
+  }
+  return url
+}
+
+const IDENTITY_URL = apiBase(
+  import.meta.env.VITE_IDENTITY_URL,
+  'http://localhost:8081/api/v1',
+)
+const CORE_URL = apiBase(
+  import.meta.env.VITE_CORE_URL,
+  'http://localhost:8082/api/v1',
+)
 
 export { TOKEN_KEY }
 
