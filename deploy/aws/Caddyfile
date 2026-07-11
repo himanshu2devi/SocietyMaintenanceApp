@@ -1,0 +1,23 @@
+# Replace hostnames with your real DNS (GoDaddy → A records to EC2 Elastic IP).
+# Until DNS is ready, use the temporary http:// block with your EC2 public IP.
+
+identity.societywale.in {
+	encode gzip
+	reverse_proxy identity:8081
+}
+
+core.societywale.in {
+	encode gzip
+	reverse_proxy core:8082
+}
+
+# Temporary HTTP access by public IP (optional). Comment out after HTTPS domains work.
+# Replace YOUR_EC2_PUBLIC_IP with the instance Elastic IP, e.g. 13.228.x.x
+# http://YOUR_EC2_PUBLIC_IP {
+# 	handle_path /identity* {
+# 		reverse_proxy identity:8081
+# 	}
+# 	handle_path /core* {
+# 		reverse_proxy core:8082
+# 	}
+# }

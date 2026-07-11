@@ -6,3 +6,4 @@ frontend/dist/
 backend/neon.local.env
 backend/*/data/
 backend/*/target/
+deploy/aws/.env
