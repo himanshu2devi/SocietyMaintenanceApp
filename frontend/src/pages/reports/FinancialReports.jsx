@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { ReportService } from '../../api/services'
 import { Alert, SectionTitle } from '../../components/ui/Feedback'
+import { useAuth } from '../../context/AuthContext'
 import { useToast } from '../../context/ToastContext'
 import { getApiErrorMessage } from '../../utils/apiError'
 import {
@@ -14,6 +15,7 @@ const now = new Date()
 const SOCIETY_LABEL = 'Society financial report'
 
 export default function FinancialReports() {
+  const { isAdmin } = useAuth()
   const toast = useToast()
   const [year, setYear] = useState(now.getFullYear())
   const [month, setMonth] = useState(now.getMonth() + 1)
@@ -128,7 +130,14 @@ export default function FinancialReports() {
             title={`Monthly income & expense — ${monthName(monthly.month)} ${monthly.year}`}
             subtitle={SOCIETY_LABEL}
             action={
-              <button className="btn-primary" onClick={downloadMonthlyPdf}>Download PDF</button>
+              <button
+                className="btn-primary"
+                onClick={downloadMonthlyPdf}
+                disabled={!isAdmin}
+                title={isAdmin ? 'Download monthly report as PDF' : 'Only society admins can download reports'}
+              >
+                Download PDF
+              </button>
             }
           />
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -167,7 +176,14 @@ export default function FinancialReports() {
             title={`Annual balance sheet — ${annual.year}`}
             subtitle={SOCIETY_LABEL}
             action={
-              <button className="btn-primary" onClick={downloadAnnualPdf}>Download PDF</button>
+              <button
+                className="btn-primary"
+                onClick={downloadAnnualPdf}
+                disabled={!isAdmin}
+                title={isAdmin ? 'Download annual report as PDF' : 'Only society admins can download reports'}
+              >
+                Download PDF
+              </button>
             }
           />
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
