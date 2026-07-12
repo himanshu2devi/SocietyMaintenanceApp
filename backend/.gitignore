@@ -2,6 +2,6 @@ target/
 !.mvn/wrapper/maven-wrapper.jar
 *.class
 *.log
-.idea
+.idea/
 *.iml
 .vscode
