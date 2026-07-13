@@ -63,23 +63,29 @@ export function buildNoticeWhatsAppText(notice, societyName = 'Society') {
   ].filter(Boolean).join('\n')
 }
 
-function startPdfDoc(title) {
+function startPdfDoc(title, societyName) {
   const doc = new jsPDF({ unit: 'pt', format: 'a4' })
   const margin = 48
+  const society = (societyName || 'Housing Society').trim()
+
   doc.setFont('helvetica', 'bold')
   doc.setFontSize(11)
   doc.setTextColor(234, 88, 12)
-  doc.text('SOCIETYWALE', margin, 48)
+  doc.text('SOCIETYWALE', margin, 40)
 
-  doc.setFontSize(18)
+  doc.setFontSize(16)
   doc.setTextColor(15, 23, 42)
-  doc.text(title, margin, 76)
+  doc.text(society, margin, 62)
+
+  doc.setFontSize(14)
+  doc.setTextColor(30, 41, 59)
+  doc.text(title, margin, 84)
 
   doc.setFont('helvetica', 'normal')
   doc.setFontSize(10)
   doc.setTextColor(100, 116, 139)
-  doc.text(`Generated ${new Date().toLocaleString('en-IN')}`, margin, 94)
-  return { doc, margin, y: 118 }
+  doc.text(`Generated ${new Date().toLocaleString('en-IN')}`, margin, 102)
+  return { doc, margin, y: 126 }
 }
 
 function addFooter(doc) {
@@ -89,7 +95,7 @@ function addFooter(doc) {
     doc.setFontSize(9)
     doc.setTextColor(148, 163, 184)
     doc.text(
-      'Confidential society financial report · SocietyWale',
+      'Confidential society financial report · Powered by societywale.in',
       48,
       doc.internal.pageSize.getHeight() - 28,
     )
@@ -97,9 +103,9 @@ function addFooter(doc) {
 }
 
 /** Direct .pdf file download — no popup / print dialog. */
-export function downloadMonthlyReportPdf(report, filename) {
+export function downloadMonthlyReportPdf(report, filename, societyName) {
   const title = `Monthly Income & Expense — ${monthName(report.month)} ${report.year}`
-  const { doc, margin, y } = startPdfDoc(title)
+  const { doc, margin, y } = startPdfDoc(title, societyName)
 
   autoTable(doc, {
     startY: y,
@@ -140,9 +146,9 @@ export function downloadMonthlyReportPdf(report, filename) {
 }
 
 /** Direct .pdf file download — no popup / print dialog. */
-export function downloadAnnualReportPdf(sheet, filename) {
+export function downloadAnnualReportPdf(sheet, filename, societyName) {
   const title = `Annual Balance Sheet — ${sheet.year}`
-  const { doc, margin, y } = startPdfDoc(title)
+  const { doc, margin, y } = startPdfDoc(title, societyName)
 
   autoTable(doc, {
     startY: y,

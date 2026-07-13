@@ -1,21 +1,29 @@
 import { useEffect, useState } from 'react'
 import { NoticeService, RuleService } from '../../api/services'
 import { Alert, SectionTitle } from '../../components/ui/Feedback'
+import { useAuth } from '../../context/AuthContext'
 import { useToast } from '../../context/ToastContext'
 import { getApiErrorMessage } from '../../utils/apiError'
 import { buildNoticeWhatsAppText, formatNoticeDate, whatsappLink } from '../../utils/share'
 import { collectErrors, firstError, hasErrors, text } from '../../utils/validation'
 
+const emptyNotice = { title: '', body: '', priority: 'NORMAL' }
+const emptyRule = { category: '', title: '', ruleText: '' }
+
 export default function NoticeBoard() {
+  const { user } = useAuth()
   const toast = useToast()
   const [notices, setNotices] = useState([])
   const [rules, setRules] = useState([])
-  const [noticeForm, setNoticeForm] = useState({ title: '', body: '', priority: 'NORMAL' })
-  const [ruleForm, setRuleForm] = useState({ category: '', title: '', ruleText: '' })
+  const [noticeForm, setNoticeForm] = useState(emptyNotice)
+  const [ruleForm, setRuleForm] = useState(emptyRule)
+  const [editingNoticeId, setEditingNoticeId] = useState(null)
+  const [editingRuleId, setEditingRuleId] = useState(null)
   const [noticeFieldErrors, setNoticeFieldErrors] = useState({})
   const [ruleFieldErrors, setRuleFieldErrors] = useState({})
   const [error, setError] = useState('')
   const [notifyBusy, setNotifyBusy] = useState('')
+  const [busy, setBusy] = useState('')
 
   async function load() {
     try {
@@ -31,7 +39,33 @@ export default function NoticeBoard() {
     load()
   }, [])
 
-  async function postNotice(e) {
+  function startEditNotice(n) {
+    setEditingNoticeId(n.id)
+    setNoticeForm({ title: n.title || '', body: n.body || '', priority: n.priority || 'NORMAL' })
+    setNoticeFieldErrors({})
+    setError('')
+  }
+
+  function cancelNoticeEdit() {
+    setEditingNoticeId(null)
+    setNoticeForm(emptyNotice)
+    setNoticeFieldErrors({})
+  }
+
+  function startEditRule(r) {
+    setEditingRuleId(r.id)
+    setRuleForm({ category: r.category || '', title: r.title || '', ruleText: r.ruleText || '' })
+    setRuleFieldErrors({})
+    setError('')
+  }
+
+  function cancelRuleEdit() {
+    setEditingRuleId(null)
+    setRuleForm(emptyRule)
+    setRuleFieldErrors({})
+  }
+
+  async function saveNotice(e) {
     e.preventDefault()
     setError('')
     const errors = collectErrors({
@@ -43,22 +77,30 @@ export default function NoticeBoard() {
       setError(firstError(errors))
       return
     }
+    const payload = {
+      title: noticeForm.title.trim(),
+      body: noticeForm.body.trim(),
+      priority: noticeForm.priority,
+    }
+    setBusy('notice')
     try {
-      await NoticeService.create({
-        title: noticeForm.title.trim(),
-        body: noticeForm.body.trim(),
-        priority: noticeForm.priority,
-      })
-      setNoticeForm({ title: '', body: '', priority: 'NORMAL' })
-      setNoticeFieldErrors({})
-      toast.success('Notice posted. Use Notify members when ready.')
+      if (editingNoticeId) {
+        await NoticeService.update(editingNoticeId, payload)
+        toast.success('Notice updated.')
+      } else {
+        await NoticeService.create(payload)
+        toast.success('Notice posted. Use Notify members when ready.')
+      }
+      cancelNoticeEdit()
       await load()
     } catch (err) {
-      setError(getApiErrorMessage(err, 'Could not post notice.'))
+      setError(getApiErrorMessage(err, editingNoticeId ? 'Could not update notice.' : 'Could not post notice.'))
+    } finally {
+      setBusy('')
     }
   }
 
-  async function postRule(e) {
+  async function saveRule(e) {
     e.preventDefault()
     setError('')
     const errors = collectErrors({
@@ -71,18 +113,50 @@ export default function NoticeBoard() {
       setError(firstError(errors))
       return
     }
+    const payload = {
+      category: ruleForm.category.trim(),
+      title: ruleForm.title.trim(),
+      ruleText: ruleForm.ruleText.trim(),
+    }
+    setBusy('rule')
     try {
-      await RuleService.create({
-        category: ruleForm.category.trim(),
-        title: ruleForm.title.trim(),
-        ruleText: ruleForm.ruleText.trim(),
-      })
-      setRuleForm({ category: '', title: '', ruleText: '' })
-      setRuleFieldErrors({})
-      toast.success('Rule added.')
+      if (editingRuleId) {
+        await RuleService.update(editingRuleId, payload)
+        toast.success('Rule updated.')
+      } else {
+        await RuleService.create(payload)
+        toast.success('Rule added.')
+      }
+      cancelRuleEdit()
       await load()
     } catch (err) {
-      setError(getApiErrorMessage(err, 'Could not add rule.'))
+      setError(getApiErrorMessage(err, editingRuleId ? 'Could not update rule.' : 'Could not add rule.'))
+    } finally {
+      setBusy('')
+    }
+  }
+
+  async function deleteNotice(n) {
+    if (!window.confirm(`Delete notice “${n.title}”?`)) return
+    try {
+      await NoticeService.remove(n.id)
+      toast.success('Notice deleted.')
+      if (editingNoticeId === n.id) cancelNoticeEdit()
+      await load()
+    } catch (err) {
+      setError(getApiErrorMessage(err, 'Could not delete notice.'))
+    }
+  }
+
+  async function deleteRule(r) {
+    if (!window.confirm(`Delete rule “${r.title}”?`)) return
+    try {
+      await RuleService.remove(r.id)
+      toast.success('Rule deleted.')
+      if (editingRuleId === r.id) cancelRuleEdit()
+      await load()
+    } catch (err) {
+      setError(getApiErrorMessage(err, 'Could not delete rule.'))
     }
   }
 
@@ -101,7 +175,11 @@ export default function NoticeBoard() {
   }
 
   function shareNoticeWhatsApp(notice) {
-    window.open(whatsappLink(buildNoticeWhatsAppText(notice)), '_blank', 'noopener,noreferrer')
+    window.open(
+      whatsappLink(buildNoticeWhatsAppText(notice, user?.societyName || 'Society')),
+      '_blank',
+      'noopener,noreferrer',
+    )
   }
 
   const priorityColor = {
@@ -117,8 +195,11 @@ export default function NoticeBoard() {
 
       <div className="grid gap-6 lg:grid-cols-2">
         <div className="card">
-          <SectionTitle title="Post Announcement" subtitle="Broadcast to all members" />
-          <form onSubmit={postNotice} className="space-y-3" noValidate>
+          <SectionTitle
+            title={editingNoticeId ? 'Edit announcement' : 'Post announcement'}
+            subtitle={editingNoticeId ? 'Update and save changes instantly' : 'Broadcast to all members'}
+          />
+          <form onSubmit={saveNotice} className="space-y-3" noValidate>
             <div>
               <label className="label">Title</label>
               <input
@@ -152,13 +233,23 @@ export default function NoticeBoard() {
                 ))}
               </select>
             </div>
-            <button className="btn-primary w-full">Post Notice</button>
+            <div className="flex flex-wrap gap-2">
+              <button className="btn-primary flex-1" disabled={busy === 'notice'}>
+                {busy === 'notice' ? 'Saving…' : editingNoticeId ? 'Save notice' : 'Post notice'}
+              </button>
+              {editingNoticeId && (
+                <button type="button" className="btn-secondary" onClick={cancelNoticeEdit}>Cancel</button>
+              )}
+            </div>
           </form>
         </div>
 
         <div className="card">
-          <SectionTitle title="Add Rule" subtitle="Society rules & bylaws" />
-          <form onSubmit={postRule} className="space-y-3" noValidate>
+          <SectionTitle
+            title={editingRuleId ? 'Edit rule' : 'Add rule'}
+            subtitle={editingRuleId ? 'Update society rule text' : 'Society rules & bylaws'}
+          />
+          <form onSubmit={saveRule} className="space-y-3" noValidate>
             <div>
               <label className="label">Category</label>
               <input
@@ -181,7 +272,7 @@ export default function NoticeBoard() {
               {ruleFieldErrors.title && <p className="mt-1 text-xs font-medium text-red-600">{ruleFieldErrors.title}</p>}
             </div>
             <div>
-              <label className="label">Rule Text</label>
+              <label className="label">Rule text</label>
               <textarea
                 className="input"
                 rows="3"
@@ -191,14 +282,21 @@ export default function NoticeBoard() {
               />
               {ruleFieldErrors.ruleText && <p className="mt-1 text-xs font-medium text-red-600">{ruleFieldErrors.ruleText}</p>}
             </div>
-            <button className="btn-primary w-full">Add Rule</button>
+            <div className="flex flex-wrap gap-2">
+              <button className="btn-primary flex-1" disabled={busy === 'rule'}>
+                {busy === 'rule' ? 'Saving…' : editingRuleId ? 'Save rule' : 'Add rule'}
+              </button>
+              {editingRuleId && (
+                <button type="button" className="btn-secondary" onClick={cancelRuleEdit}>Cancel</button>
+              )}
+            </div>
           </form>
         </div>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
         <div className="card">
-          <SectionTitle title="Notice Board" subtitle={`${notices.length} notices`} />
+          <SectionTitle title="Notice board" subtitle={`${notices.length} notices`} />
           <ul className="space-y-3">
             {notices.map((n) => (
               <li key={n.id} className="rounded-xl border border-slate-100 p-4">
@@ -228,12 +326,18 @@ export default function NoticeBoard() {
                       {notifyBusy === n.id ? 'Notifying…' : 'Notify members'}
                     </button>
                   )}
+                  <button type="button" className="btn-success !py-1.5 !text-xs" onClick={() => shareNoticeWhatsApp(n)}>
+                    Share on WhatsApp
+                  </button>
+                  <button type="button" className="btn-secondary !py-1.5 !text-xs" onClick={() => startEditNotice(n)}>
+                    Edit
+                  </button>
                   <button
                     type="button"
-                    className="btn-success !py-1.5 !text-xs"
-                    onClick={() => shareNoticeWhatsApp(n)}
+                    className="btn-secondary !border-red-200 !py-1.5 !text-xs !text-red-700 hover:!bg-red-50"
+                    onClick={() => deleteNotice(n)}
                   >
-                    Share on WhatsApp
+                    Delete
                   </button>
                 </div>
               </li>
@@ -243,13 +347,25 @@ export default function NoticeBoard() {
         </div>
 
         <div className="card">
-          <SectionTitle title="Society Rules" subtitle={`${rules.length} rules`} />
+          <SectionTitle title="Society rules" subtitle={`${rules.length} rules`} />
           <ul className="space-y-3">
             {rules.map((r) => (
               <li key={r.id} className="rounded-xl border border-slate-100 p-4">
                 <span className="badge bg-orange-50 text-orange-700">{r.category}</span>
                 <h4 className="mt-2 font-semibold text-slate-950">{r.title}</h4>
                 <p className="mt-1 text-sm leading-6 text-slate-600">{r.ruleText}</p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <button type="button" className="btn-secondary !py-1.5 !text-xs" onClick={() => startEditRule(r)}>
+                    Edit
+                  </button>
+                  <button
+                    type="button"
+                    className="btn-secondary !border-red-200 !py-1.5 !text-xs !text-red-700 hover:!bg-red-50"
+                    onClick={() => deleteRule(r)}
+                  >
+                    Delete
+                  </button>
+                </div>
               </li>
             ))}
             {rules.length === 0 && <p className="text-sm text-gray-400">No rules yet.</p>}

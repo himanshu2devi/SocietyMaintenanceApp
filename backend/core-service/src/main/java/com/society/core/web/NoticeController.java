@@ -60,4 +60,22 @@ public class NoticeController {
             @PathVariable UUID id) {
         return ResponseEntity.ok(service.notifyMembers(user.societyId(), id));
     }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<NoticeResponse> update(
+            @AuthenticationPrincipal AuthenticatedUser user,
+            @PathVariable UUID id,
+            @Valid @RequestBody UpdateNoticeRequest req) {
+        return ResponseEntity.ok(service.updateNotice(user.societyId(), id, req));
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> delete(
+            @AuthenticationPrincipal AuthenticatedUser user,
+            @PathVariable UUID id) {
+        service.deleteNotice(user.societyId(), id);
+        return ResponseEntity.noContent().build();
+    }
 }

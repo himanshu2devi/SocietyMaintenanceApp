@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
+import SeoManager from './components/SeoManager'
 import ProtectedRoute from './components/ProtectedRoute'
 import ScrollToHash from './components/ScrollToHash'
 import IdleLogoutWatcher from './components/IdleLogoutWatcher'
@@ -17,14 +18,18 @@ import ForgotPassword from './pages/auth/ForgotPassword'
 import AdminDashboard from './pages/admin/AdminDashboard'
 import MemberDashboard from './pages/member/MemberDashboard'
 import FinancialReports from './pages/reports/FinancialReports'
+import SocietyAnalytics from './pages/admin/SocietyAnalytics'
+import Profile from './pages/Profile'
+import AiAssistant from './components/AiAssistant'
 
 export default function App() {
   return (
     <div className="flex min-h-screen flex-col bg-slate-50 text-slate-900">
+      <SeoManager />
       <ScrollToHash />
       <IdleLogoutWatcher />
       <Navbar />
-      <main className="flex-1">
+      <main className="flex-1" id="main-content">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
@@ -35,6 +40,17 @@ export default function App() {
           <Route path="/forgot-password" element={<AuthPage><ForgotPassword /></AuthPage>} />
           <Route path="/register" element={<AuthPage><RegisterSociety /></AuthPage>} />
           <Route path="/register-member" element={<AuthPage><RegisterMember /></AuthPage>} />
+
+          <Route
+            path="/profile"
+            element={
+              <AppPage>
+                <ProtectedRoute>
+                  <Profile />
+                </ProtectedRoute>
+              </AppPage>
+            }
+          />
 
           <Route
             path="/admin/*"
@@ -69,10 +85,22 @@ export default function App() {
             }
           />
 
+          <Route
+            path="/analytics"
+            element={
+              <AppPage>
+                <ProtectedRoute requireRole="ADMIN">
+                  <SocietyAnalytics />
+                </ProtectedRoute>
+              </AppPage>
+            }
+          />
+
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
       <Footer />
+      <AiAssistant />
     </div>
   )
 }

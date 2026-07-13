@@ -12,10 +12,9 @@ import {
 } from '../../utils/share'
 
 const now = new Date()
-const SOCIETY_LABEL = 'Society financial report'
 
 export default function FinancialReports() {
-  const { isAdmin } = useAuth()
+  const { isAdmin, user } = useAuth()
   const toast = useToast()
   const [year, setYear] = useState(now.getFullYear())
   const [month, setMonth] = useState(now.getMonth() + 1)
@@ -24,6 +23,9 @@ export default function FinancialReports() {
   const [annual, setAnnual] = useState(null)
   const [error, setError] = useState('')
   const [busy, setBusy] = useState('')
+  const societyLabel = user?.societyName
+    ? `${user.societyName}${user.societyCode ? ` · ${user.societyCode}` : ''}`
+    : 'Society financial report'
 
   async function loadMonthly() {
     setError('')
@@ -56,7 +58,7 @@ export default function FinancialReports() {
   function downloadMonthlyPdf() {
     if (!monthly) return
     try {
-      downloadMonthlyReportPdf(monthly)
+      downloadMonthlyReportPdf(monthly, undefined, user?.societyName)
       toast.success('PDF downloaded.')
     } catch (err) {
       toast.error(getApiErrorMessage(err, 'Could not download PDF.'))
@@ -66,7 +68,7 @@ export default function FinancialReports() {
   function downloadAnnualPdf() {
     if (!annual) return
     try {
-      downloadAnnualReportPdf(annual)
+      downloadAnnualReportPdf(annual, undefined, user?.societyName)
       toast.success('PDF downloaded.')
     } catch (err) {
       toast.error(getApiErrorMessage(err, 'Could not download PDF.'))
@@ -79,7 +81,7 @@ export default function FinancialReports() {
         <p className="text-xs font-bold uppercase tracking-[.14em] text-orange-600">SocietyWale reports</p>
         <h1 className="mt-2 text-2xl font-extrabold tracking-tight text-slate-950 sm:text-3xl">Financial Reports</h1>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
-          Generate monthly or annual statements, then download the PDF directly. Members can view; committee manages source data in Maintenance and Expenses.
+          Generate monthly or annual statements for {user?.societyName || 'your society'}, then download a branded PDF. Members can view; committee manages source data in Maintenance and Expenses.
         </p>
       </div>
 
@@ -128,7 +130,7 @@ export default function FinancialReports() {
         <div className="card">
           <SectionTitle
             title={`Monthly income & expense — ${monthName(monthly.month)} ${monthly.year}`}
-            subtitle={SOCIETY_LABEL}
+            subtitle={societyLabel}
             action={
               <button
                 className="btn-primary"
@@ -174,7 +176,7 @@ export default function FinancialReports() {
         <div className="card">
           <SectionTitle
             title={`Annual balance sheet — ${annual.year}`}
-            subtitle={SOCIETY_LABEL}
+            subtitle={societyLabel}
             action={
               <button
                 className="btn-primary"

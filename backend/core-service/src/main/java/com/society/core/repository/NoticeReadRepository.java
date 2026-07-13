@@ -15,4 +15,6 @@ public interface NoticeReadRepository extends JpaRepository<NoticeRead, UUID> {
     Optional<NoticeRead> findByNoticeIdAndMemberId(UUID noticeId, UUID memberId);
 
     long countBySocietyIdAndMemberIdAndNoticeIdIn(UUID societyId, UUID memberId, Collection<UUID> noticeIds);
+
+    void deleteByNoticeId(UUID noticeId);
 }

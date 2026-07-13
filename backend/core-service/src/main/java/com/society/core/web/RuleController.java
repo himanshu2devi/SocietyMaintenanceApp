@@ -11,6 +11,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/rules")
@@ -35,5 +36,23 @@ public class RuleController {
             @Valid @RequestBody CreateRuleRequest req) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(service.createRule(user.societyId(), user.userId(), req));
+    }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<RuleResponse> update(
+            @AuthenticationPrincipal AuthenticatedUser user,
+            @PathVariable UUID id,
+            @Valid @RequestBody UpdateRuleRequest req) {
+        return ResponseEntity.ok(service.updateRule(user.societyId(), id, req));
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> delete(
+            @AuthenticationPrincipal AuthenticatedUser user,
+            @PathVariable UUID id) {
+        service.deleteRule(user.societyId(), id);
+        return ResponseEntity.noContent().build();
     }
 }

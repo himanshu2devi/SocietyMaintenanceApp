@@ -19,15 +19,18 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final MailNotificationService mailNotificationService;
 
     public AuthService(SocietyRepository societyRepository,
                        UserRepository userRepository,
                        PasswordEncoder passwordEncoder,
-                       JwtService jwtService) {
+                       JwtService jwtService,
+                       MailNotificationService mailNotificationService) {
         this.societyRepository = societyRepository;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
+        this.mailNotificationService = mailNotificationService;
     }
 
     @Transactional
@@ -55,8 +58,15 @@ public class AuthService {
         admin.setRole(Role.ADMIN);
         admin = userRepository.save(admin);
 
+        mailNotificationService.sendSocietyRegisteredEmails(
+                admin.getFullName(),
+                admin.getEmail(),
+                society.getName(),
+                society.getSocietyCode(),
+                society.getCity());
+
         String token = jwtService.generateToken(admin);
-        return new AuthResponse(token, "Bearer", toView(admin, society.getName()));
+        return new AuthResponse(token, "Bearer", toView(admin, society));
     }
 
     @Transactional
@@ -84,8 +94,15 @@ public class AuthService {
         member.setRole(Role.MEMBER);
         member = userRepository.save(member);
 
+        mailNotificationService.sendMemberWelcomeEmail(
+                member.getFullName(),
+                member.getEmail(),
+                society.getName(),
+                society.getSocietyCode(),
+                member.getFlatNumber());
+
         String token = jwtService.generateToken(member);
-        return new AuthResponse(token, "Bearer", toView(member, society.getName()));
+        return new AuthResponse(token, "Bearer", toView(member, society));
     }
 
     @Transactional(readOnly = true)
@@ -136,17 +153,16 @@ public class AuthService {
     }
 
     private UserView toView(User u) {
-        String societyName = societyRepository.findById(u.getSocietyId())
-                .map(Society::getName)
-                .orElse(null);
-        return toView(u, societyName);
+        Society society = societyRepository.findById(u.getSocietyId()).orElse(null);
+        return toView(u, society);
     }
 
-    private static UserView toView(User u, String societyName) {
+    private static UserView toView(User u, Society society) {
         return new UserView(
                 u.getId().toString(),
                 u.getSocietyId().toString(),
-                societyName,
+                society != null ? society.getName() : null,
+                society != null ? society.getSocietyCode() : null,
                 u.getFullName(),
                 u.getEmail(),
                 u.getMobile(),

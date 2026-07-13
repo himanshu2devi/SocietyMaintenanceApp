@@ -106,6 +106,7 @@ public class AuthDtos {
             String id,
             String societyId,
             String societyName,
+            String societyCode,
             String fullName,
             String email,
             String mobile,

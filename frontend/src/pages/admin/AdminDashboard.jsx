@@ -12,6 +12,7 @@ import CommitteeDirectory from './CommitteeDirectory'
 import SocietyAccounts from './SocietyAccounts'
 import AuditDocuments from './AuditDocuments'
 import PaymentClaims from './PaymentClaims'
+import ComplaintBoard from '../shared/ComplaintBoard'
 
 const tabs = [
   { id: 'overview', label: 'Overview', icon: '⌂', component: Overview },
@@ -23,6 +24,7 @@ const tabs = [
   { id: 'audit', label: 'Audit reports', icon: '▤', component: AuditDocuments },
   { id: 'expenses', label: 'Expenses', icon: '▣', component: ExpenseLogger },
   { id: 'notices', label: 'Notices & rules', icon: '◉', component: NoticeBoard },
+  { id: 'complaints', label: 'Complaints', icon: '⚠', component: ComplaintBoard },
 ]
 
 export default function AdminDashboard() {
@@ -67,8 +69,12 @@ export default function AdminDashboard() {
       <aside className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm shadow-slate-900/[.03] lg:min-h-[calc(100vh-150px)]">
         <div className="border-b border-slate-100 px-3 pb-4 pt-2">
           <p className="text-xs font-bold uppercase tracking-[.14em] text-slate-400">Committee workspace</p>
-          <p className="mt-2 truncate text-sm font-bold text-slate-900">{user?.societyName || 'Your society'}</p>
-          <p className="mt-0.5 truncate text-xs text-slate-500">{user?.fullName} · Admin</p>
+          <p className="mt-2 break-words text-sm font-bold leading-snug text-slate-900">{user?.societyName || 'Your society'}</p>
+          {user?.societyCode && (
+            <p className="mt-0.5 break-all text-xs font-semibold text-orange-600">Code · {user.societyCode}</p>
+          )}
+          <p className="mt-1 break-words text-xs leading-snug text-slate-500">{user?.fullName}</p>
+          <p className="mt-0.5 text-xs font-semibold text-slate-400">Admin</p>
         </div>
         <nav className="mt-3 grid gap-1">
           {tabs.map((tab) => (
@@ -95,10 +101,11 @@ export default function AdminDashboard() {
           <div>
             <p className="text-xs font-bold uppercase tracking-[.14em] text-orange-600">
               {user?.societyName || 'SocietyWale admin'}
+              {user?.societyCode ? ` · ${user.societyCode}` : ''}
             </p>
             <h1 className="mt-1 text-2xl font-extrabold tracking-tight text-slate-950">{tabs.find((tab) => tab.id === active).label}</h1>
           </div>
-          <p className="text-sm text-slate-500">Members can view. Only admins can create or change records.</p>
+          <p className="text-sm text-slate-500">Committee manages records. Members view and participate securely.</p>
         </div>
         <ActiveComponent
           onNavigate={setActive}
@@ -112,9 +119,10 @@ export default function AdminDashboard() {
 
 function Overview({ onNavigate, pendingClaims = 0 }) {
   const steps = [
-    ['1', 'Publish committee', 'Add chairman, secretary and treasurer contacts.', 'committee'],
-    ['2', 'Add bank account', 'Members need account details to pay maintenance.', 'accounts'],
-    ['3', 'Track maintenance', 'Record dues and approve member payment claims.', 'maintenance'],
+    ['1', 'Publish committee', 'Add chairman, secretary and treasurer contacts residents can reach.', 'committee'],
+    ['2', 'Add bank account', 'Publish account / UPI details so residents know where to pay.', 'accounts'],
+    ['3', 'Track maintenance', 'Record dues, review payment claims and keep collections current.', 'maintenance'],
+    ['4', 'Handle complaints', 'Track resident issues from open to resolved with clear ownership.', 'complaints'],
   ]
 
   return (
@@ -136,10 +144,37 @@ function Overview({ onNavigate, pendingClaims = 0 }) {
       )}
 
       <div className="rounded-3xl bg-[linear-gradient(135deg,#102A43_0%,#173e62_55%,#0f766e_150%)] p-7 text-white sm:p-9">
-        <p className="text-xs font-bold uppercase tracking-[.15em] text-orange-300">Committee control</p>
-        <h2 className="mt-3 max-w-xl text-2xl font-extrabold leading-tight sm:text-3xl">Admins manage. Members view, download and notify payments.</h2>
+        <p className="text-xs font-bold uppercase tracking-[.15em] text-orange-300">Operations overview</p>
+        <h2 className="mt-3 max-w-2xl text-2xl font-extrabold leading-tight sm:text-3xl">
+          Your society command centre for collections, communication and compliance-ready records.
+        </h2>
+        <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-200">
+          Use this workspace to keep member data current, verify payments, publish notices, log expenses, close complaints and prepare AGM-friendly reports — without scattered spreadsheets.
+        </p>
+        <div className="mt-6 flex flex-wrap gap-2">
+          {[
+            ['Maintenance', 'maintenance'],
+            ['Notices', 'notices'],
+            ['Complaints', 'complaints'],
+          ].map(([label, target]) => (
+            <button
+              key={label}
+              type="button"
+              onClick={() => onNavigate(target)}
+              className="rounded-full bg-white/10 px-3 py-1.5 text-xs font-bold text-white transition hover:bg-white/20"
+            >
+              {label}
+            </button>
+          ))}
+          <a
+            href="/reports"
+            className="rounded-full bg-white/10 px-3 py-1.5 text-xs font-bold text-white transition hover:bg-white/20"
+          >
+            Reports
+          </a>
+        </div>
       </div>
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {steps.map(([number, title, copy, target]) => (
           <article key={number} className="card">
             <span className="grid h-9 w-9 place-items-center rounded-xl bg-orange-50 text-sm font-extrabold text-orange-600">{number}</span>

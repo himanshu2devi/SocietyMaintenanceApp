@@ -14,12 +14,21 @@ function navClass() {
   return 'rounded-lg px-3 py-2 text-sm font-semibold text-slate-500 transition hover:text-slate-950'
 }
 
+function initials(name = '') {
+  const parts = String(name).trim().split(/\s+/).filter(Boolean)
+  if (!parts.length) return 'U'
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase()
+  return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase()
+}
+
 export default function Navbar() {
   const { isAuthenticated, isAdmin, user, logout } = useAuth()
   const navigate = useNavigate()
   const [open, setOpen] = useState(false)
+  const [profileOpen, setProfileOpen] = useState(false)
   const [unreadNotices, setUnreadNotices] = useState(0)
   const knownUnread = useRef(null)
+  const profileRef = useRef(null)
 
   useEffect(() => {
     if (!isAuthenticated || isAdmin) {
@@ -49,8 +58,17 @@ export default function Navbar() {
     }
   }, [isAuthenticated, isAdmin, user?.id])
 
+  useEffect(() => {
+    function onDocClick(e) {
+      if (!profileRef.current?.contains(e.target)) setProfileOpen(false)
+    }
+    document.addEventListener('mousedown', onDocClick)
+    return () => document.removeEventListener('mousedown', onDocClick)
+  }, [])
+
   function handleLogout() {
     logout()
+    setProfileOpen(false)
     navigate('/login')
   }
 
@@ -60,11 +78,11 @@ export default function Navbar() {
   }
 
   return (
-    <header className="sticky top-0 z-30 border-b border-slate-200/70 bg-white/90 backdrop-blur-xl">
+    <header className="sticky top-0 z-30 border-b border-slate-200/70 bg-white/90 backdrop-blur-xl" role="banner">
       <div className="mx-auto flex h-[72px] max-w-7xl items-center justify-between px-4 sm:px-6">
         <Brand />
 
-        <nav className="hidden items-center gap-1 md:flex">
+        <nav className="hidden items-center gap-1 md:flex" aria-label="Primary">
           {publicLinks.map((l) => (
             <Link key={l.to} to={l.to} className={navClass()}>
               {l.label}
@@ -79,6 +97,11 @@ export default function Navbar() {
           {isAuthenticated && (
             <Link to="/reports" className={navClass()}>
               Reports
+            </Link>
+          )}
+          {isAuthenticated && isAdmin && (
+            <Link to="/analytics" className={navClass()}>
+              Analytics
             </Link>
           )}
         </nav>
@@ -102,12 +125,49 @@ export default function Navbar() {
                   )}
                 </button>
               )}
-              <span className="hidden max-w-[220px] truncate text-sm font-medium text-slate-500 lg:inline">
-                {user?.societyName ? `${user.societyName} · ${user.fullName}` : user?.fullName}
-              </span>
-              <button onClick={handleLogout} className="btn-secondary !px-3 !py-2">
-                Sign out
-              </button>
+              <div className="relative" ref={profileRef}>
+                <button
+                  type="button"
+                  onClick={() => setProfileOpen((v) => !v)}
+                  className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white py-1.5 pl-1.5 pr-3 transition hover:bg-slate-50"
+                  aria-haspopup="menu"
+                  aria-expanded={profileOpen}
+                >
+                  <span className="grid h-8 w-8 place-items-center rounded-lg bg-orange-500 text-xs font-extrabold text-white">
+                    {initials(user?.fullName)}
+                  </span>
+                  <span className="hidden max-w-[160px] truncate text-sm font-semibold text-slate-800 lg:inline">
+                    {user?.fullName || 'Profile'}
+                  </span>
+                </button>
+                {profileOpen && (
+                  <div
+                    role="menu"
+                    className="absolute right-0 mt-2 w-56 overflow-hidden rounded-2xl border border-slate-200 bg-white py-2 shadow-xl shadow-slate-900/10"
+                  >
+                    <div className="border-b border-slate-100 px-4 py-3">
+                      <p className="truncate text-sm font-bold text-slate-950">{user?.fullName}</p>
+                      <p className="truncate text-xs text-slate-500">{isAdmin ? 'Committee admin' : 'Member'}</p>
+                    </div>
+                    <Link
+                      to="/profile"
+                      role="menuitem"
+                      onClick={() => setProfileOpen(false)}
+                      className="block px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+                    >
+                      View profile
+                    </Link>
+                    <button
+                      type="button"
+                      role="menuitem"
+                      onClick={handleLogout}
+                      className="block w-full px-4 py-2.5 text-left text-sm font-semibold text-slate-700 hover:bg-slate-50"
+                    >
+                      Sign out
+                    </button>
+                  </div>
+                )}
+              </div>
             </>
           ) : (
             <>
@@ -137,6 +197,15 @@ export default function Navbar() {
               )}
             </button>
           )}
+          {isAuthenticated && (
+            <Link
+              to="/profile"
+              className="grid h-10 w-10 place-items-center rounded-xl bg-orange-500 text-xs font-extrabold text-white"
+              aria-label="Profile"
+            >
+              {initials(user?.fullName)}
+            </Link>
+          )}
           <button
             type="button"
             className="grid h-10 w-10 place-items-center rounded-xl border border-slate-200 text-slate-700"
@@ -158,11 +227,14 @@ export default function Navbar() {
             ))}
             {isAuthenticated ? (
               <>
-                {user?.societyName && (
-                  <p className="px-3 py-2 text-xs font-bold uppercase tracking-wide text-slate-400">{user.societyName}</p>
-                )}
+                <Link to="/profile" onClick={() => setOpen(false)} className="rounded-xl px-3 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50">
+                  My profile
+                </Link>
                 <Link to={isAdmin ? '/admin' : '/member'} onClick={() => setOpen(false)} className="rounded-xl px-3 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50">My dashboard</Link>
                 <Link to="/reports" onClick={() => setOpen(false)} className="rounded-xl px-3 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50">Reports</Link>
+                {isAdmin && (
+                  <Link to="/analytics" onClick={() => setOpen(false)} className="rounded-xl px-3 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50">Analytics</Link>
+                )}
                 <button onClick={handleLogout} className="btn-secondary mt-2">Sign out</button>
               </>
             ) : (

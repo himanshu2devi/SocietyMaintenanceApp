@@ -15,6 +15,7 @@ import { Alert, SectionTitle, StatusBadge } from '../../components/ui/Feedback'
 import { getApiErrorMessage } from '../../utils/apiError'
 import { inr, monthName, whatsappLink, formatNoticeDate } from '../../utils/share'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
+import ComplaintBoard from '../shared/ComplaintBoard'
 
 const now = new Date()
 
@@ -237,6 +238,7 @@ export default function MemberDashboard() {
             <div>
               <p className="text-xs font-bold uppercase tracking-[.14em] text-orange-300">
                 {user?.societyName || 'My society'}
+                {user?.societyCode ? ` · ${user.societyCode}` : ''}
               </p>
               <h1 className="mt-3 text-2xl font-extrabold tracking-tight sm:text-3xl">{user?.fullName || 'Member'}</h1>
               <p className="mt-1 text-sm text-slate-200">Resident access · view records and notify payments</p>
@@ -564,6 +566,8 @@ export default function MemberDashboard() {
           </ul>
         </div>
       </div>
+
+      <ComplaintBoard />
     </div>
   )
 }

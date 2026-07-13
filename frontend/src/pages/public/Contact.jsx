@@ -9,9 +9,17 @@ import {
   personName,
   text,
 } from '../../utils/validation'
+import {
+  SITE_EMAIL,
+  SITE_PHONES,
+  mailtoHref,
+  telHref,
+  whatsappHref,
+} from '../../utils/siteContact'
 
 export default function Contact() {
   const [sent, setSent] = useState(false)
+  const [busy, setBusy] = useState(false)
   const [form, setForm] = useState({ name: '', email: '', society: '', message: '' })
   const [fieldErrors, setFieldErrors] = useState({})
   const [error, setError] = useState('')
@@ -23,6 +31,7 @@ export default function Contact() {
   function handleSubmit(e) {
     e.preventDefault()
     setError('')
+    setSent(false)
     const errors = collectErrors({
       name: personName(form.name, 'Name'),
       email: email(form.email),
@@ -32,10 +41,25 @@ export default function Contact() {
     setFieldErrors(errors)
     if (hasErrors(errors)) {
       setError(firstError(errors))
-      setSent(false)
       return
     }
+
+    setBusy(true)
+    const subject = form.society.trim()
+      ? `SocietyWale enquiry — ${form.society.trim()}`
+      : 'SocietyWale enquiry'
+    const lines = [
+      `Name: ${form.name.trim()}`,
+      `Email: ${form.email.trim()}`,
+    ]
+    if (form.society.trim()) lines.push(`Society: ${form.society.trim()}`)
+    lines.push('', form.message.trim())
+    const body = lines.join('\n')
+
+    // Opens the user's email app with a ready-to-send message to SocietyWale.
+    window.location.href = mailtoHref(subject, body)
     setSent(true)
+    setBusy(false)
   }
 
   return (
@@ -47,7 +71,7 @@ export default function Contact() {
             We’re here to help your society get started.
           </h1>
           <p className="mt-5 max-w-xl text-base leading-7 text-slate-600">
-            Questions about onboarding, committee roles or member access? Send a message and we’ll respond as soon as we can.
+            Questions about onboarding, committee roles or member access? Email us, call us, or send a message — we’ll respond as soon as we can.
           </p>
         </div>
       </section>
@@ -55,17 +79,46 @@ export default function Contact() {
       <section className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 lg:grid-cols-[1fr_1.1fr] lg:py-20">
         <div className="space-y-5">
           <div className="rounded-2xl border border-slate-200 bg-white p-6">
+            <p className="text-xs font-bold uppercase tracking-[.14em] text-orange-600">Email</p>
+            <a
+              className="mt-2 block text-sm font-semibold text-slate-900 transition hover:text-orange-600"
+              href={mailtoHref('SocietyWale enquiry')}
+            >
+              {SITE_EMAIL}
+            </a>
+            <p className="mt-1 text-sm text-slate-500">Typical reply within 1–2 business days.</p>
+          </div>
+
+          <div className="rounded-2xl border border-slate-200 bg-white p-6">
+            <p className="text-xs font-bold uppercase tracking-[.14em] text-orange-600">Call / WhatsApp</p>
+            <ul className="mt-3 space-y-3">
+              {SITE_PHONES.map((phone) => (
+                <li key={phone.digits} className="flex flex-wrap items-center gap-3">
+                  <a className="text-sm font-semibold text-slate-900 transition hover:text-orange-600" href={telHref(phone.digits)}>
+                    +91 {phone.label}
+                  </a>
+                  <a
+                    className="text-xs font-bold uppercase tracking-wide text-emerald-700 hover:text-emerald-800"
+                    href={whatsappHref(phone.digits, 'Hello SocietyWale, I have a question about the product.')}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    WhatsApp
+                  </a>
+                </li>
+              ))}
+            </ul>
+            <p className="mt-3 text-sm text-slate-500">Available for onboarding help and product questions.</p>
+          </div>
+
+          <div className="rounded-2xl border border-slate-200 bg-white p-6">
             <p className="text-xs font-bold uppercase tracking-[.14em] text-orange-600">Support</p>
             <h2 className="mt-2 text-xl font-bold text-slate-950">Committee onboarding</h2>
             <p className="mt-2 text-sm leading-6 text-slate-600">
               Create a workspace, add members, publish bank details and start tracking maintenance in one afternoon.
             </p>
           </div>
-          <div className="rounded-2xl border border-slate-200 bg-white p-6">
-            <p className="text-xs font-bold uppercase tracking-[.14em] text-orange-600">Email</p>
-            <p className="mt-2 text-sm font-semibold text-slate-900">hello@societywale.app</p>
-            <p className="mt-1 text-sm text-slate-500">Typical reply within 1–2 business days.</p>
-          </div>
+
           <p className="text-sm text-slate-500">
             Looking for legal details? Read our{' '}
             <Link className="font-semibold text-orange-600 hover:text-orange-700" to="/terms">Terms</Link>
@@ -75,9 +128,19 @@ export default function Contact() {
         </div>
 
         <div className="card">
-          <Alert type="error">{error}</Alert>
-          {sent && <Alert type="success">Thanks! Your message has been received. We’ll get back to you soon.</Alert>}
-          <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+          <h2 className="text-lg font-extrabold text-slate-950">Send a message</h2>
+          <p className="mt-1 text-sm text-slate-500">
+            Submit the form to open your email app with a ready message to {SITE_EMAIL}.
+          </p>
+          <div className="mt-4">
+            <Alert type="error">{error}</Alert>
+            {sent && (
+              <Alert type="success">
+                Your email app should open next. If it does not, write to us at {SITE_EMAIL} or call +91 {SITE_PHONES[0].label}.
+              </Alert>
+            )}
+          </div>
+          <form onSubmit={handleSubmit} className="mt-2 space-y-4" noValidate>
             <div>
               <label className="label">Name</label>
               <input name="name" className="input" value={form.name} onChange={update} placeholder="Your name" maxLength={120} />
@@ -98,7 +161,9 @@ export default function Contact() {
               <textarea name="message" className="input" rows="4" value={form.message} onChange={update} placeholder="How can we help?" maxLength={2000} />
               {fieldErrors.message && <p className="mt-1 text-xs font-medium text-red-600">{fieldErrors.message}</p>}
             </div>
-            <button className="btn-primary w-full !bg-orange-500 hover:!bg-orange-600">Send message</button>
+            <button className="btn-primary w-full !bg-orange-500 hover:!bg-orange-600" disabled={busy}>
+              {busy ? 'Opening email…' : 'Send message'}
+            </button>
           </form>
         </div>
       </section>

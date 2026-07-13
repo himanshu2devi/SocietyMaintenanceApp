@@ -1,32 +1,46 @@
 import { Link } from 'react-router-dom'
 import { Brand } from './Brand'
+import { SITE_EMAIL, SITE_PHONES, mailtoHref, telHref } from '../utils/siteContact'
 
 export default function Footer() {
   return (
-    <footer className="mt-auto border-t border-slate-200 bg-white">
-      <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:px-6 lg:grid-cols-[1.4fr_repeat(4,1fr)]">
+    <footer className="mt-auto border-t border-slate-200 bg-white" role="contentinfo">
+      <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:px-6 lg:grid-cols-[1.5fr_repeat(3,1fr)]">
         <div>
           <Brand />
           <p className="mt-4 max-w-sm text-sm leading-6 text-slate-500">
-            Practical digital operations for housing societies in India. Built for clearer communication, collections and accountability.
+            Society management software for Indian housing societies. Maintenance, members, notices, expenses, complaints, audit-ready records and more in one place.
           </p>
-          <p className="mt-5 text-sm font-semibold text-slate-700">Made for Indian societies</p>
+          <address className="mt-5 not-italic space-y-1.5 text-sm text-slate-600">
+            <a className="block font-semibold text-slate-800 transition hover:text-orange-600" href={mailtoHref()}>
+              {SITE_EMAIL}
+            </a>
+            {SITE_PHONES.map((phone) => (
+              <a
+                key={phone.digits}
+                className="block transition hover:text-orange-600"
+                href={telHref(phone.digits)}
+              >
+                +91 {phone.label}
+              </a>
+            ))}
+          </address>
+          <p className="mt-5 text-sm font-semibold text-slate-700">Made for Indian societies with❤</p>
         </div>
         <FooterColumn
           title="Product"
           links={[
             ['Features', '/#features'],
-            ['For committees', '/#committees'],
-            ['Sign in', '/login'],
-            ['Create society', '/register'],
-            ['Member signup', '/register-member'],
+            ['FAQs', '/#faq'],
+            // ['For committees', '/#committees'],
+            // ['Trust & security', '/#trust'],
           ]}
         />
         <FooterColumn
           title="Company"
           links={[
-            ['About SocietyWale', '/about'],
-            ['Contact us', '/contact'],
+            ['About us', '/about'],
+            ['Contact', '/contact'],
           ]}
         />
         <FooterColumn
@@ -36,23 +50,11 @@ export default function Footer() {
             ['Privacy policy', '/privacy'],
           ]}
         />
-        <FooterColumn
-          title="Support"
-          links={[
-            ['Contact support', '/contact'],
-            ['Forgot password', '/forgot-password'],
-            ['Member login', '/login'],
-          ]}
-        />
       </div>
       <div className="border-t border-slate-100">
-        <div className="mx-auto flex max-w-7xl flex-col gap-2 px-4 py-5 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-          <span>© {new Date().getFullYear()} SocietyWale. All rights reserved.</span>
-          <span className="flex flex-wrap gap-x-4 gap-y-1">
-            <Link className="hover:text-orange-600" to="/terms">Terms</Link>
-            <Link className="hover:text-orange-600" to="/privacy">Privacy</Link>
-            <Link className="hover:text-orange-600" to="/contact">Support</Link>
-          </span>
+        <div className="mx-auto flex max-w-7xl flex-col gap-1 px-4 py-5 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+          <p>© {new Date().getFullYear()} SocietyWale. All rights reserved.</p>
+          <p>Serving housing societies &amp; RWAs across India · societywale.in</p>
         </div>
       </div>
     </footer>

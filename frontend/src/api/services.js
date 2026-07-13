@@ -43,6 +43,8 @@ export const ExpenseService = {
 export const NoticeService = {
   list: () => coreApi.get('/notices').then((r) => r.data),
   create: (payload) => coreApi.post('/notices', payload).then((r) => r.data),
+  update: (id, payload) => coreApi.put(`/notices/${id}`, payload).then((r) => r.data),
+  remove: (id) => coreApi.delete(`/notices/${id}`).then((r) => r.data),
   notify: (id) => coreApi.post(`/notices/${id}/notify`).then((r) => r.data),
   unreadCount: () => coreApi.get('/notices/unread-count').then((r) => r.data),
   markRead: () => coreApi.post('/notices/mark-read').then((r) => r.data),
@@ -51,6 +53,15 @@ export const NoticeService = {
 export const RuleService = {
   list: () => coreApi.get('/rules').then((r) => r.data),
   create: (payload) => coreApi.post('/rules', payload).then((r) => r.data),
+  update: (id, payload) => coreApi.put(`/rules/${id}`, payload).then((r) => r.data),
+  remove: (id) => coreApi.delete(`/rules/${id}`).then((r) => r.data),
+}
+
+export const ComplaintService = {
+  list: () => coreApi.get('/complaints').then((r) => r.data),
+  create: (payload) => coreApi.post('/complaints', payload).then((r) => r.data),
+  update: (id, payload) => coreApi.put(`/complaints/${id}`, payload).then((r) => r.data),
+  remove: (id) => coreApi.delete(`/complaints/${id}`).then((r) => r.data),
 }
 
 export const ReportService = {
@@ -78,4 +89,9 @@ export const PaymentClaimService = {
   list: (status) => coreApi.get('/payment-claims', { params: status ? { status } : {} }).then((r) => r.data),
   submit: (payload) => coreApi.post('/payment-claims', payload).then((r) => r.data),
   review: (id, payload) => coreApi.post(`/payment-claims/${id}/review`, payload).then((r) => r.data),
+}
+
+export const AssistantService = {
+  status: () => coreApi.get('/assistant/status').then((r) => r.data),
+  chat: (payload) => coreApi.post('/assistant/chat', payload).then((r) => r.data),
 }

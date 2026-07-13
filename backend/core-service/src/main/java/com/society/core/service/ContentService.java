@@ -71,6 +71,26 @@ public class ContentService {
         return toNoticeResponse(noticeRepository.save(notice), false);
     }
 
+    @Transactional
+    public NoticeResponse updateNotice(UUID societyId, UUID noticeId, UpdateNoticeRequest req) {
+        Notice notice = noticeRepository.findByIdAndSocietyId(noticeId, societyId)
+                .orElseThrow(() -> new NotFoundException("Notice not found"));
+        notice.setTitle(req.title().trim());
+        notice.setBody(req.body().trim());
+        notice.setPriority(req.priority() == null || req.priority().isBlank()
+                ? "NORMAL"
+                : req.priority().trim().toUpperCase());
+        return toNoticeResponse(noticeRepository.save(notice), false);
+    }
+
+    @Transactional
+    public void deleteNotice(UUID societyId, UUID noticeId) {
+        Notice notice = noticeRepository.findByIdAndSocietyId(noticeId, societyId)
+                .orElseThrow(() -> new NotFoundException("Notice not found"));
+        noticeReadRepository.deleteByNoticeId(notice.getId());
+        noticeRepository.delete(notice);
+    }
+
     @Transactional(readOnly = true)
     public UnreadNoticesResponse unreadCount(UUID societyId, UUID memberId) {
         List<Notice> notified = noticeRepository.findBySocietyIdAndNotifiedAtIsNotNullOrderByNotifiedAtDesc(societyId);
@@ -102,6 +122,23 @@ public class ContentService {
         r.setRuleText(req.ruleText().trim());
         r.setCreatedBy(createdBy);
         return toRuleResponse(ruleRepository.save(r));
+    }
+
+    @Transactional
+    public RuleResponse updateRule(UUID societyId, UUID ruleId, UpdateRuleRequest req) {
+        SocietyRule rule = ruleRepository.findByIdAndSocietyId(ruleId, societyId)
+                .orElseThrow(() -> new NotFoundException("Rule not found"));
+        rule.setCategory(req.category().trim());
+        rule.setTitle(req.title().trim());
+        rule.setRuleText(req.ruleText().trim());
+        return toRuleResponse(ruleRepository.save(rule));
+    }
+
+    @Transactional
+    public void deleteRule(UUID societyId, UUID ruleId) {
+        SocietyRule rule = ruleRepository.findByIdAndSocietyId(ruleId, societyId)
+                .orElseThrow(() -> new NotFoundException("Rule not found"));
+        ruleRepository.delete(rule);
     }
 
     @Transactional(readOnly = true)
