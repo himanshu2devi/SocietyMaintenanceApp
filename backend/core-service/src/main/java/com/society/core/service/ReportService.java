@@ -6,6 +6,7 @@ import com.society.core.repository.ExpenseRepository;
 import com.society.core.repository.MaintenanceChargeRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -38,9 +39,20 @@ public class ReportService {
                 .map(ct -> new CategoryAmount(ct.getCategory(), ct.getTotal()))
                 .toList();
 
+        List<ExpenseLine> lines = expenseRepository
+                .findBySocietyIdAndFiscalYearAndFiscalMonthOrderByExpenseDateAsc(societyId, year, month)
+                .stream()
+                .map(e -> new ExpenseLine(
+                        e.getExpenseDate(),
+                        e.getCategory(),
+                        e.getTitle(),
+                        StringUtils.hasText(e.getBillId()) ? e.getBillId().trim() : "N/A",
+                        e.getAmount()))
+                .toList();
+
         return new MonthlyReport(
                 year, month, collected, pending, expenses,
-                collected.subtract(expenses), breakdown);
+                collected.subtract(expenses), breakdown, lines);
     }
 
     @Transactional(readOnly = true)

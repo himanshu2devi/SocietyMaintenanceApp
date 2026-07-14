@@ -35,6 +35,11 @@ const PAGE_SEO = {
     description:
       'Privacy policy for SocietyWale. How we process society and resident data as a service provider under Indian data protection expectations.',
   },
+  '/refund-policy': {
+    title: 'Refund & Cancellation Policy — SocietyWale',
+    description:
+      'SocietyWale refund and cancellation policy for annual society workspace subscriptions. Fees are non-refundable after successful payment.',
+  },
   '/login': {
     title: 'Sign in — SocietyWale',
     description: 'Sign in to your SocietyWale society workspace.',

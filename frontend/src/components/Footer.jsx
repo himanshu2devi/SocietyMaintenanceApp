@@ -46,8 +46,9 @@ export default function Footer() {
         <FooterColumn
           title="Legal"
           links={[
-            ['Terms of use', '/terms'],
+            ['Terms & Conditions', '/terms'],
             ['Privacy policy', '/privacy'],
+            ['Refund & Cancellation Policy', '/refund-policy'],
           ]}
         />
       </div>

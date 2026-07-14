@@ -34,8 +34,13 @@ export default function Terms() {
       </p>
       <h2>Payments and commercial use</h2>
       <p>
-        Where paid plans or commercial terms apply, fees, renewals and cancellations will be communicated at the time of purchase
-        or in a separate order form. Operational records entered by your society remain yours to export or retain as permitted by law.
+        Society workspace subscriptions are paid digitally (for example via Razorpay) at signup. Access to the
+        administrator dashboard is granted only after successful payment. Fees, offer pricing and checkout amount are
+        shown before you pay. <strong>Successful payments are non-refundable</strong> as set out in our{' '}
+        <Link className="font-semibold text-orange-600" to="/refund-policy">
+          Refund &amp; Cancellation Policy
+        </Link>
+        . Operational records entered by your society remain yours to export or retain as permitted by law.
       </p>
       <h2>Service availability</h2>
       <p>

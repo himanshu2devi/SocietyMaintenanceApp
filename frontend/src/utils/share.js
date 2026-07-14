@@ -128,7 +128,7 @@ export function downloadMonthlyReportPdf(report, filename, societyName) {
     doc.setFont('helvetica', 'bold')
     doc.setFontSize(12)
     doc.setTextColor(15, 23, 42)
-    doc.text('Expense breakdown', margin, nextY)
+    doc.text('Expense breakdown (by category)', margin, nextY)
     autoTable(doc, {
       startY: nextY + 10,
       margin: { left: margin, right: margin },
@@ -138,6 +138,30 @@ export function downloadMonthlyReportPdf(report, filename, societyName) {
       headStyles: { fillColor: [234, 88, 12], textColor: 255 },
       styles: { fontSize: 10, cellPadding: 7 },
       columnStyles: { 1: { halign: 'right' } },
+    })
+    nextY = doc.lastAutoTable.finalY + 22
+  }
+
+  if (report.expenseLines?.length) {
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(12)
+    doc.setTextColor(15, 23, 42)
+    doc.text('Expense details', margin, nextY)
+    autoTable(doc, {
+      startY: nextY + 10,
+      margin: { left: margin, right: margin },
+      theme: 'striped',
+      head: [['Date', 'Category', 'Title', 'Bill ID', 'Amount']],
+      body: report.expenseLines.map((line) => [
+        line.expenseDate || '—',
+        line.category || '—',
+        line.title || '—',
+        line.billId || 'N/A',
+        inrPdf(line.amount),
+      ]),
+      headStyles: { fillColor: [15, 42, 67], textColor: 255 },
+      styles: { fontSize: 9, cellPadding: 6 },
+      columnStyles: { 4: { halign: 'right' } },
     })
   }
 

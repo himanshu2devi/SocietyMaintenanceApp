@@ -5,6 +5,7 @@ import com.society.core.dto.ExpenseDtos.*;
 import com.society.core.repository.ExpenseRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.UUID;
@@ -29,6 +30,7 @@ public class ExpenseService {
         e.setExpenseDate(req.expenseDate());
         e.setPaymentMode(req.paymentMode() == null ? "CASH" : req.paymentMode());
         e.setVendorName(req.vendorName());
+        e.setBillId(normalizeBillId(req.billId()));
         e.setRecordedBy(recordedBy);
         return toResponse(repository.save(e));
     }
@@ -48,7 +50,19 @@ public class ExpenseService {
                 e.getAmount(),
                 e.getExpenseDate(),
                 e.getPaymentMode(),
-                e.getVendorName()
+                e.getVendorName(),
+                displayBillId(e.getBillId())
         );
+    }
+
+    static String normalizeBillId(String billId) {
+        if (!StringUtils.hasText(billId)) {
+            return "N/A";
+        }
+        return billId.trim();
+    }
+
+    static String displayBillId(String billId) {
+        return StringUtils.hasText(billId) ? billId.trim() : "N/A";
     }
 }

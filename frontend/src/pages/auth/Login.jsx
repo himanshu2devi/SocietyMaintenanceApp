@@ -85,7 +85,7 @@ export default function Login() {
         <p className="border-t border-slate-100 pt-5 text-center text-sm text-slate-500">
           Setting up a new society?{' '}
           <Link to="/register" className="font-bold text-orange-600 hover:text-orange-700">
-            Create your workspace
+            Pay Now and Sign Up
           </Link>
           <br />
           Society resident?{' '}

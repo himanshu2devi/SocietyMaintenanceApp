@@ -1,11 +1,20 @@
 package com.society.core.dto;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 public class ReportDtos {
 
     public record CategoryAmount(String category, BigDecimal amount) {}
+
+    public record ExpenseLine(
+            LocalDate expenseDate,
+            String category,
+            String title,
+            String billId,
+            BigDecimal amount
+    ) {}
 
     public record MonthlyReport(
             int year,
@@ -14,7 +23,8 @@ public class ReportDtos {
             BigDecimal maintenancePending,
             BigDecimal totalExpenses,
             BigDecimal netSurplusDeficit,
-            List<CategoryAmount> expenseBreakdown
+            List<CategoryAmount> expenseBreakdown,
+            List<ExpenseLine> expenseLines
     ) {}
 
     public record AnnualBalanceSheet(

@@ -48,6 +48,13 @@
             <artifactId>spring-boot-starter-mail</artifactId>
         </dependency>
 
+        <!-- Razorpay Official Java SDK (orders + signature verification) -->
+        <dependency>
+            <groupId>com.razorpay</groupId>
+            <artifactId>razorpay-java</artifactId>
+            <version>1.4.8</version>
+        </dependency>
+
         <!-- Database drivers: Postgres for prod, H2 for quick local dev -->
         <dependency>
             <groupId>org.postgresql</groupId>

@@ -37,6 +37,9 @@ public interface ExpenseRepository extends JpaRepository<Expense, UUID> {
                                                   @Param("year") int year,
                                                   @Param("month") int month);
 
+    List<Expense> findBySocietyIdAndFiscalYearAndFiscalMonthOrderByExpenseDateAsc(
+            UUID societyId, int fiscalYear, int fiscalMonth);
+
     interface CategoryTotal {
         String getCategory();
         BigDecimal getTotal();

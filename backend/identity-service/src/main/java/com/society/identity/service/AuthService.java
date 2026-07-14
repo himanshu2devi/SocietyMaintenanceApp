@@ -2,6 +2,7 @@ package com.society.identity.service;
 
 import com.society.identity.domain.Role;
 import com.society.identity.domain.Society;
+import com.society.identity.domain.SubscriptionPayment;
 import com.society.identity.domain.User;
 import com.society.identity.dto.AuthDtos.*;
 import com.society.identity.exception.ApiExceptions.*;
@@ -20,50 +21,71 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final MailNotificationService mailNotificationService;
+    private final RazorpayPaymentService razorpayPaymentService;
 
     public AuthService(SocietyRepository societyRepository,
                        UserRepository userRepository,
                        PasswordEncoder passwordEncoder,
                        JwtService jwtService,
-                       MailNotificationService mailNotificationService) {
+                       MailNotificationService mailNotificationService,
+                       RazorpayPaymentService razorpayPaymentService) {
         this.societyRepository = societyRepository;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.mailNotificationService = mailNotificationService;
+        this.razorpayPaymentService = razorpayPaymentService;
     }
 
     @Transactional
     public AuthResponse registerSociety(RegisterSocietyRequest req) {
-        if (societyRepository.existsBySocietyCode(req.societyCode())) {
+        if (!razorpayPaymentService.isConfigured()) {
+            throw new BadRequestException(
+                    "Online payments are not configured yet. Please contact SocietyWale support.");
+        }
+
+        String societyCode = req.societyCode().trim();
+        String adminEmail = req.adminEmail().trim().toLowerCase();
+
+        if (societyRepository.existsBySocietyCode(societyCode)) {
             throw new ConflictException("Society code already registered");
         }
-        if (userRepository.existsByEmail(req.adminEmail())) {
+        if (userRepository.existsByEmail(adminEmail)) {
             throw new ConflictException("Email already in use");
         }
 
+        // Payment must succeed before any society/admin account is created.
+        SubscriptionPayment payment = razorpayPaymentService.verifyAndMarkPaid(
+                req.razorpayOrderId(),
+                req.razorpayPaymentId(),
+                req.razorpaySignature());
+
         Society society = new Society();
-        society.setName(req.societyName());
-        society.setSocietyCode(req.societyCode());
-        society.setAddress(req.address());
-        society.setCity(req.city());
+        society.setName(req.societyName().trim());
+        society.setSocietyCode(societyCode);
+        society.setAddress(req.address() == null || req.address().isBlank() ? null : req.address().trim());
+        society.setCity(req.city() == null || req.city().isBlank() ? null : req.city().trim());
         society = societyRepository.save(society);
 
         User admin = new User();
         admin.setSocietyId(society.getId());
-        admin.setFullName(req.adminName());
-        admin.setEmail(req.adminEmail());
-        admin.setMobile(req.adminMobile());
+        admin.setFullName(req.adminName().trim());
+        admin.setEmail(adminEmail);
+        admin.setMobile(req.adminMobile().trim());
         admin.setPasswordHash(passwordEncoder.encode(req.password()));
         admin.setRole(Role.ADMIN);
         admin = userRepository.save(admin);
+
+        payment = razorpayPaymentService.consumeForRegistration(
+                payment, societyCode, adminEmail, society.getId());
 
         mailNotificationService.sendSocietyRegisteredEmails(
                 admin.getFullName(),
                 admin.getEmail(),
                 society.getName(),
                 society.getSocietyCode(),
-                society.getCity());
+                society.getCity(),
+                payment);
 
         String token = jwtService.generateToken(admin);
         return new AuthResponse(token, "Bearer", toView(admin, society));

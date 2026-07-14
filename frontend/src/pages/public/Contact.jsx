@@ -122,8 +122,10 @@ export default function Contact() {
           <p className="text-sm text-slate-500">
             Looking for legal details? Read our{' '}
             <Link className="font-semibold text-orange-600 hover:text-orange-700" to="/terms">Terms</Link>
+            {', '}
+            <Link className="font-semibold text-orange-600 hover:text-orange-700" to="/privacy">Privacy Policy</Link>
             {' '}and{' '}
-            <Link className="font-semibold text-orange-600 hover:text-orange-700" to="/privacy">Privacy Policy</Link>.
+            <Link className="font-semibold text-orange-600 hover:text-orange-700" to="/refund-policy">Refund &amp; Cancellation Policy</Link>.
           </p>
         </div>
 

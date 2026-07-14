@@ -169,6 +169,35 @@ export default function FinancialReports() {
               </table>
             </>
           )}
+          {monthly.expenseLines?.length > 0 && (
+            <>
+              <h3 className="mb-2 mt-6 text-sm font-semibold text-slate-700">Expense details</h3>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b text-left text-gray-500">
+                      <th className="py-2 pr-3">Date</th>
+                      <th className="py-2 pr-3">Category</th>
+                      <th className="py-2 pr-3">Title</th>
+                      <th className="py-2 pr-3">Bill ID</th>
+                      <th className="py-2 text-right">Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {monthly.expenseLines.map((line, idx) => (
+                      <tr key={`${line.expenseDate}-${line.title}-${idx}`} className="border-b last:border-0">
+                        <td className="py-2 pr-3">{line.expenseDate}</td>
+                        <td className="py-2 pr-3">{line.category}</td>
+                        <td className="py-2 pr-3">{line.title}</td>
+                        <td className="py-2 pr-3 font-mono text-xs">{line.billId || 'N/A'}</td>
+                        <td className="py-2 text-right font-medium">{inr(line.amount)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          )}
         </div>
       )}
 

@@ -11,6 +11,7 @@ import About from './pages/public/About'
 import Contact from './pages/public/Contact'
 import Terms from './pages/public/Terms'
 import Privacy from './pages/public/Privacy'
+import RefundPolicy from './pages/public/RefundPolicy'
 import Login from './pages/auth/Login'
 import RegisterSociety from './pages/auth/RegisterSociety'
 import RegisterMember from './pages/auth/RegisterMember'
@@ -36,6 +37,7 @@ export default function App() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/privacy" element={<Privacy />} />
+          <Route path="/refund-policy" element={<RefundPolicy />} />
           <Route path="/login" element={<AuthPage><Login /></AuthPage>} />
           <Route path="/forgot-password" element={<AuthPage><ForgotPassword /></AuthPage>} />
           <Route path="/register" element={<AuthPage><RegisterSociety /></AuthPage>} />

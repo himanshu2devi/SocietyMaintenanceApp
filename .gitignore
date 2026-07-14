@@ -8,3 +8,4 @@ backend/*/data/
 backend/*/target/
 package-lock.json
 .env.example
+deploy/aws/.env

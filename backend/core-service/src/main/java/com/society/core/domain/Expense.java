@@ -42,6 +42,10 @@ public class Expense {
     @Column(name = "vendor_name", length = 150)
     private String vendorName;
 
+    /** Invoice / bill reference from vendor; display "N/A" when blank. */
+    @Column(name = "bill_id", length = 80)
+    private String billId;
+
     @Column(name = "recorded_by", nullable = false)
     private UUID recordedBy;
 
@@ -81,6 +85,8 @@ public class Expense {
     public void setPaymentMode(String paymentMode) { this.paymentMode = paymentMode; }
     public String getVendorName() { return vendorName; }
     public void setVendorName(String vendorName) { this.vendorName = vendorName; }
+    public String getBillId() { return billId; }
+    public void setBillId(String billId) { this.billId = billId; }
     public UUID getRecordedBy() { return recordedBy; }
     public void setRecordedBy(UUID recordedBy) { this.recordedBy = recordedBy; }
     public int getFiscalYear() { return fiscalYear; }

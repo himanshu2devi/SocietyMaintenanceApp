@@ -37,7 +37,13 @@ public class AuthDtos {
                     regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9]).{8,72}$",
                     message = "Password must include uppercase, lowercase, a number, and a symbol"
             )
-            String password
+            String password,
+            @NotBlank(message = "Complete payment before creating your workspace")
+            String razorpayOrderId,
+            @NotBlank(message = "Complete payment before creating your workspace")
+            String razorpayPaymentId,
+            @NotBlank(message = "Complete payment before creating your workspace")
+            String razorpaySignature
     ) {}
 
     public record LoginRequest(

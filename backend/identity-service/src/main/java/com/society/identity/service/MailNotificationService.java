@@ -1,5 +1,6 @@
 package com.society.identity.service;
 
+import com.society.identity.domain.SubscriptionPayment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -8,10 +9,15 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+
 @Service
 public class MailNotificationService {
 
     private static final Logger log = LoggerFactory.getLogger(MailNotificationService.class);
+    private static final DateTimeFormatter PAID_AT =
+            DateTimeFormatter.ofPattern("dd MMM yyyy, hh:mm a z").withZone(ZoneId.of("Asia/Kolkata"));
 
     private final JavaMailSender mailSender;
     private final boolean enabled;
@@ -29,7 +35,7 @@ public class MailNotificationService {
         this.enabled = enabled;
         this.fromAddress = fromAddress;
         this.ownerInbox = ownerInbox;
-        this.appUrl = appUrl;
+        this.appUrl = normalizeAppUrl(appUrl);
     }
 
     public boolean isEnabled() {
@@ -42,31 +48,65 @@ public class MailNotificationService {
             String adminEmail,
             String societyName,
             String societyCode,
-            String city) {
+            String city,
+            SubscriptionPayment payment) {
         if (!enabled) {
             log.info("Mail disabled — skipped society registration emails for {}", societyCode);
             return;
         }
 
         String safeCity = (city == null || city.isBlank()) ? "—" : city.trim();
+        String amount = payment != null
+                ? RazorpayPaymentService.formatInr(payment.getAmountPaise())
+                : "—";
+        String receiptNo = payment != null && payment.getReceiptNumber() != null
+                ? payment.getReceiptNumber()
+                : "—";
+        String paymentId = payment != null && payment.getRazorpayPaymentId() != null
+                ? payment.getRazorpayPaymentId()
+                : "—";
+        String orderId = payment != null && payment.getRazorpayOrderId() != null
+                ? payment.getRazorpayOrderId()
+                : "—";
+        String paidAt = payment != null && payment.getPaidAt() != null
+                ? PAID_AT.format(payment.getPaidAt())
+                : "—";
 
         try {
             SimpleMailMessage welcome = baseMessage();
             welcome.setTo(adminEmail);
-            welcome.setSubject("Welcome to SocietyWale — " + societyName);
+            welcome.setSubject("Welcome to SocietyWale — payment confirmed · " + societyName);
             welcome.setText("""
                     Dear %s,
 
-                    Welcome to SocietyWale!
+                    Welcome to SocietyWale — your society workspace is ready.
 
-                    Your society workspace is ready:
-                    • Society: %s
-                    • Society code: %s
-                    • Sign in: %s/login
+                    ----------------------------------------
+                    WORKSPACE
+                    ----------------------------------------
+                    Society: %s
+                    Society code: %s
+                    Website: %s
+                    Sign in: %s/login
 
-                    Next steps for your committee:
-                    1) Sign in and open your Dashboard
-                    2) Publish committee contacts and bank details
+                    ----------------------------------------
+                    PAYMENT RECEIPT
+                    ----------------------------------------
+                    Status: Paid
+                    Amount: %s
+                    Receipt no.: %s
+                    Razorpay payment ID: %s
+                    Razorpay order ID: %s
+                    Paid at: %s
+                    Plan: Annual society workspace (1 year)
+
+                    Please keep this email as your payment receipt.
+
+                    ----------------------------------------
+                    NEXT STEPS
+                    ----------------------------------------
+                    1) Sign in at %s/login
+                    2) Open Dashboard and add committee contacts
                     3) Set the monthly maintenance amount
                     4) Share your society code so residents can join
 
@@ -75,7 +115,20 @@ public class MailNotificationService {
                     Warm regards,
                     Team SocietyWale
                     %s
-                    """.formatted(adminName, societyName, societyCode, appUrl, fromAddress, appUrl));
+                    """.formatted(
+                    adminName,
+                    societyName,
+                    societyCode,
+                    appUrl,
+                    appUrl,
+                    amount,
+                    receiptNo,
+                    paymentId,
+                    orderId,
+                    paidAt,
+                    appUrl,
+                    fromAddress,
+                    appUrl));
             mailSender.send(welcome);
         } catch (Exception ex) {
             log.warn("Failed sending admin welcome email to {}: {}", adminEmail, ex.getMessage());
@@ -84,9 +137,9 @@ public class MailNotificationService {
         try {
             SimpleMailMessage owner = baseMessage();
             owner.setTo(ownerInbox);
-            owner.setSubject("[SocietyWale] New society registered — " + societyName);
+            owner.setSubject("[SocietyWale] New paid society — " + societyName);
             owner.setText("""
-                    New society signup on SocietyWale
+                    New society signup (payment received)
 
                     Society name: %s
                     Society code: %s
@@ -94,8 +147,19 @@ public class MailNotificationService {
                     Admin name: %s
                     Admin email: %s
 
-                    Review in your dashboard / CRM as needed.
-                    """.formatted(societyName, societyCode, safeCity, adminName, adminEmail));
+                    Payment status: Paid
+                    Amount: %s
+                    Payment ID: %s
+                    Order ID: %s
+                    """.formatted(
+                    societyName,
+                    societyCode,
+                    safeCity,
+                    adminName,
+                    adminEmail,
+                    amount,
+                    paymentId,
+                    orderId));
             mailSender.send(owner);
         } catch (Exception ex) {
             log.warn("Failed sending owner notification for society {}: {}", societyCode, ex.getMessage());
@@ -127,7 +191,9 @@ public class MailNotificationService {
                     • Society: %s
                     • Society code: %s
                     • Flat / unit: %s
-                    • Sign in: %s/login
+
+                    Website: %s
+                    Sign in: %s/login
 
                     After signing in you can view dues, notices, society bank details,
                     raise payment claims, and submit complaints to your committee.
@@ -143,6 +209,7 @@ public class MailNotificationService {
                     societyCode,
                     flatNumber,
                     appUrl,
+                    appUrl,
                     fromAddress,
                     appUrl));
             mailSender.send(welcome);
@@ -155,5 +222,16 @@ public class MailNotificationService {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(fromAddress);
         return message;
+    }
+
+    private static String normalizeAppUrl(String url) {
+        if (url == null || url.isBlank()) {
+            return "https://societywale.in";
+        }
+        String cleaned = url.trim().replaceAll("/+$", "");
+        if (cleaned.contains("localhost") || cleaned.contains("127.0.0.1")) {
+            return "https://societywale.in";
+        }
+        return cleaned;
     }
 }

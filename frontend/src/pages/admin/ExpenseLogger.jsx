@@ -11,6 +11,7 @@ const emptyForm = {
   amount: '',
   expenseDate: today,
   vendorName: '',
+  billId: '',
 }
 
 export default function ExpenseLogger() {
@@ -38,9 +39,14 @@ export default function ExpenseLogger() {
   async function handleAdd(e) {
     e.preventDefault()
     setError('')
+    const billId = (form.billId || '').trim()
+    if (!billId) {
+      setError('Bill ID is required. Enter the invoice number, or N/A if not available.')
+      return
+    }
     setBusy(true)
     try {
-      await ExpenseService.create({ ...form, amount: Number(form.amount) })
+      await ExpenseService.create({ ...form, billId, amount: Number(form.amount) })
       setForm(emptyForm)
       await load()
     } catch (err) {
@@ -86,6 +92,18 @@ export default function ExpenseLogger() {
               </div>
             </div>
             <div>
+              <label className="label">Bill ID</label>
+              <input
+                name="billId"
+                className="input"
+                value={form.billId}
+                onChange={update}
+                required
+                maxLength={80}
+                placeholder="Invoice / bill no. or N/A"
+              />
+            </div>
+            <div>
               <label className="label">Vendor (optional)</label>
               <input name="vendorName" className="input" value={form.vendorName} onChange={update} />
             </div>
@@ -109,6 +127,7 @@ export default function ExpenseLogger() {
                   <th className="py-2 pr-4">Date</th>
                   <th className="py-2 pr-4">Category</th>
                   <th className="py-2 pr-4">Title</th>
+                  <th className="py-2 pr-4">Bill ID</th>
                   <th className="py-2 pr-4">Amount</th>
                 </tr>
               </thead>
@@ -123,12 +142,13 @@ export default function ExpenseLogger() {
                       <div className="font-medium">{e.title}</div>
                       {e.description && <div className="text-xs text-gray-400">{e.description}</div>}
                     </td>
+                    <td className="py-2 pr-4 font-mono text-xs">{e.billId || 'N/A'}</td>
                     <td className="py-2 pr-4">₹{Number(e.amount).toLocaleString('en-IN')}</td>
                   </tr>
                 ))}
                 {expenses.length === 0 && (
                   <tr>
-                    <td colSpan="4" className="py-6 text-center text-gray-400">
+                    <td colSpan="5" className="py-6 text-center text-gray-400">
                       No expenses logged yet.
                     </td>
                   </tr>
