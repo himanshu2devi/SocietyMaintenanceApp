@@ -1,11 +1,14 @@
 package com.society.identity.service;
 
 import com.society.identity.domain.SubscriptionPayment;
+import jakarta.mail.internet.MimeMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +23,7 @@ public class MailNotificationService {
             DateTimeFormatter.ofPattern("dd MMM yyyy, hh:mm a z").withZone(ZoneId.of("Asia/Kolkata"));
 
     private final JavaMailSender mailSender;
+    private final PaymentReceiptPdfService paymentReceiptPdfService;
     private final boolean enabled;
     private final String fromAddress;
     private final String ownerInbox;
@@ -27,11 +31,13 @@ public class MailNotificationService {
 
     public MailNotificationService(
             JavaMailSender mailSender,
+            PaymentReceiptPdfService paymentReceiptPdfService,
             @Value("${app.mail.enabled:false}") boolean enabled,
             @Value("${app.mail.from:societywale.in@gmail.com}") String fromAddress,
             @Value("${app.mail.owner-inbox:societywale.in@gmail.com}") String ownerInbox,
             @Value("${app.mail.app-url:https://societywale.in}") String appUrl) {
         this.mailSender = mailSender;
+        this.paymentReceiptPdfService = paymentReceiptPdfService;
         this.enabled = enabled;
         this.fromAddress = fromAddress;
         this.ownerInbox = ownerInbox;
@@ -59,9 +65,6 @@ public class MailNotificationService {
         String amount = payment != null
                 ? RazorpayPaymentService.formatInr(payment.getAmountPaise())
                 : "—";
-        String receiptNo = payment != null && payment.getReceiptNumber() != null
-                ? payment.getReceiptNumber()
-                : "—";
         String paymentId = payment != null && payment.getRazorpayPaymentId() != null
                 ? payment.getRazorpayPaymentId()
                 : "—";
@@ -73,10 +76,12 @@ public class MailNotificationService {
                 : "—";
 
         try {
-            SimpleMailMessage welcome = baseMessage();
-            welcome.setTo(adminEmail);
-            welcome.setSubject("Welcome to SocietyWale — payment confirmed · " + societyName);
-            welcome.setText("""
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+            helper.setFrom(fromAddress);
+            helper.setTo(adminEmail);
+            helper.setSubject("Welcome to SocietyWale — payment confirmed · " + societyName);
+            helper.setText("""
                     Dear %s,
 
                     Welcome to SocietyWale — your society workspace is ready.
@@ -90,17 +95,13 @@ public class MailNotificationService {
                     Sign in: %s/login
 
                     ----------------------------------------
-                    PAYMENT RECEIPT
+                    PAYMENT
                     ----------------------------------------
                     Status: Paid
                     Amount: %s
-                    Receipt no.: %s
-                    Razorpay payment ID: %s
-                    Razorpay order ID: %s
                     Paid at: %s
-                    Plan: Annual society workspace (1 year)
 
-                    Please keep this email as your payment receipt.
+                    Your official SocietyWale payment receipt is attached as a PDF.
 
                     ----------------------------------------
                     NEXT STEPS
@@ -122,20 +123,27 @@ public class MailNotificationService {
                     appUrl,
                     appUrl,
                     amount,
-                    receiptNo,
-                    paymentId,
-                    orderId,
                     paidAt,
                     appUrl,
                     fromAddress,
-                    appUrl));
-            mailSender.send(welcome);
+                    appUrl), false);
+
+            if (payment != null) {
+                byte[] pdfBytes = paymentReceiptPdfService.generate(
+                        adminName, adminEmail, societyName, societyCode, payment);
+                String filename = paymentReceiptPdfService.filename(
+                        payment.getReceiptNumber(), societyCode);
+                helper.addAttachment(filename, new ByteArrayResource(pdfBytes), "application/pdf");
+            }
+
+            mailSender.send(mimeMessage);
         } catch (Exception ex) {
-            log.warn("Failed sending admin welcome email to {}: {}", adminEmail, ex.getMessage());
+            log.warn("Failed sending admin welcome email (with PDF) to {}: {}", adminEmail, ex.getMessage());
         }
 
         try {
-            SimpleMailMessage owner = baseMessage();
+            SimpleMailMessage owner = new SimpleMailMessage();
+            owner.setFrom(fromAddress);
             owner.setTo(ownerInbox);
             owner.setSubject("[SocietyWale] New paid society — " + societyName);
             owner.setText("""
@@ -179,7 +187,8 @@ public class MailNotificationService {
         }
 
         try {
-            SimpleMailMessage welcome = baseMessage();
+            SimpleMailMessage welcome = new SimpleMailMessage();
+            welcome.setFrom(fromAddress);
             welcome.setTo(memberEmail);
             welcome.setSubject("Welcome to " + societyName + " on SocietyWale");
             welcome.setText("""
@@ -216,12 +225,6 @@ public class MailNotificationService {
         } catch (Exception ex) {
             log.warn("Failed sending member welcome email to {}: {}", memberEmail, ex.getMessage());
         }
-    }
-
-    private SimpleMailMessage baseMessage() {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom(fromAddress);
-        return message;
     }
 
     private static String normalizeAppUrl(String url) {

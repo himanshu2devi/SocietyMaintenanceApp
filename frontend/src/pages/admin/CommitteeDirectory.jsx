@@ -81,7 +81,7 @@ export default function CommitteeDirectory() {
       </div>
       <div className="card lg:col-span-2">
         <SectionTitle title="Committee directory" subtitle="Visible to all society members" />
-        <div className="overflow-x-auto">
+        <div className="table-scroll">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b text-left text-gray-500">

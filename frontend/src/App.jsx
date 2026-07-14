@@ -30,7 +30,7 @@ export default function App() {
       <ScrollToHash />
       <IdleLogoutWatcher />
       <Navbar />
-      <main className="flex-1" id="main-content">
+      <main className="min-w-0 flex-1" id="main-content">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
@@ -108,9 +108,9 @@ export default function App() {
 }
 
 function AppPage({ children }) {
-  return <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:py-8">{children}</div>
+  return <div className="mx-auto w-full min-w-0 max-w-7xl px-3 py-5 sm:px-6 sm:py-6 lg:px-6 lg:py-8">{children}</div>
 }
 
 function AuthPage({ children }) {
-  return <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:py-10">{children}</div>
+  return <div className="w-full min-w-0">{children}</div>
 }

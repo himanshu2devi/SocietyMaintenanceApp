@@ -5,14 +5,60 @@
 @layer base {
   html {
     scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  html,
+  body,
+  #root {
+    max-width: 100%;
+    overflow-x: clip;
   }
 
   body {
     @apply bg-slate-50 font-sans text-slate-900 antialiased;
+    min-height: 100dvh;
+  }
+
+  img,
+  svg,
+  video,
+  canvas {
+    max-width: 100%;
+    height: auto;
+  }
+
+  table {
+    @apply w-full;
   }
 
   ::selection {
     @apply bg-orange-100 text-slate-900;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    .ai-fab,
+    .ai-fab-ring,
+    .ai-fab-spark,
+    .ai-typing-dot,
+    .ai-panel-enter {
+      animation: none !important;
+    }
+
+    header {
+      transition: none !important;
+    }
+
+    .nav-panel,
+    .nav-backdrop,
+    .nav-burger-icon span {
+      transition: none !important;
+    }
   }
 }
 
@@ -39,19 +85,24 @@
     @apply mb-1.5 block text-sm font-semibold text-slate-700;
   }
   .card {
-    @apply rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm shadow-slate-900/[0.03];
+    @apply rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm shadow-slate-900/[0.03] sm:p-5;
   }
   .badge {
     @apply inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold;
   }
   .eyebrow {
-    @apply inline-flex items-center gap-2 rounded-full border border-orange-100 bg-orange-50 px-3 py-1.5 text-xs font-bold uppercase tracking-[0.14em] text-orange-700;
+    @apply inline-flex max-w-full items-center gap-2 rounded-full border border-orange-100 bg-orange-50 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.12em] text-orange-700 sm:text-xs sm:tracking-[0.14em];
   }
   .section-title {
-    @apply text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl;
+    @apply text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl lg:text-4xl;
   }
   .section-copy {
-    @apply mt-4 max-w-2xl text-base leading-7 text-slate-600;
+    @apply mt-4 max-w-2xl text-sm leading-7 text-slate-600 sm:text-base;
+  }
+
+  /* Horizontal scroll region for wide tables on phone / 13" laptop */
+  .table-scroll {
+    @apply -mx-1 overflow-x-auto overscroll-x-contain;
   }
 
   .ai-fab {
@@ -108,6 +159,61 @@
   .ai-typing-dot {
     @apply inline-block h-1.5 w-1.5 rounded-full bg-teal-500/70;
     animation: ai-typing 1.2s ease-in-out infinite;
+  }
+
+  .nav-burger-icon {
+    @apply relative block h-3.5 w-4;
+  }
+
+  .nav-burger-icon span {
+    @apply absolute left-0 block h-0.5 w-full rounded-full bg-current transition-all duration-300 ease-out;
+  }
+
+  .nav-burger-icon span:nth-child(1) {
+    top: 0;
+  }
+
+  .nav-burger-icon span:nth-child(2) {
+    top: 50%;
+    margin-top: -1px;
+  }
+
+  .nav-burger-icon span:nth-child(3) {
+    bottom: 0;
+  }
+
+  .nav-burger-icon[data-open='true'] span:nth-child(1) {
+    top: 50%;
+    margin-top: -1px;
+    transform: rotate(45deg);
+  }
+
+  .nav-burger-icon[data-open='true'] span:nth-child(2) {
+    opacity: 0;
+    transform: scaleX(0);
+  }
+
+  .nav-burger-icon[data-open='true'] span:nth-child(3) {
+    bottom: auto;
+    top: 50%;
+    margin-top: -1px;
+    transform: rotate(-45deg);
+  }
+
+  .nav-backdrop {
+    @apply pointer-events-none fixed inset-0 top-14 z-20 bg-slate-950/0 opacity-0 transition-all duration-300 sm:top-[72px];
+  }
+
+  .nav-backdrop-open {
+    @apply pointer-events-auto bg-slate-950/35 opacity-100;
+  }
+
+  .nav-panel {
+    @apply pointer-events-none absolute inset-x-0 top-full z-30 max-h-0 overflow-hidden opacity-0 shadow-none transition-[max-height,opacity,box-shadow] duration-300 ease-out;
+  }
+
+  .nav-panel-open {
+    @apply pointer-events-auto max-h-[min(70dvh,520px)] opacity-100 shadow-xl shadow-slate-900/10;
   }
 }
 

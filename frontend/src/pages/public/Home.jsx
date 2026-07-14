@@ -66,53 +66,53 @@ export default function Home() {
     <div className="overflow-hidden">
       <section className="relative isolate overflow-hidden bg-[#fff9f6]">
         <div className="absolute inset-x-0 top-0 -z-10 h-full bg-[radial-gradient(circle_at_90%_15%,rgba(255,122,69,.17),transparent_28%),radial-gradient(circle_at_5%_60%,rgba(15,157,138,.09),transparent_26%)]" />
-        <div className="mx-auto grid max-w-7xl gap-12 px-4 pb-20 pt-16 sm:px-6 lg:grid-cols-[1.05fr_.95fr] lg:items-center lg:pb-28 lg:pt-24">
-          <div>
+        <div className="mx-auto grid max-w-7xl gap-10 px-4 pb-16 pt-12 sm:gap-12 sm:px-6 sm:pb-20 sm:pt-16 lg:grid-cols-[1.05fr_.95fr] lg:items-center lg:pb-28 lg:pt-20 xl:pt-24">
+          <div className="min-w-0">
             <p className="eyebrow">Smart Society Management solution for India</p>
-            <h1 className="mt-6 max-w-3xl text-4xl font-extrabold leading-[1.08] tracking-tight text-slate-950 sm:text-5xl lg:text-6xl">
+            <h1 className="mt-5 max-w-3xl text-3xl font-extrabold leading-[1.1] tracking-tight text-slate-950 sm:mt-6 sm:text-5xl xl:text-6xl">
               Run your housing society with <span className="text-orange-500">clarity, control and trust.</span>
             </h1>
-            <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-600">
+            <p className="mt-5 max-w-2xl text-base leading-7 text-slate-600 sm:mt-6 sm:text-lg sm:leading-8">
               SocietyWale helps managing committees and residents run the society day to day — maintenance, members, notices, expenses, payment claims and clear reports in one place.
             </p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <div className="mt-7 flex flex-col gap-3 sm:mt-8 sm:flex-row sm:flex-wrap">
               <Link to="/register" className="btn-primary !bg-orange-500 !px-6 !py-3.5 hover:!bg-orange-600">
                 Start your society workspace <span aria-hidden="true">→</span>
               </Link>
               <Link to="/contact" className="btn-secondary !px-6 !py-3.5">Talk to us</Link>
             </div>
-            <div className="mt-8 flex flex-wrap gap-x-6 gap-y-3 text-sm font-medium text-slate-600">
+            <div className="mt-7 flex flex-wrap gap-x-6 gap-y-3 text-sm font-medium text-slate-600 sm:mt-8">
               <span className="inline-flex items-center gap-2"><b className="text-emerald-600">✓</b> Built for committees</span>
               <span className="inline-flex items-center gap-2"><b className="text-emerald-600">✓</b> Resident self-service</span>
               <span className="inline-flex items-center gap-2"><b className="text-emerald-600">✓</b> Audit-friendly records</span>
             </div>
           </div>
 
-          <div className="relative mx-auto w-full max-w-xl">
-            <div className="absolute -right-8 -top-8 h-40 w-40 rounded-full bg-orange-200/60 blur-3xl" />
-            <div className="relative rounded-[28px] border border-slate-200 bg-white p-3 shadow-2xl shadow-slate-900/10">
-              <div className="rounded-[20px] bg-slate-950 p-5 text-white">
-                <div className="flex items-center justify-between border-b border-white/10 pb-5">
-                  <div>
+          <div className="relative mx-auto w-full max-w-xl min-w-0 px-1 sm:px-0">
+            <div className="absolute -right-4 -top-6 h-32 w-32 rounded-full bg-orange-200/60 blur-3xl sm:-right-8 sm:-top-8 sm:h-40 sm:w-40" />
+            <div className="relative rounded-[24px] border border-slate-200 bg-white p-2.5 shadow-2xl shadow-slate-900/10 sm:rounded-[28px] sm:p-3">
+              <div className="rounded-[18px] bg-slate-950 p-4 text-white sm:rounded-[20px] sm:p-5">
+                <div className="flex items-center justify-between gap-3 border-b border-white/10 pb-4 sm:pb-5">
+                  <div className="min-w-0">
                     <p className="text-xs font-bold uppercase tracking-[.16em] text-orange-300">Committee overview</p>
-                    <h2 className="mt-1 text-xl font-bold">Good evening, Secretary</h2>
+                    <h2 className="mt-1 truncate text-lg font-bold sm:text-xl">Good evening, Secretary</h2>
                   </div>
-                  <div className="grid h-10 w-10 place-items-center rounded-xl bg-white/10 text-orange-300">⌂</div>
+                  <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-white/10 text-orange-300">⌂</div>
                 </div>
-                <div className="mt-5 grid grid-cols-3 gap-3">
+                <div className="mt-4 grid grid-cols-3 gap-2 sm:mt-5 sm:gap-3">
                   <Metric value="84%" label="Collected" />
                   <Metric value="₹ 1.2L" label="This month" />
                   <Metric value="8" label="Pending flats" />
                 </div>
-                <div className="mt-5 rounded-2xl bg-white p-4 text-slate-900">
-                  <div className="flex items-center justify-between">
-                    <div>
+                <div className="mt-4 rounded-2xl bg-white p-3 text-slate-900 sm:mt-5 sm:p-4">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="min-w-0">
                       <p className="text-xs font-semibold text-slate-500">Collections this month</p>
-                      <p className="mt-1 text-2xl font-extrabold">₹ 1,24,500</p>
+                      <p className="mt-1 text-xl font-extrabold sm:text-2xl">₹ 1,24,500</p>
                     </div>
-                    <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700">On track</span>
+                    <span className="shrink-0 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700">On track</span>
                   </div>
-                  <div className="mt-4 flex h-20 items-end gap-2">
+                  <div className="mt-4 flex h-16 items-end gap-1.5 sm:h-20 sm:gap-2">
                     {[35, 52, 44, 68, 61, 83, 74, 95].map((height, i) => (
                       <span key={i} className="flex-1 rounded-t-md bg-orange-100" style={{ height: `${height}%` }}>
                         <span className={`block h-full rounded-t-md ${i > 5 ? 'bg-orange-500' : 'bg-orange-300'}`} />
@@ -121,7 +121,7 @@ export default function Home() {
                   </div>
                 </div>
               </div>
-              <div className="absolute -bottom-6 -left-6 hidden max-w-[225px] rounded-2xl border border-slate-100 bg-white p-4 shadow-xl shadow-slate-900/10 sm:block">
+              <div className="absolute bottom-2 left-2 hidden max-w-[min(225px,70%)] rounded-2xl border border-slate-100 bg-white p-3 shadow-xl shadow-slate-900/10 sm:bottom-auto sm:-bottom-6 sm:left-auto sm:-left-4 sm:block sm:p-4 lg:-left-6">
                 <div className="flex items-center gap-3">
                   <span className="grid h-9 w-9 place-items-center rounded-full bg-emerald-100 text-emerald-700">✓</span>
                   <div>
@@ -281,9 +281,9 @@ export default function Home() {
 
 function Metric({ value, label }) {
   return (
-    <div className="rounded-xl bg-white/10 p-3">
-      <p className="text-base font-extrabold">{value}</p>
-      <p className="mt-1 text-[11px] font-medium text-slate-300">{label}</p>
+    <div className="min-w-0 rounded-xl bg-white/10 p-2 sm:p-3">
+      <p className="truncate text-sm font-extrabold sm:text-base">{value}</p>
+      <p className="mt-1 truncate text-[10px] font-medium text-slate-300 sm:text-[11px]">{label}</p>
     </div>
   )
 }

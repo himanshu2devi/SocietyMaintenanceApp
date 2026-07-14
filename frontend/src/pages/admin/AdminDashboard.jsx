@@ -65,8 +65,8 @@ export default function AdminDashboard() {
   const ActiveComponent = tabs.find((t) => t.id === active).component
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[220px_minmax(0,1fr)]">
-      <aside className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm shadow-slate-900/[.03] lg:min-h-[calc(100vh-150px)]">
+    <div className="grid min-w-0 gap-4 lg:grid-cols-[200px_minmax(0,1fr)] lg:gap-6 xl:grid-cols-[220px_minmax(0,1fr)]">
+      <aside className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm shadow-slate-900/[.03] lg:min-h-[calc(100dvh-150px)]">
         <div className="border-b border-slate-100 px-3 pb-4 pt-2">
           <p className="text-xs font-bold uppercase tracking-[.14em] text-slate-400">Committee workspace</p>
           <p className="mt-2 break-words text-sm font-bold leading-snug text-slate-900">{user?.societyName || 'Your society'}</p>
@@ -76,17 +76,21 @@ export default function AdminDashboard() {
           <p className="mt-1 break-words text-xs leading-snug text-slate-500">{user?.fullName}</p>
           <p className="mt-0.5 text-xs font-semibold text-slate-400">Admin</p>
         </div>
-        <nav className="mt-3 grid gap-1">
+        <nav
+          className="-mx-1 mt-3 flex gap-1 overflow-x-auto overscroll-x-contain px-1 pb-1 lg:mx-0 lg:grid lg:gap-1 lg:overflow-visible lg:px-0 lg:pb-0"
+          aria-label="Committee sections"
+        >
           {tabs.map((tab) => (
             <button
               key={tab.id}
+              type="button"
               onClick={() => setActive(tab.id)}
-              className={`flex items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-semibold transition ${
+              className={`flex shrink-0 items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm font-semibold transition lg:gap-3 lg:py-3 ${
                 active === tab.id ? 'bg-orange-50 text-orange-700' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-950'
               }`}
             >
-              <span className="grid h-7 w-7 place-items-center rounded-lg bg-white text-base shadow-sm">{tab.icon}</span>
-              <span className="flex-1">{tab.label}</span>
+              <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-white text-base shadow-sm">{tab.icon}</span>
+              <span className="whitespace-nowrap lg:flex-1 lg:whitespace-normal">{tab.label}</span>
               {tab.id === 'claims' && pendingClaims > 0 && (
                 <span className="rounded-full bg-orange-600 px-2 py-0.5 text-[11px] font-bold text-white">
                   {pendingClaims}
@@ -97,15 +101,15 @@ export default function AdminDashboard() {
         </nav>
       </aside>
       <section className="min-w-0">
-        <div className="mb-6 flex flex-col gap-3 border-b border-slate-200 pb-5 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-[.14em] text-orange-600">
+        <div className="mb-5 flex flex-col gap-3 border-b border-slate-200 pb-4 sm:mb-6 sm:flex-row sm:items-end sm:justify-between sm:pb-5">
+          <div className="min-w-0">
+            <p className="break-words text-xs font-bold uppercase tracking-[.14em] text-orange-600">
               {user?.societyName || 'SocietyWale admin'}
               {user?.societyCode ? ` · ${user.societyCode}` : ''}
             </p>
-            <h1 className="mt-1 text-2xl font-extrabold tracking-tight text-slate-950">{tabs.find((tab) => tab.id === active).label}</h1>
+            <h1 className="mt-1 text-xl font-extrabold tracking-tight text-slate-950 sm:text-2xl">{tabs.find((tab) => tab.id === active).label}</h1>
           </div>
-          <p className="text-sm text-slate-500">Committee manages records. Members view and participate securely.</p>
+          <p className="shrink-0 text-sm text-slate-500">Committee manages records. Members view and participate securely.</p>
         </div>
         <ActiveComponent
           onNavigate={setActive}

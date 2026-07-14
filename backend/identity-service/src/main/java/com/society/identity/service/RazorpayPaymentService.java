@@ -26,7 +26,6 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.EnumSet;
 import java.util.HexFormat;
 import java.util.UUID;
 
@@ -57,7 +56,7 @@ public class RazorpayPaymentService {
             @Value("${app.razorpay.key-id:}") String keyId,
             @Value("${app.razorpay.key-secret:}") String keySecret,
             @Value("${app.razorpay.webhook-secret:}") String webhookSecret,
-            @Value("${app.razorpay.amount-paise:100}") long amountPaise,
+            @Value("${app.razorpay.amount-paise:499900}") long amountPaise,
             @Value("${app.razorpay.currency:INR}") String currency,
             @Value("${app.razorpay.list-price-rupees:9999}") int listPriceRupees,
             @Value("${app.razorpay.offer-price-rupees:4999}") int offerPriceRupees,
@@ -99,14 +98,6 @@ public class RazorpayPaymentService {
     }
 
     public SubscriptionPricingResponse pricing() {
-        long paidCount = paymentRepository.countByStatusIn(
-                EnumSet.of(PaymentStatus.PAID, PaymentStatus.CONSUMED));
-        long remaining = Math.max(0, earlyBirdLimit - paidCount);
-        boolean earlyBird = remaining > 0;
-        String note = amountPaise < offerPriceRupees * 100L
-                ? "Checkout currently charges the configured launch/test amount. Official early-bird list price is shown for transparency."
-                : "Annual society workspace subscription. Early customers get the offer price while seats remain.";
-
         return new SubscriptionPricingResponse(
                 isConfigured(),
                 isConfigured() ? keyId : null,
@@ -116,11 +107,11 @@ public class RazorpayPaymentService {
                 listPriceRupees,
                 offerPriceRupees,
                 earlyBirdLimit,
-                remaining,
-                earlyBird,
+                0,
+                true,
                 "Annual society workspace",
                 "year",
-                note
+                "Annual society workspace subscription. Limited time offer price applies at checkout."
         );
     }
 
@@ -179,10 +170,6 @@ public class RazorpayPaymentService {
             payment.setReceiptNumber(receipt);
             paymentRepository.save(payment);
 
-            long paidCount = paymentRepository.countByStatusIn(
-                    EnumSet.of(PaymentStatus.PAID, PaymentStatus.CONSUMED));
-            boolean earlyBird = paidCount < earlyBirdLimit;
-
             return new CreateOrderResponse(
                     keyId,
                     orderId,
@@ -192,7 +179,7 @@ public class RazorpayPaymentService {
                     receipt,
                     listPriceRupees,
                     offerPriceRupees,
-                    earlyBird,
+                    true,
                     "Annual society workspace"
             );
         } catch (RazorpayException ex) {
@@ -207,7 +194,7 @@ public class RazorpayPaymentService {
             }
             if (detail.toLowerCase().contains("amount")) {
                 throw new BadRequestException(
-                        "Razorpay rejected the payment amount. Confirm RAZORPAY_AMOUNT_PAISE is a valid number (e.g. 100 for ₹1).");
+                        "Razorpay rejected the payment amount. Confirm RAZORPAY_AMOUNT_PAISE is set correctly (e.g. 499900 for ₹4,999).");
             }
             throw new BadRequestException(
                     "Could not start payment with Razorpay. Please try again in a moment. If this continues, contact SocietyWale support.");

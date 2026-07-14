@@ -179,7 +179,7 @@ export default function MemberDirectory() {
       <div className="lg:col-span-2">
         <div className="card">
           <SectionTitle title="Member Directory" subtitle={`${activeCount} active · ${members.length} total`} />
-          <div className="overflow-x-auto">
+          <div className="table-scroll">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b text-left text-gray-500">

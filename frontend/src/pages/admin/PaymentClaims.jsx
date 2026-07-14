@@ -88,7 +88,7 @@ export default function PaymentClaims({ onNavigate, onClaimsChanged }) {
           }
         />
         <Alert type="error">{error}</Alert>
-        <div className="overflow-x-auto">
+        <div className="table-scroll">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b text-left text-gray-500">

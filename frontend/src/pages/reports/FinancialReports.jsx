@@ -89,7 +89,7 @@ export default function FinancialReports() {
 
       <div className="card">
         <SectionTitle title="Report filters" subtitle="Choose period, then generate" />
-        <div className="grid gap-4 lg:grid-cols-[1fr_auto]">
+        <div className="grid gap-4 xl:grid-cols-[1fr_auto]">
           <div className="flex flex-wrap items-end gap-3">
             <div>
               <label className="label">Year</label>
@@ -172,7 +172,7 @@ export default function FinancialReports() {
           {monthly.expenseLines?.length > 0 && (
             <>
               <h3 className="mb-2 mt-6 text-sm font-semibold text-slate-700">Expense details</h3>
-              <div className="overflow-x-auto">
+              <div className="table-scroll">
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b text-left text-gray-500">
@@ -223,7 +223,7 @@ export default function FinancialReports() {
             <Stat label="Expenses" value={inr(annual.totalExpenses)} tone="text-red-700" bg="bg-red-50" />
             <Stat label="Closing" value={inr(annual.closingBalance)} tone={annual.closingBalance >= 0 ? 'text-teal-800' : 'text-red-700'} bg="bg-slate-50" />
           </div>
-          <div className="mt-6 overflow-x-auto">
+          <div className="mt-6 table-scroll">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b text-left text-gray-500">

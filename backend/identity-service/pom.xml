@@ -48,6 +48,13 @@
             <artifactId>spring-boot-starter-mail</artifactId>
         </dependency>
 
+        <!-- PDF receipts for paid society signup emails -->
+        <dependency>
+            <groupId>com.github.librepdf</groupId>
+            <artifactId>openpdf</artifactId>
+            <version>1.3.39</version>
+        </dependency>
+
         <!-- Razorpay Official Java SDK (orders + signature verification) -->
         <dependency>
             <groupId>com.razorpay</groupId>

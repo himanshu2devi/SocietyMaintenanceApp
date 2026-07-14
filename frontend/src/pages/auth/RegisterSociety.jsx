@@ -39,11 +39,8 @@ const DEFAULT_PRICING = {
   enabled: true,
   listPriceRupees: 9999,
   offerPriceRupees: 4999,
-  earlyBirdLimit: 10,
-  earlyBirdRemaining: 10,
-  earlyBirdActive: true,
-  amountPaise: 100,
-  amountDisplay: '₹1',
+  amountPaise: 499900,
+  amountDisplay: '₹4,999',
   currency: 'INR',
   planLabel: 'Annual society workspace',
 }
@@ -70,13 +67,6 @@ export default function RegisterSociety() {
           ...d,
           listPriceRupees: d.listPriceRupees ?? DEFAULT_PRICING.listPriceRupees,
           offerPriceRupees: d.offerPriceRupees ?? DEFAULT_PRICING.offerPriceRupees,
-          earlyBirdLimit: d.earlyBirdLimit ?? DEFAULT_PRICING.earlyBirdLimit,
-          earlyBirdRemaining:
-            d.earlyBirdRemaining != null ? d.earlyBirdRemaining : DEFAULT_PRICING.earlyBirdRemaining,
-          earlyBirdActive:
-            d.earlyBirdActive != null
-              ? d.earlyBirdActive
-              : (d.earlyBirdRemaining ?? DEFAULT_PRICING.earlyBirdRemaining) > 0,
           amountPaise: d.amountPaise ?? DEFAULT_PRICING.amountPaise,
           amountDisplay: d.amountDisplay || DEFAULT_PRICING.amountDisplay,
           enabled: d.enabled !== false,
@@ -210,13 +200,11 @@ export default function RegisterSociety() {
   }
 
   const busy = loading || paying
-  const earlyBird = pricing.earlyBirdActive !== false
   const listPrice = pricing.listPriceRupees || 9999
   const offerPrice = pricing.offerPriceRupees || 4999
-  const displayPrice = earlyBird ? offerPrice : listPrice
-  const chargeLabel = pricing.amountDisplay || `₹${(Number(pricing.amountPaise || 100) / 100).toLocaleString('en-IN')}`
-  const seatsLeft = pricing.earlyBirdRemaining != null ? pricing.earlyBirdRemaining : pricing.earlyBirdLimit || 10
-  const seatsTotal = pricing.earlyBirdLimit || 10
+  const chargeLabel =
+    pricing.amountDisplay ||
+    `₹${(Number(pricing.amountPaise || 499900) / 100).toLocaleString('en-IN')}`
 
   return (
     <AuthShell
@@ -233,43 +221,30 @@ export default function RegisterSociety() {
             <p className="text-xs font-bold uppercase tracking-[0.12em] text-orange-700">
               Annual society subscription
             </p>
-            {earlyBird && (
-              <span className="rounded-full bg-teal-600 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
-                Limited early offer
-              </span>
-            )}
+            <span className="rounded-full bg-teal-600 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
+              Limited time offer
+            </span>
           </div>
 
           <div className="mt-3 flex flex-wrap items-end gap-3">
-            {earlyBird && (
-              <span className="text-lg font-semibold text-slate-400 line-through">
-                ₹{listPrice.toLocaleString('en-IN')}
-              </span>
-            )}
+            <span className="text-lg font-semibold text-slate-400 line-through">
+              ₹{listPrice.toLocaleString('en-IN')}
+            </span>
             <span className="text-3xl font-extrabold tracking-tight text-slate-950">
-              ₹{displayPrice.toLocaleString('en-IN')}
+              ₹{offerPrice.toLocaleString('en-IN')}
               <span className="text-sm font-semibold text-slate-600"> / year</span>
             </span>
           </div>
 
-          {earlyBird && (
-            <p className="mt-2 text-sm font-semibold text-teal-800">
-              Launch offer for first {seatsTotal} societies — save ₹
-              {(listPrice - offerPrice).toLocaleString('en-IN')}. {seatsLeft} seat{seatsLeft === 1 ? '' : 's'} left.
-            </p>
-          )}
-
           <div className="mt-3 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-700">
             <p>
-              <span className="font-semibold text-slate-900">You pay at checkout: </span>
+              {/* <span className="font-semibold text-slate-900">You pay at checkout: </span>
               <span className="text-base font-extrabold text-orange-600">{chargeLabel}</span>
-              {Number(pricing.amountPaise) === 100 ? (
-                <span className="text-xs font-medium text-slate-500"> (testing amount while we verify live payments)</span>
-              ) : null}
+              <span className="text-xs font-medium text-slate-500"> / year</span> */}
             </p>
             <p className="mt-1 text-xs leading-5 text-slate-500">
-              Pay securely via Razorpay (UPI / cards / netbanking). Click <b>Pay Now and Sign Up</b> after filling the form.
-              No refund after successful payment — see{' '}
+              Pay securely via Razorpay (UPI / cards / netbanking). Click <b>Pay {chargeLabel} and Sign Up</b> after
+              filling the form. See {' '}
               <Link to="/refund-policy" className="font-semibold text-orange-600 hover:text-orange-700">
                 Refund &amp; Cancellation Policy
               </Link>
@@ -340,7 +315,7 @@ export default function RegisterSociety() {
               ? 'Opening Razorpay…'
               : loading
                 ? 'Creating workspace…'
-                : `Pay ${chargeLabel} and Sign Up`}
+                : `Pay Now and Sign Up`}
           </button>
           <p className="text-center text-[11px] leading-4 text-slate-500">
             Secure payments by Razorpay. Workspace access is created only after a successful payment of {chargeLabel}.

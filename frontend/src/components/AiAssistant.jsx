@@ -136,9 +136,9 @@ export default function AiAssistant() {
   }
 
   return (
-    <div className="fixed bottom-5 right-5 z-40 flex flex-col items-end gap-3">
+    <div className="fixed bottom-[max(1.25rem,env(safe-area-inset-bottom))] right-[max(1.25rem,env(safe-area-inset-right))] z-40 flex max-w-[calc(100vw-1.5rem)] flex-col items-end gap-3">
       {open && (
-        <div className="ai-panel-enter flex h-[440px] w-[min(100vw-2rem,380px)] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl shadow-slate-900/20">
+        <div className="ai-panel-enter flex h-[min(440px,calc(100dvh-8rem))] w-[min(100vw-1.5rem,380px)] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl shadow-slate-900/20">
           <div className="bg-[linear-gradient(135deg,#102A43,#0f766e)] px-4 py-3 text-white">
             <div className="flex items-center gap-3">
               <span className="relative grid h-9 w-9 place-items-center overflow-hidden rounded-full bg-gradient-to-br from-orange-400 to-teal-600 text-white shadow">

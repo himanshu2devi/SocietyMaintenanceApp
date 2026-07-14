@@ -92,7 +92,7 @@ export default function ExpenseLogger() {
               </div>
             </div>
             <div>
-              <label className="label">Bill ID</label>
+              <label className="label">Bill ID/Transaction ID</label>
               <input
                 name="billId"
                 className="input"
@@ -100,7 +100,7 @@ export default function ExpenseLogger() {
                 onChange={update}
                 required
                 maxLength={80}
-                placeholder="Invoice / bill no. or N/A"
+                placeholder="Enter N/A if not available"
               />
             </div>
             <div>
@@ -120,7 +120,7 @@ export default function ExpenseLogger() {
             title="Expense Log"
             subtitle={`Total: ₹${total.toLocaleString('en-IN')}`}
           />
-          <div className="overflow-x-auto">
+          <div className="table-scroll">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b text-left text-gray-500">

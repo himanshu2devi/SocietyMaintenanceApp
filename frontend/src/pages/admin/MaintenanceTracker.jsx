@@ -415,7 +415,7 @@ export default function MaintenanceTracker() {
           )}
         </div>
         {rates.length > 0 && (
-          <div className="mt-4 overflow-x-auto">
+          <div className="mt-4 table-scroll">
             <p className="mb-2 text-xs font-bold uppercase tracking-[.12em] text-slate-400">Amount timeline</p>
             <table className="w-full text-sm">
               <thead>
@@ -600,7 +600,7 @@ export default function MaintenanceTracker() {
               Default status is <span className="font-semibold text-amber-700">not paid</span> until marked paid.
               Payment mode appears only for paid members.
             </p>
-            <div className="overflow-x-auto">
+            <div className="table-scroll">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b text-left text-gray-500">

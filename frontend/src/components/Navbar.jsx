@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { Brand } from './Brand'
 import { NoticeService } from '../api/services'
@@ -24,11 +24,19 @@ function initials(name = '') {
 export default function Navbar() {
   const { isAuthenticated, isAdmin, user, logout } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
   const [open, setOpen] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
   const [unreadNotices, setUnreadNotices] = useState(0)
+  const [navHidden, setNavHidden] = useState(false)
   const knownUnread = useRef(null)
   const profileRef = useRef(null)
+  const lastScrollY = useRef(0)
+
+  useEffect(() => {
+    setOpen(false)
+    setProfileOpen(false)
+  }, [location.pathname, location.hash])
 
   useEffect(() => {
     if (!isAuthenticated || isAdmin) {
@@ -66,9 +74,47 @@ export default function Navbar() {
     return () => document.removeEventListener('mousedown', onDocClick)
   }, [])
 
+  // Hide header on scroll down / show on scroll up; close mobile menu while scrolling
+  useEffect(() => {
+    lastScrollY.current = window.scrollY
+
+    function onScroll() {
+      const y = window.scrollY
+      const delta = y - lastScrollY.current
+
+      if (Math.abs(delta) < 6) return
+
+      if (y < 48) {
+        setNavHidden(false)
+      } else if (delta > 0) {
+        setNavHidden(true)
+        setOpen(false)
+        setProfileOpen(false)
+      } else {
+        setNavHidden(false)
+      }
+
+      lastScrollY.current = y
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  // Prevent background scroll while mobile menu is open
+  useEffect(() => {
+    if (!open) return undefined
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = prev
+    }
+  }, [open])
+
   function handleLogout() {
     logout()
     setProfileOpen(false)
+    setOpen(false)
     navigate('/login')
   }
 
@@ -77,12 +123,23 @@ export default function Navbar() {
     navigate('/member', { state: { focusNotices: true } })
   }
 
-  return (
-    <header className="sticky top-0 z-30 border-b border-slate-200/70 bg-white/90 backdrop-blur-xl" role="banner">
-      <div className="mx-auto flex h-[72px] max-w-7xl items-center justify-between px-4 sm:px-6">
-        <Brand />
+  function closeMenu() {
+    setOpen(false)
+  }
 
-        <nav className="hidden items-center gap-1 md:flex" aria-label="Primary">
+  return (
+    <header
+      className={`sticky top-0 z-30 border-b border-slate-200/70 bg-white/95 backdrop-blur-xl transition-transform duration-300 ease-out ${
+        navHidden && !open ? '-translate-y-full' : 'translate-y-0'
+      }`}
+      role="banner"
+    >
+      <div className="mx-auto flex h-14 min-w-0 max-w-7xl items-center justify-between gap-3 px-3 sm:h-[72px] sm:px-6">
+        <div className="min-w-0 shrink">
+          <Brand />
+        </div>
+
+        <nav className="hidden items-center gap-0.5 lg:flex" aria-label="Primary">
           {publicLinks.map((l) => (
             <Link key={l.to} to={l.to} className={navClass()}>
               {l.label}
@@ -106,7 +163,7 @@ export default function Navbar() {
           )}
         </nav>
 
-        <div className="hidden items-center gap-2 md:flex">
+        <div className="hidden items-center gap-2 lg:flex">
           {isAuthenticated ? (
             <>
               {!isAdmin && (
@@ -129,14 +186,14 @@ export default function Navbar() {
                 <button
                   type="button"
                   onClick={() => setProfileOpen((v) => !v)}
-                  className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white py-1.5 pl-1.5 pr-3 transition hover:bg-slate-50"
+                  className="flex max-w-[220px] items-center gap-2 rounded-xl border border-slate-200 bg-white py-1.5 pl-1.5 pr-3 transition hover:bg-slate-50"
                   aria-haspopup="menu"
                   aria-expanded={profileOpen}
                 >
-                  <span className="grid h-8 w-8 place-items-center rounded-lg bg-orange-500 text-xs font-extrabold text-white">
+                  <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-orange-500 text-xs font-extrabold text-white">
                     {initials(user?.fullName)}
                   </span>
-                  <span className="hidden max-w-[160px] truncate text-sm font-semibold text-slate-800 lg:inline">
+                  <span className="hidden truncate text-sm font-semibold text-slate-800 xl:inline">
                     {user?.fullName || 'Profile'}
                   </span>
                 </button>
@@ -181,7 +238,7 @@ export default function Navbar() {
           )}
         </div>
 
-        <div className="flex items-center gap-2 md:hidden">
+        <div className="flex items-center gap-2 lg:hidden">
           {isAuthenticated && !isAdmin && (
             <button
               type="button"
@@ -208,44 +265,80 @@ export default function Navbar() {
           )}
           <button
             type="button"
-            className="grid h-10 w-10 place-items-center rounded-xl border border-slate-200 text-slate-700"
+            className={`nav-burger grid h-10 w-10 place-items-center rounded-xl border transition ${
+              open ? 'border-orange-200 bg-orange-50 text-orange-700' : 'border-slate-200 text-slate-700'
+            }`}
             onClick={() => setOpen((value) => !value)}
-            aria-label="Toggle navigation menu"
+            aria-label={open ? 'Close navigation menu' : 'Open navigation menu'}
             aria-expanded={open}
+            aria-controls="mobile-nav-panel"
           >
-            <span className="text-lg">{open ? '×' : '☰'}</span>
+            <span className="nav-burger-icon" data-open={open ? 'true' : 'false'} aria-hidden="true">
+              <span />
+              <span />
+              <span />
+            </span>
           </button>
         </div>
       </div>
-      {open && (
-        <div className="border-t border-slate-100 bg-white px-4 py-4 shadow-lg md:hidden">
-          <div className="mx-auto flex max-w-7xl flex-col gap-1">
-            {publicLinks.map((link) => (
-              <Link key={link.to} to={link.to} onClick={() => setOpen(false)} className="rounded-xl px-3 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50">
-                {link.label}
+
+      {/* Backdrop */}
+      <div
+        className={`nav-backdrop lg:hidden ${open ? 'nav-backdrop-open' : ''}`}
+        onClick={closeMenu}
+        aria-hidden={!open}
+      />
+
+      {/* Mobile / tablet panel */}
+      <div
+        id="mobile-nav-panel"
+        className={`nav-panel border-t border-slate-100 bg-white lg:hidden ${open ? 'nav-panel-open' : ''}`}
+        aria-hidden={!open}
+      >
+        <nav className="mx-auto flex max-h-[min(70dvh,520px)] max-w-7xl flex-col gap-1 overflow-y-auto overscroll-contain px-3 py-4 sm:px-4" aria-label="Mobile">
+          {publicLinks.map((link) => (
+            <Link
+              key={link.to}
+              to={link.to}
+              onClick={closeMenu}
+              className="rounded-xl px-3 py-3.5 text-sm font-semibold text-slate-700 transition hover:bg-orange-50 hover:text-orange-700 active:scale-[0.99]"
+            >
+              {link.label}
+            </Link>
+          ))}
+          {isAuthenticated ? (
+            <>
+              <div className="my-2 border-t border-slate-100" />
+              <Link to="/profile" onClick={closeMenu} className="rounded-xl px-3 py-3.5 text-sm font-semibold text-slate-700 transition hover:bg-orange-50 hover:text-orange-700">
+                My profile
               </Link>
-            ))}
-            {isAuthenticated ? (
-              <>
-                <Link to="/profile" onClick={() => setOpen(false)} className="rounded-xl px-3 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50">
-                  My profile
+              <Link to={isAdmin ? '/admin' : '/member'} onClick={closeMenu} className="rounded-xl px-3 py-3.5 text-sm font-semibold text-slate-700 transition hover:bg-orange-50 hover:text-orange-700">
+                My dashboard
+              </Link>
+              <Link to="/reports" onClick={closeMenu} className="rounded-xl px-3 py-3.5 text-sm font-semibold text-slate-700 transition hover:bg-orange-50 hover:text-orange-700">
+                Reports
+              </Link>
+              {isAdmin && (
+                <Link to="/analytics" onClick={closeMenu} className="rounded-xl px-3 py-3.5 text-sm font-semibold text-slate-700 transition hover:bg-orange-50 hover:text-orange-700">
+                  Analytics
                 </Link>
-                <Link to={isAdmin ? '/admin' : '/member'} onClick={() => setOpen(false)} className="rounded-xl px-3 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50">My dashboard</Link>
-                <Link to="/reports" onClick={() => setOpen(false)} className="rounded-xl px-3 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50">Reports</Link>
-                {isAdmin && (
-                  <Link to="/analytics" onClick={() => setOpen(false)} className="rounded-xl px-3 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50">Analytics</Link>
-                )}
-                <button onClick={handleLogout} className="btn-secondary mt-2">Sign out</button>
-              </>
-            ) : (
-              <div className="mt-2 grid grid-cols-2 gap-2">
-                <Link to="/login" onClick={() => setOpen(false)} className="btn-secondary">Sign in</Link>
-                <Link to="/register-member" onClick={() => setOpen(false)} className="btn-primary !bg-orange-500 hover:!bg-orange-600">Member signup</Link>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
+              )}
+              <button type="button" onClick={handleLogout} className="btn-secondary mt-3 w-full">
+                Sign out
+              </button>
+            </>
+          ) : (
+            <div className="mt-3 grid grid-cols-2 gap-2">
+              <Link to="/login" onClick={closeMenu} className="btn-secondary">
+                Sign in
+              </Link>
+              <Link to="/register" onClick={closeMenu} className="btn-primary !bg-orange-500 hover:!bg-orange-600">
+                Sign Up
+              </Link>
+            </div>
+          )}
+        </nav>
+      </div>
     </header>
   )
 }

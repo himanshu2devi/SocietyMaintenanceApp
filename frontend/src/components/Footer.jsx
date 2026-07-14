@@ -5,7 +5,7 @@ import { SITE_EMAIL, SITE_PHONES, mailtoHref, telHref } from '../utils/siteConta
 export default function Footer() {
   return (
     <footer className="mt-auto border-t border-slate-200 bg-white" role="contentinfo">
-      <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:px-6 lg:grid-cols-[1.5fr_repeat(3,1fr)]">
+      <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:gap-10 sm:px-6 sm:py-12 md:grid-cols-2 lg:grid-cols-[1.5fr_repeat(3,1fr)]">
         <div>
           <Brand />
           <p className="mt-4 max-w-sm text-sm leading-6 text-slate-500">
