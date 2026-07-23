@@ -39,8 +39,8 @@ const DEFAULT_PRICING = {
   enabled: true,
   listPriceRupees: 9999,
   offerPriceRupees: 4999,
-  amountPaise: 100,
-  amountDisplay: '₹1',
+  amountPaise: 499900,
+  amountDisplay: '₹4,999',
   currency: 'INR',
   planLabel: 'Annual society workspace',
 }
@@ -204,7 +204,7 @@ export default function RegisterSociety() {
   const offerPrice = pricing.offerPriceRupees || 4999
   const chargeLabel =
     pricing.amountDisplay ||
-    `₹${(Number(pricing.amountPaise || 100) / 100).toLocaleString('en-IN')}`
+    `₹${(Number(pricing.amountPaise || 499900) / 100).toLocaleString('en-IN')}`
 
   return (
     <AuthShell
@@ -282,7 +282,7 @@ export default function RegisterSociety() {
           </div>
 
           <div className="rounded-2xl bg-slate-50 p-4">
-            <p className="text-sm font-bold text-slate-900">2. Committee administrator</p>
+            <p className="text-sm font-bold text-slate-900">2. Committee/Secretary admin</p>
             <p className="mt-1 text-xs leading-5 text-slate-600">This account will manage members, maintenance, expenses and notices.</p>
           </div>
 
@@ -318,7 +318,7 @@ export default function RegisterSociety() {
                 : `Pay Now and Sign Up`}
           </button>
           <p className="text-center text-[11px] leading-4 text-slate-500">
-            Secure payments by Razorpay. Workspace access is created only after a successful payment of {chargeLabel}.
+            Secure payments. Workspace access is created only after a successful payment.
           </p>
         </form>
 
