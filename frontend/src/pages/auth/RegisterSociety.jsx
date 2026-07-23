@@ -39,8 +39,8 @@ const DEFAULT_PRICING = {
   enabled: true,
   listPriceRupees: 9999,
   offerPriceRupees: 4999,
-  amountPaise: 499900,
-  amountDisplay: '₹4,999',
+  amountPaise: 100,
+  amountDisplay: '₹1',
   currency: 'INR',
   planLabel: 'Annual society workspace',
 }
@@ -204,7 +204,7 @@ export default function RegisterSociety() {
   const offerPrice = pricing.offerPriceRupees || 4999
   const chargeLabel =
     pricing.amountDisplay ||
-    `₹${(Number(pricing.amountPaise || 499900) / 100).toLocaleString('en-IN')}`
+    `₹${(Number(pricing.amountPaise || 100) / 100).toLocaleString('en-IN')}`
 
   return (
     <AuthShell
@@ -256,7 +256,7 @@ export default function RegisterSociety() {
         <form onSubmit={handleSubmit} className="space-y-4" noValidate>
           <div className="rounded-2xl bg-orange-50 p-4">
             <p className="text-sm font-bold text-slate-900">1. Society details</p>
-            <p className="mt-1 text-xs leading-5 text-slate-600">Use a short, unique code your committee can recognise.</p>
+            <p className="mt-1 text-xs leading-5 text-slate-600">Use a unique combination of city and society registration number to create a society code.</p>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <div>

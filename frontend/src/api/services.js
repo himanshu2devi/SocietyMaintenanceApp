@@ -26,6 +26,8 @@ export const MaintenanceService = {
   markPending: (payload) => coreApi.post('/maintenance/pending', payload).then((r) => r.data),
   markPaid: (chargeId, paymentMode) =>
     coreApi.patch(`/maintenance/${chargeId}/paid`, null, { params: { paymentMode } }).then((r) => r.data),
+  downloadReceipt: (chargeId) =>
+    coreApi.get(`/maintenance/${chargeId}/receipt`, { responseType: 'blob' }).then((r) => r.data),
 }
 
 export const MaintenanceRateService = {
@@ -34,6 +36,20 @@ export const MaintenanceRateService = {
     coreApi.get('/maintenance-rates/effective', { params: { year, month } }).then((r) => r.data),
   setRate: (payload) => coreApi.post('/maintenance-rates', payload).then((r) => r.data),
 }
+
+export const MaintenanceBillingService = {
+  settings: () => coreApi.get('/maintenance-billing/settings').then((r) => r.data),
+  chooseMode: (billingMode) =>
+    coreApi.post('/maintenance-billing/settings/mode', { billingMode }).then((r) => r.data),
+  listMemberDefaults: () => coreApi.get('/maintenance-billing/member-defaults').then((r) => r.data),
+  upsertMemberDefaults: (defaults) =>
+    coreApi.put('/maintenance-billing/member-defaults', { defaults }).then((r) => r.data),
+  resolve: (year, month, { memberId, flatNumber } = {}) =>
+    coreApi
+      .get('/maintenance-billing/resolve', { params: { year, month, memberId, flatNumber } })
+      .then((r) => r.data),
+}
+
 
 export const ExpenseService = {
   list: () => coreApi.get('/expenses').then((r) => r.data),

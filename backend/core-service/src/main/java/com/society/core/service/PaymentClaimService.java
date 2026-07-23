@@ -3,7 +3,7 @@ package com.society.core.service;
 import com.society.core.domain.MaintenanceCharge;
 import com.society.core.domain.MaintenanceStatus;
 import com.society.core.domain.PaymentClaim;
-import com.society.core.dto.MaintenanceRateDtos.EffectiveRateResponse;
+import com.society.core.dto.MaintenanceBillingDtos.ResolvedAmountResponse;
 import com.society.core.dto.PaymentClaimDtos.*;
 import com.society.core.exception.ApiExceptions.BadRequestException;
 import com.society.core.exception.ApiExceptions.ConflictException;
@@ -27,14 +27,14 @@ public class PaymentClaimService {
 
     private final PaymentClaimRepository claimRepository;
     private final MaintenanceChargeRepository chargeRepository;
-    private final MaintenanceRateService rateService;
+    private final MaintenanceBillingService billingService;
 
     public PaymentClaimService(PaymentClaimRepository claimRepository,
                                MaintenanceChargeRepository chargeRepository,
-                               MaintenanceRateService rateService) {
+                               MaintenanceBillingService billingService) {
         this.claimRepository = claimRepository;
         this.chargeRepository = chargeRepository;
-        this.rateService = rateService;
+        this.billingService = billingService;
     }
 
     @Transactional
@@ -101,10 +101,12 @@ public class PaymentClaimService {
 
     private MaintenanceCharge createPendingCharge(UUID societyId, UUID memberId, String flatNumber,
                                                   int year, int month) {
-        EffectiveRateResponse rate = rateService.effective(societyId, year, month);
-        if (!rate.configured() || rate.amount() == null || rate.amount().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new BadRequestException(
-                    "Society maintenance amount is not set for this month. Ask committee to set the rate first.");
+        ResolvedAmountResponse resolved = billingService.resolveAmount(societyId, memberId, flatNumber, year, month);
+        if (!resolved.configured() || resolved.amount() == null || resolved.amount().compareTo(BigDecimal.ZERO) <= 0) {
+            String hint = resolved.billingMode() != null && resolved.billingMode().name().equals("VARIABLE")
+                    ? "Ask committee to set your flat's default maintenance amount first."
+                    : "Society maintenance amount is not set for this month. Ask committee to set the rate first.";
+            throw new BadRequestException(hint);
         }
 
         MaintenanceCharge charge = new MaintenanceCharge();
@@ -113,7 +115,7 @@ public class PaymentClaimService {
         charge.setMemberId(memberId);
         charge.setBillingYear(year);
         charge.setBillingMonth(month);
-        charge.setAmount(rate.amount());
+        charge.setAmount(resolved.amount());
         charge.setStatus(MaintenanceStatus.PENDING);
         charge.setPaymentMode(null);
         charge.setPaidAt(null);
@@ -163,6 +165,9 @@ public class PaymentClaimService {
             charge.setStatus(MaintenanceStatus.PAID);
             charge.setPaidAt(Instant.now());
             charge.setPaymentMode(mode);
+            if (claim.getReferenceNumber() != null && !claim.getReferenceNumber().isBlank()) {
+                charge.setTransactionReference(claim.getReferenceNumber().trim());
+            }
             String note = "Verified via payment claim";
             if (claim.getReferenceNumber() != null && !claim.getReferenceNumber().isBlank()) {
                 note = note + " (ref: " + claim.getReferenceNumber() + ")";

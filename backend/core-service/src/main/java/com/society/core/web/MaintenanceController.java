@@ -4,7 +4,9 @@ import com.society.core.dto.MaintenanceDtos.*;
 import com.society.core.security.AuthenticatedUser;
 import com.society.core.service.MaintenanceService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -27,6 +29,22 @@ public class MaintenanceController {
     public ResponseEntity<List<MaintenanceChargeResponse>> list(
             @AuthenticationPrincipal AuthenticatedUser user) {
         return ResponseEntity.ok(service.list(user.societyId()));
+    }
+
+    @GetMapping("/{chargeId}/receipt")
+    public ResponseEntity<byte[]> downloadReceipt(
+            @AuthenticationPrincipal AuthenticatedUser user,
+            @PathVariable UUID chargeId) {
+        var receipt = service.downloadReceipt(
+                user.societyId(),
+                chargeId,
+                user.userId(),
+                user.role(),
+                user.flatNumber());
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + receipt.filename() + "\"")
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(receipt.bytes());
     }
 
     @PostMapping("/collect")

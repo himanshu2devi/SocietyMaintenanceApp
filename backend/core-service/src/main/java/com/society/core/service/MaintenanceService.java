@@ -4,6 +4,7 @@ import com.society.core.domain.MaintenanceCharge;
 import com.society.core.domain.MaintenanceStatus;
 import com.society.core.dto.MaintenanceDtos.*;
 import com.society.core.exception.ApiExceptions.BadRequestException;
+import com.society.core.exception.ApiExceptions.ForbiddenException;
 import com.society.core.exception.ApiExceptions.NotFoundException;
 import com.society.core.repository.MaintenanceChargeRepository;
 import org.springframework.stereotype.Service;
@@ -21,9 +22,16 @@ public class MaintenanceService {
     private static final Set<String> PAYMENT_MODES = Set.of("CASH", "ONLINE");
 
     private final MaintenanceChargeRepository repository;
+    private final MaintenanceReceiptPdfService receiptPdfService;
+    private final SocietyDirectoryLookup directoryLookup;
 
-    public MaintenanceService(MaintenanceChargeRepository repository) {
+    public MaintenanceService(
+            MaintenanceChargeRepository repository,
+            MaintenanceReceiptPdfService receiptPdfService,
+            SocietyDirectoryLookup directoryLookup) {
         this.repository = repository;
+        this.receiptPdfService = receiptPdfService;
+        this.directoryLookup = directoryLookup;
     }
 
     /** Record a collection: upsert the flat/period charge and mark it PAID. */
@@ -44,6 +52,9 @@ public class MaintenanceService {
         charge.setPaymentMode(normalizePaymentMode(req.paymentMode()));
         charge.setPaidAt(Instant.now());
         charge.setNotes(req.notes());
+        if (req.transactionReference() != null && !req.transactionReference().isBlank()) {
+            charge.setTransactionReference(req.transactionReference().trim());
+        }
         return toResponse(repository.save(charge));
     }
 
@@ -65,6 +76,7 @@ public class MaintenanceService {
         charge.setPaymentMode(null);
         charge.setPaidAt(null);
         charge.setNotes(req.notes());
+        charge.setTransactionReference(null);
         return toResponse(repository.save(charge));
     }
 
@@ -83,6 +95,44 @@ public class MaintenanceService {
         return repository.findBySocietyIdOrderByBillingYearDescBillingMonthDesc(societyId)
                 .stream().map(MaintenanceService::toResponse).toList();
     }
+
+    /**
+     * Paid maintenance receipt PDF. Members may download only their own flat's paid charges;
+     * admins may download any paid charge in the society.
+     */
+    @Transactional(readOnly = true)
+    public ReceiptPdf downloadReceipt(
+            UUID societyId,
+            UUID chargeId,
+            UUID userId,
+            String role,
+            String flatNumber) {
+        MaintenanceCharge charge = repository.findByIdAndSocietyId(chargeId, societyId)
+                .orElseThrow(() -> new NotFoundException("Maintenance charge not found"));
+        if (charge.getStatus() != MaintenanceStatus.PAID) {
+            throw new BadRequestException("Receipt is available only after maintenance is marked paid.");
+        }
+
+        boolean admin = role != null && role.toUpperCase(Locale.ROOT).contains("ADMIN");
+        if (!admin) {
+            boolean sameMember = charge.getMemberId() != null && charge.getMemberId().equals(userId);
+            boolean sameFlat = flatNumber != null && !flatNumber.isBlank()
+                    && flatNumber.trim().equalsIgnoreCase(charge.getFlatNumber());
+            if (!sameMember && !sameFlat) {
+                throw new ForbiddenException("You can only download receipts for your own flat.");
+            }
+        }
+
+        String societyName = directoryLookup.findSocietyName(societyId).orElse("Society");
+        String memberName = directoryLookup
+                .findMemberName(societyId, charge.getMemberId(), charge.getFlatNumber())
+                .orElse("Member");
+
+        byte[] pdf = receiptPdfService.generate(societyName, memberName, charge);
+        return new ReceiptPdf(receiptPdfService.filename(charge), pdf);
+    }
+
+    public record ReceiptPdf(String filename, byte[] bytes) {}
 
     private static String normalizePaymentMode(String paymentMode) {
         if (paymentMode == null || paymentMode.isBlank()) {
@@ -111,7 +161,8 @@ public class MaintenanceService {
                 c.getStatus().name(),
                 c.getPaymentMode(),
                 c.getPaidAt(),
-                c.getNotes()
+                c.getNotes(),
+                c.getTransactionReference()
         );
     }
 }

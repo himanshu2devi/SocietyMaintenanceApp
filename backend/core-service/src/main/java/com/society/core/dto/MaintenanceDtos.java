@@ -15,7 +15,8 @@ public class MaintenanceDtos {
             @NotNull @DecimalMin(value = "0.0", inclusive = false) BigDecimal amount,
             @NotBlank String paymentMode,
             String notes,
-            String memberId
+            String memberId,
+            String transactionReference
     ) {}
 
     /** Create a charge for a flat and mark it as PENDING. */
@@ -38,6 +39,7 @@ public class MaintenanceDtos {
             String status,
             String paymentMode,
             Instant paidAt,
-            String notes
+            String notes,
+            String transactionReference
     ) {}
 }

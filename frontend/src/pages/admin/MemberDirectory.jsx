@@ -152,7 +152,7 @@ export default function MemberDirectory() {
               {fieldErrors.fullName && <p className="mt-1 text-xs font-medium text-red-600">{fieldErrors.fullName}</p>}
             </div>
             <div>
-              <label className="label">Flat Number</label>
+              <label className="label">Flat/Shop Number</label>
               <input name="flatNumber" className="input" value={form.flatNumber} onChange={update} placeholder="A-101" maxLength={30} />
               {fieldErrors.flatNumber && <p className="mt-1 text-xs font-medium text-red-600">{fieldErrors.flatNumber}</p>}
             </div>
@@ -184,7 +184,7 @@ export default function MemberDirectory() {
               <thead>
                 <tr className="border-b text-left text-gray-500">
                   <th className="py-2 pr-4">Name</th>
-                  <th className="py-2 pr-4">Flat</th>
+                  <th className="py-2 pr-4">Flat/Shop</th>
                   <th className="py-2 pr-4">Mobile</th>
                   <th className="py-2 pr-4">Email</th>
                   <th className="py-2 pr-4">Status</th>

@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext'
 import {
   ComplaintService,
   ExpenseService,
+  MaintenanceBillingService,
   MaintenanceRateService,
   MaintenanceService,
   MemberService,
@@ -70,6 +71,8 @@ export default function SocietyAnalytics() {
   const [notices, setNotices] = useState([])
   const [members, setMembers] = useState([])
   const [rates, setRates] = useState([])
+  const [memberDefaults, setMemberDefaults] = useState([])
+  const [billingMode, setBillingMode] = useState('SAME')
   const [monthly, setMonthly] = useState(null)
   const [annual, setAnnual] = useState(null)
 
@@ -77,7 +80,7 @@ export default function SocietyAnalytics() {
     setLoading(true)
     setError('')
     try {
-      const [c, e, cl, cp, n, m, rateList, mon, ann] = await Promise.all([
+      const [c, e, cl, cp, n, m, rateList, mon, ann, settings, defaults] = await Promise.all([
         MaintenanceService.list(),
         ExpenseService.list(),
         PaymentClaimService.list(),
@@ -87,6 +90,8 @@ export default function SocietyAnalytics() {
         MaintenanceRateService.list(),
         ReportService.monthly(year, month),
         ReportService.annual(year, 0),
+        MaintenanceBillingService.settings().catch(() => ({ configured: true, billingMode: 'SAME' })),
+        MaintenanceBillingService.listMemberDefaults().catch(() => []),
       ])
       setCharges(c || [])
       setExpenses(e || [])
@@ -95,6 +100,8 @@ export default function SocietyAnalytics() {
       setNotices(n || [])
       setMembers(m || [])
       setRates(rateList || [])
+      setBillingMode(settings?.billingMode || 'SAME')
+      setMemberDefaults(defaults || [])
       setMonthly(mon)
       setAnnual(ann)
     } catch (err) {
@@ -120,7 +127,30 @@ export default function SocietyAnalytics() {
       activeMembers.map((mem) => String(mem.flatNumber || '').trim().toLowerCase()).filter(Boolean),
     )
     const billedUnits = flatSet.size || activeMembers.length
-    const expectedFromRate = rateAmount > 0 && billedUnits > 0 ? rateAmount * billedUnits : 0
+
+    let expectedFromRate = 0
+    if (billingMode === 'VARIABLE') {
+      expectedFromRate = activeMembers.reduce((sum, mem) => {
+        const target = periodKey(year, month)
+        const applicable = (memberDefaults || [])
+          .filter((d) => {
+            const matchesMember = d.memberId === mem.id
+            const matchesFlat = String(d.flatNumber || '').trim().toLowerCase()
+              === String(mem.flatNumber || '').trim().toLowerCase()
+            if (!matchesMember && !matchesFlat) return false
+            return periodKey(d.effectiveFromYear, d.effectiveFromMonth) <= target
+          })
+          .sort(
+            (a, b) =>
+              periodKey(b.effectiveFromYear, b.effectiveFromMonth)
+              - periodKey(a.effectiveFromYear, a.effectiveFromMonth),
+          )
+        const amt = applicable[0] ? Number(applicable[0].amount) : 0
+        return sum + (amt > 0 ? amt : 0)
+      }, 0)
+    } else {
+      expectedFromRate = rateAmount > 0 && billedUnits > 0 ? rateAmount * billedUnits : 0
+    }
 
     const monthCharges = charges.filter(
       (c) => Number(c.billingYear) === year && Number(c.billingMonth) === month,
@@ -262,7 +292,7 @@ export default function SocietyAnalytics() {
       mixTotal,
       net: displayCollected - displayExpenses,
     }
-  }, [charges, expenses, claims, complaints, notices, members, rates, monthly, annual, year, month, view])
+  }, [charges, expenses, claims, complaints, notices, members, rates, memberDefaults, billingMode, monthly, annual, year, month, view])
 
   if (!isAdmin) return <Navigate to="/member" replace />
 

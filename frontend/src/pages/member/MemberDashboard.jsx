@@ -5,6 +5,7 @@ import {
   AuditDocumentService,
   BankAccountService,
   CommitteeService,
+  MaintenanceBillingService,
   MaintenanceRateService,
   MaintenanceService,
   NoticeService,
@@ -64,6 +65,7 @@ export default function MemberDashboard() {
   const navigate = useNavigate()
   const [charges, setCharges] = useState([])
   const [rates, setRates] = useState([])
+  const [resolvedDue, setResolvedDue] = useState(null)
   const [notices, setNotices] = useState([])
   const [rules, setRules] = useState([])
   const [accounts, setAccounts] = useState([])
@@ -123,6 +125,23 @@ export default function MemberDashboard() {
 
   useEffect(() => {
     if (!user) return undefined
+    let cancelled = false
+    MaintenanceBillingService.resolve(
+      Number(claimForm.billingYear),
+      Number(claimForm.billingMonth),
+      { memberId: user.id, flatNumber: user.flatNumber },
+    )
+      .then((res) => {
+        if (!cancelled) setResolvedDue(res)
+      })
+      .catch(() => {
+        if (!cancelled) setResolvedDue(null)
+      })
+    return () => { cancelled = true }
+  }, [user, claimForm.billingYear, claimForm.billingMonth])
+
+  useEffect(() => {
+    if (!user) return undefined
     const id = window.setInterval(() => refreshUnreadNotices(), 30000)
     return () => window.clearInterval(id)
   }, [user])
@@ -162,9 +181,32 @@ export default function MemberDashboard() {
     (c) => Number(c.billingYear) === Number(claimForm.billingYear)
       && Number(c.billingMonth) === Number(claimForm.billingMonth),
   )
+  const displayAmount = selectedCharge
+    ? Number(selectedCharge.amount)
+    : (resolvedDue?.configured && resolvedDue?.amount != null
+      ? Number(resolvedDue.amount)
+      : (selectedRate ? Number(selectedRate.amount) : null))
+  const amountReady = displayAmount != null && displayAmount > 0
   const selectedPeriodKey = `${claimForm.billingYear}-${claimForm.billingMonth}`
   const alreadyClaimed = submittedPeriods.has(selectedPeriodKey)
   const alreadyPaid = selectedCharge?.status === 'PAID'
+
+  async function downloadMaintenanceReceipt(charge) {
+    try {
+      const blob = await MaintenanceService.downloadReceipt(charge.id)
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `SocietyWale-Maintenance-Receipt-${charge.flatNumber || 'flat'}-${charge.billingYear}${String(charge.billingMonth).padStart(2, '0')}.pdf`
+      document.body.appendChild(a)
+      a.click()
+      a.remove()
+      window.URL.revokeObjectURL(url)
+      toast.success('Receipt downloaded.')
+    } catch (err) {
+      toast.error(getApiErrorMessage(err, 'Could not download receipt.'))
+    }
+  }
 
   async function submitClaim(e) {
     e.preventDefault()
@@ -367,15 +409,19 @@ export default function MemberDashboard() {
                 <span className="font-semibold text-emerald-700">This period is already paid.</span>
               ) : alreadyClaimed ? (
                 <span className="font-semibold text-amber-700">Claim already submitted — waiting for admin approval.</span>
-              ) : selectedRate ? (
-                <>Amount for {monthName(claimForm.billingMonth)} {claimForm.billingYear}: <strong>{inr(selectedRate.amount)}</strong></>
+              ) : amountReady ? (
+                <>Amount for {monthName(claimForm.billingMonth)} {claimForm.billingYear}: <strong>{inr(displayAmount)}</strong></>
               ) : (
-                <span className="text-amber-700">No society rate for this month yet. Ask committee to set maintenance amount first.</span>
+                <span className="text-amber-700">
+                  {resolvedDue?.billingMode === 'VARIABLE'
+                    ? 'Your flat amount is not set yet. Ask committee to set your default maintenance amount first.'
+                    : 'No society rate for this month yet. Ask committee to set maintenance amount first.'}
+                </span>
               )}
             </div>
             <button
               className="btn-primary sm:col-span-2"
-              disabled={claimBusy || alreadyPaid || alreadyClaimed || !selectedRate}
+              disabled={claimBusy || alreadyPaid || alreadyClaimed || !amountReady}
             >
               {claimBusy ? 'Submitting…' : 'Submit payment claim'}
             </button>
@@ -420,6 +466,15 @@ export default function MemberDashboard() {
                     </td>
                     <td className="py-2 pr-4">
                       <div className="flex flex-wrap gap-2">
+                        {c.status === 'PAID' && (
+                          <button
+                            type="button"
+                            className="btn-secondary !py-1.5 !text-xs"
+                            onClick={() => downloadMaintenanceReceipt(c)}
+                          >
+                            Download receipt
+                          </button>
+                        )}
                         {c.status === 'PENDING' && !claimed && (
                           <button type="button" className="btn-primary !py-1.5 !text-xs" onClick={() => startClaimForCharge(c)}>
                             Claim payment

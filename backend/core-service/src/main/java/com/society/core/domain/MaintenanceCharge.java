@@ -51,6 +51,10 @@ public class MaintenanceCharge {
     @Column(length = 500)
     private String notes;
 
+    /** UTR / reference for ONLINE payments (from claim approval or admin entry). */
+    @Column(name = "transaction_reference", length = 120)
+    private String transactionReference;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt = Instant.now();
 
@@ -76,6 +80,8 @@ public class MaintenanceCharge {
     public void setPaidAt(Instant paidAt) { this.paidAt = paidAt; }
     public String getNotes() { return notes; }
     public void setNotes(String notes) { this.notes = notes; }
+    public String getTransactionReference() { return transactionReference; }
+    public void setTransactionReference(String transactionReference) { this.transactionReference = transactionReference; }
     public Instant getCreatedAt() { return createdAt; }
     public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }
 }

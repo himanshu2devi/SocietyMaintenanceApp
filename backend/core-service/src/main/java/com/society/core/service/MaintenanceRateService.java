@@ -1,9 +1,12 @@
 package com.society.core.service;
 
+import com.society.core.domain.MaintenanceBillingMode;
 import com.society.core.domain.MaintenanceRateSchedule;
 import com.society.core.dto.MaintenanceRateDtos.*;
+import com.society.core.exception.ApiExceptions.BadRequestException;
 import com.society.core.exception.ApiExceptions.ConflictException;
 import com.society.core.repository.MaintenanceRateScheduleRepository;
+import com.society.core.repository.SocietyMaintenanceSettingsRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,9 +17,13 @@ import java.util.UUID;
 public class MaintenanceRateService {
 
     private final MaintenanceRateScheduleRepository repository;
+    private final SocietyMaintenanceSettingsRepository settingsRepository;
 
-    public MaintenanceRateService(MaintenanceRateScheduleRepository repository) {
+    public MaintenanceRateService(
+            MaintenanceRateScheduleRepository repository,
+            SocietyMaintenanceSettingsRepository settingsRepository) {
         this.repository = repository;
+        this.settingsRepository = settingsRepository;
     }
 
     @Transactional(readOnly = true)
@@ -38,6 +45,13 @@ public class MaintenanceRateService {
 
     @Transactional
     public MaintenanceRateResponse setRate(UUID societyId, UUID createdBy, UpsertMaintenanceRateRequest req) {
+        settingsRepository.findBySocietyId(societyId).ifPresent(settings -> {
+            if (settings.getBillingMode() == MaintenanceBillingMode.VARIABLE) {
+                throw new BadRequestException(
+                        "This society uses variable per-flat amounts. Set each member's default amount instead.");
+            }
+        });
+
         var existing = repository.findBySocietyIdAndEffectiveFromYearAndEffectiveFromMonth(
                 societyId, req.effectiveFromYear(), req.effectiveFromMonth());
 

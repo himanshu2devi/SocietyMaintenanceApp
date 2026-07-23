@@ -1,5 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
-import { MaintenanceRateService, MaintenanceService, MemberService } from '../../api/services'
+import {
+  MaintenanceBillingService,
+  MaintenanceRateService,
+  MaintenanceService,
+  MemberService,
+} from '../../api/services'
 import { Alert, SectionTitle, StatusBadge } from '../../components/ui/Feedback'
 import { useToast } from '../../context/ToastContext'
 import { getApiErrorMessage } from '../../utils/apiError'
@@ -44,6 +49,26 @@ function memberLabel(m) {
   return `${m.fullName} · Flat ${m.flatNumber}${m.mobile ? ` · ${m.mobile}` : ''}`
 }
 
+function effectiveMemberAmount(defaults, member, year, month) {
+  const target = periodKey(year, month)
+  const memberId = member?.id
+  const flatKey = normalizeFlat(member?.flatNumber)
+  const applicable = (defaults || [])
+    .filter((d) => {
+      const matchesMember = memberId && d.memberId === memberId
+      const matchesFlat = flatKey && normalizeFlat(d.flatNumber) === flatKey
+      if (!matchesMember && !matchesFlat) return false
+      return periodKey(d.effectiveFromYear, d.effectiveFromMonth) <= target
+    })
+    .sort(
+      (a, b) =>
+        periodKey(b.effectiveFromYear, b.effectiveFromMonth)
+        - periodKey(a.effectiveFromYear, a.effectiveFromMonth),
+    )
+  const hit = applicable[0]
+  return hit && Number(hit.amount) > 0 ? Number(hit.amount) : 0
+}
+
 export default function MaintenanceTracker() {
   const toast = useToast()
   const [charges, setCharges] = useState([])
@@ -65,23 +90,82 @@ export default function MaintenanceTracker() {
     notes: '',
   })
   const [rateBusy, setRateBusy] = useState(false)
+  const [billingSettings, setBillingSettings] = useState({ configured: false, billingMode: null })
+  const [memberDefaults, setMemberDefaults] = useState([])
+  const [defaultDrafts, setDefaultDrafts] = useState({})
+  const [defaultsBusy, setDefaultsBusy] = useState(false)
+  const [modeBusy, setModeBusy] = useState(false)
+  const [bulkFillAmount, setBulkFillAmount] = useState('')
+  const [memberRateForm, setMemberRateForm] = useState({
+    effectiveFromYear: now.getFullYear(),
+    effectiveFromMonth: now.getMonth() + 1,
+  })
+
+  const isVariable = billingSettings.configured && billingSettings.billingMode === 'VARIABLE'
+  const isSame = billingSettings.configured && billingSettings.billingMode === 'SAME'
+  const needsModeChoice = !billingSettings.configured
+
+  function buildDraftsForPeriod(activeMembers, defaults, year, month) {
+    const drafts = {}
+    activeMembers.forEach((m) => {
+      const exact = (defaults || []).find(
+        (d) =>
+          d.memberId === m.id
+          && Number(d.effectiveFromYear) === Number(year)
+          && Number(d.effectiveFromMonth) === Number(month),
+      )
+      drafts[m.id] = exact ? String(exact.amount) : ''
+    })
+    return drafts
+  }
 
   async function load() {
     try {
-      const [chargeList, memberList, rateList] = await Promise.all([
+      const [chargeList, memberList, rateList, settings, defaults] = await Promise.all([
         MaintenanceService.list(),
         MemberService.list(),
         MaintenanceRateService.list(),
+        MaintenanceBillingService.settings(),
+        MaintenanceBillingService.listMemberDefaults().catch(() => []),
       ])
+      const activeMembers = memberList.filter((m) => m.active !== false)
       setCharges(chargeList)
-      setMembers(memberList.filter((m) => m.active !== false))
+      setMembers(activeMembers)
       setRates(rateList)
+      setBillingSettings(settings || { configured: false, billingMode: null })
+      setMemberDefaults(defaults || [])
+      setDefaultDrafts((prev) => {
+        // Keep current form period if already set; otherwise use memberRateForm defaults via functional update below
+        return prev
+      })
+      setMemberRateForm((prev) => {
+        const drafts = buildDraftsForPeriod(
+          activeMembers,
+          defaults || [],
+          prev.effectiveFromYear,
+          prev.effectiveFromMonth,
+        )
+        setDefaultDrafts(drafts)
+        return prev
+      })
     } catch (err) {
       setError(getApiErrorMessage(err, 'Could not load maintenance records.'))
     }
   }
 
   useEffect(() => { load() }, [])
+
+  useEffect(() => {
+    if (!isVariable || members.length === 0) return
+    setDefaultDrafts(
+      buildDraftsForPeriod(
+        members,
+        memberDefaults,
+        memberRateForm.effectiveFromYear,
+        memberRateForm.effectiveFromMonth,
+      ),
+    )
+  }, [isVariable, members, memberDefaults, memberRateForm.effectiveFromYear, memberRateForm.effectiveFromMonth])
 
   const membersById = useMemo(() => {
     const map = {}
@@ -159,7 +243,6 @@ export default function MaintenanceTracker() {
     return Object.values(map).sort((a, b) => a.memberName.localeCompare(b.memberName))
   }, [filtered])
 
-  /** One row per registered member for the selected tracker month/year. */
   const periodRate = useMemo(
     () => effectiveAmountFor(rates, trackerYear, trackerMonth),
     [rates, trackerYear, trackerMonth],
@@ -183,6 +266,10 @@ export default function MaintenanceTracker() {
             ),
         )
 
+        const defaultAmount = isVariable
+          ? effectiveMemberAmount(memberDefaults, member, year, month)
+          : scheduledAmount
+
         return {
           key: member.id,
           memberId: member.id,
@@ -193,16 +280,24 @@ export default function MaintenanceTracker() {
           billingYear: year,
           billingMonth: month,
           chargeId: charge?.id || null,
-          // Recorded charges keep historical amount; unrecorded rows use timeline rate.
-          amount: charge ? Number(charge.amount) : scheduledAmount,
+          amount: charge ? Number(charge.amount) : defaultAmount,
           status: charge?.status || 'PENDING',
           paymentMode: charge?.paymentMode || null,
           notes: charge?.notes || '',
           isVirtual: !charge,
           usesSchedule: !charge,
+          hasDefault: charge ? true : defaultAmount > 0,
         }
       })
-  }, [members, charges, trackerYear, trackerMonth, periodRate])
+  }, [
+    members,
+    charges,
+    trackerYear,
+    trackerMonth,
+    periodRate,
+    isVariable,
+    memberDefaults,
+  ])
 
   const periodStats = useMemo(() => {
     const paid = periodRows.filter((r) => r.status === 'PAID').length
@@ -210,13 +305,25 @@ export default function MaintenanceTracker() {
     return { paid, pending, total: periodRows.length }
   }, [periodRows])
 
+  const defaultsConfiguredCount = useMemo(
+    () => members.filter((m) => effectiveMemberAmount(memberDefaults, m, trackerYear, trackerMonth) > 0).length,
+    [members, memberDefaults, trackerYear, trackerMonth],
+  )
+
   function selectMember(memberId) {
     const member = membersById[memberId]
-    setForm((prev) => ({
-      ...prev,
+    const next = {
+      ...form,
       memberId,
-      flatNumber: member?.flatNumber || prev.flatNumber,
-    }))
+      flatNumber: member?.flatNumber || form.flatNumber,
+    }
+    if (member && !form.amount) {
+      const suggested = isVariable
+        ? effectiveMemberAmount(memberDefaults, member, form.billingYear, form.billingMonth)
+        : (effectiveAmountFor(rates, form.billingYear, form.billingMonth)?.amount || 0)
+      if (suggested > 0) next.amount = String(suggested)
+    }
+    setForm(next)
   }
 
   function update(e) {
@@ -237,6 +344,18 @@ export default function MaintenanceTracker() {
       paymentMode: form.paymentMode,
       memberId: form.memberId || null,
     }
+  }
+
+  function suggestedAmountLabel() {
+    if (!form.memberId) return null
+    const member = membersById[form.memberId]
+    if (!member) return null
+    if (isVariable) {
+      const amt = effectiveMemberAmount(memberDefaults, member, form.billingYear, form.billingMonth)
+      return amt > 0 ? amt : null
+    }
+    const rate = effectiveAmountFor(rates, form.billingYear, form.billingMonth)
+    return rate ? Number(rate.amount) : null
   }
 
   async function submit(action) {
@@ -266,25 +385,21 @@ export default function MaintenanceTracker() {
     }
   }
 
-  async function togglePaid(charge) {
+  async function chooseBillingMode(billingMode) {
+    setModeBusy(true)
     try {
-      if (charge.status === 'PENDING') {
-        await MaintenanceService.markPaid(charge.id, trackerPaymentMode)
-        toast.success(`${charge.memberName} (Flat ${charge.flatNumber}) marked paid.`)
-      } else {
-        await MaintenanceService.markPending({
-          flatNumber: charge.flatNumber,
-          billingYear: charge.billingYear,
-          billingMonth: charge.billingMonth,
-          amount: charge.amount,
-          notes: charge.notes,
-          memberId: charge.memberId || null,
-        })
-        toast.info(`${charge.memberName} (Flat ${charge.flatNumber}) marked pending.`)
-      }
+      const settings = await MaintenanceBillingService.chooseMode(billingMode)
+      setBillingSettings(settings)
+      toast.success(
+        billingMode === 'SAME'
+          ? 'Same amount for every flat selected. Set the society amount below.'
+          : 'Variable amounts selected. Set a default amount for each member below.',
+      )
       await load()
     } catch (err) {
-      setError(getApiErrorMessage(err, 'Could not update status.'))
+      toast.error(getApiErrorMessage(err, 'Could not save billing mode.'))
+    } finally {
+      setModeBusy(false)
     }
   }
 
@@ -308,9 +423,66 @@ export default function MaintenanceTracker() {
     }
   }
 
+  async function saveMemberDefaults(e) {
+    e?.preventDefault?.()
+    const year = Number(memberRateForm.effectiveFromYear)
+    const month = Number(memberRateForm.effectiveFromMonth)
+    const payloadDefaults = members
+      .map((m) => {
+        const raw = defaultDrafts[m.id]
+        if (raw == null || String(raw).trim() === '') return null
+        const amount = Number(raw)
+        if (!Number.isFinite(amount) || amount <= 0) return null
+        return {
+          memberId: m.id,
+          flatNumber: m.flatNumber,
+          amount,
+          effectiveFromYear: year,
+          effectiveFromMonth: month,
+        }
+      })
+      .filter(Boolean)
+
+    if (payloadDefaults.length === 0) {
+      toast.error('Enter at least one member amount greater than zero.')
+      return
+    }
+
+    setDefaultsBusy(true)
+    try {
+      await MaintenanceBillingService.upsertMemberDefaults(payloadDefaults)
+      toast.success(
+        `Saved amounts for ${payloadDefaults.length} member${payloadDefaults.length === 1 ? '' : 's'} from ${monthName(month)} ${year}.`,
+      )
+      await load()
+    } catch (err) {
+      toast.error(getApiErrorMessage(err, 'Could not save member amounts.'))
+    } finally {
+      setDefaultsBusy(false)
+    }
+  }
+
+  function applyBulkFill() {
+    const amount = Number(bulkFillAmount)
+    if (!Number.isFinite(amount) || amount <= 0) {
+      toast.error('Enter a valid amount to fill.')
+      return
+    }
+    const next = { ...defaultDrafts }
+    members.forEach((m) => {
+      next[m.id] = String(amount)
+    })
+    setDefaultDrafts(next)
+    toast.info(`Filled ${inr(amount)} for all ${members.length} members. Click Save to confirm.`)
+  }
+
   async function togglePeriodStatus(row) {
     if (!row.amount || Number(row.amount) <= 0) {
-      toast.error('Set the society maintenance amount above for this month first.')
+      toast.error(
+        isVariable
+          ? 'Set this member’s default maintenance amount above first.'
+          : 'Set the society maintenance amount above for this month first.',
+      )
       return
     }
     if (row.status === 'PENDING' && !trackerPaymentMode) {
@@ -353,90 +525,297 @@ export default function MaintenanceTracker() {
     }
   }
 
+  const suggested = suggestedAmountLabel()
+
   return (
     <div className="space-y-6">
-      <div className="card border-orange-100 bg-gradient-to-br from-white to-orange-50/40">
-        <SectionTitle
-          title="Society maintenance amount"
-          subtitle="Same amount for every flat. Set from a start month — past recorded payments stay unchanged."
-        />
-        <form onSubmit={saveSocietyRate} className="mt-3 grid gap-3 md:grid-cols-[1fr_1fr_1fr_auto] md:items-end">
-          <div>
-            <label className="label">Monthly amount (₹)</label>
-            <input
-              type="number"
-              className="input"
-              required
-              min="1"
-              step="1"
-              placeholder="e.g. 3000"
-              value={rateForm.amount}
-              onChange={(e) => setRateForm({ ...rateForm, amount: e.target.value })}
-            />
-          </div>
-          <div>
-            <label className="label">Starts from month</label>
-            <select
-              className="input"
-              value={rateForm.effectiveFromMonth}
-              onChange={(e) => setRateForm({ ...rateForm, effectiveFromMonth: Number(e.target.value) })}
+      {needsModeChoice && (
+        <div className="card border-orange-100 bg-gradient-to-br from-white to-orange-50/40">
+          <SectionTitle
+            title="How is maintenance billed?"
+            subtitle="One-time setup for your society. Pick how monthly maintenance amounts work for flats and shops."
+          />
+          <div className="mt-4 grid gap-4 md:grid-cols-2">
+            <button
+              type="button"
+              disabled={modeBusy}
+              onClick={() => chooseBillingMode('SAME')}
+              className="rounded-2xl border border-slate-200 bg-white p-5 text-left transition hover:border-orange-300 hover:shadow-sm"
             >
-              {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
-                <option key={m} value={m}>{monthName(m)}</option>
-              ))}
-            </select>
+              <p className="text-sm font-bold uppercase tracking-[0.12em] text-orange-600">Option 1</p>
+              <p className="mt-2 text-lg font-extrabold text-slate-950">Same for every flat / shop</p>
+              <p className="mt-2 text-sm leading-6 text-slate-600">
+                One society amount applies to all members. You can still change the amount from a start month later
+                (past recorded payments stay unchanged).
+              </p>
+            </button>
+            <button
+              type="button"
+              disabled={modeBusy}
+              onClick={() => chooseBillingMode('VARIABLE')}
+              className="rounded-2xl border border-slate-200 bg-white p-5 text-left transition hover:border-orange-300 hover:shadow-sm"
+            >
+              <p className="text-sm font-bold uppercase tracking-[0.12em] text-teal-700">Option 2</p>
+              <p className="mt-2 text-lg font-extrabold text-slate-950">Different per flat / shop</p>
+              <p className="mt-2 text-sm leading-6 text-slate-600">
+                Set a default monthly amount for each member. Use this when shops, larger flats, or special units
+                pay different dues.
+              </p>
+            </button>
           </div>
-          <div>
-            <label className="label">Starts from year</label>
-            <input
-              type="number"
-              className="input"
-              required
-              value={rateForm.effectiveFromYear}
-              onChange={(e) => setRateForm({ ...rateForm, effectiveFromYear: Number(e.target.value) })}
-            />
+          {modeBusy && <p className="mt-3 text-sm text-slate-500">Saving your choice…</p>}
+        </div>
+      )}
+
+      {isSame && (
+        <div className="card border-orange-100 bg-gradient-to-br from-white to-orange-50/40">
+          <SectionTitle
+            title="Society maintenance amount"
+            subtitle="Same amount for every flat. Set from a start month — past recorded payments stay unchanged."
+          />
+          <p className="mt-1 text-xs font-semibold text-slate-500">
+            Billing mode: <span className="text-orange-700">Same for all</span>
+          </p>
+          <form onSubmit={saveSocietyRate} className="mt-3 grid gap-3 md:grid-cols-[1fr_1fr_1fr_auto] md:items-end">
+            <div>
+              <label className="label">Monthly amount (₹)</label>
+              <input
+                type="number"
+                className="input"
+                required
+                min="1"
+                step="1"
+                placeholder="e.g. 3000"
+                value={rateForm.amount}
+                onChange={(e) => setRateForm({ ...rateForm, amount: e.target.value })}
+              />
+            </div>
+            <div>
+              <label className="label">Starts from month</label>
+              <select
+                className="input"
+                value={rateForm.effectiveFromMonth}
+                onChange={(e) => setRateForm({ ...rateForm, effectiveFromMonth: Number(e.target.value) })}
+              >
+                {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
+                  <option key={m} value={m}>{monthName(m)}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="label">Starts from year</label>
+              <input
+                type="number"
+                className="input"
+                required
+                value={rateForm.effectiveFromYear}
+                onChange={(e) => setRateForm({ ...rateForm, effectiveFromYear: Number(e.target.value) })}
+              />
+            </div>
+            <button className="btn-primary !bg-orange-500 hover:!bg-orange-600" disabled={rateBusy}>
+              {rateBusy ? 'Saving…' : 'Save amount'}
+            </button>
+          </form>
+          <div className="mt-4 flex flex-wrap gap-3 text-sm">
+            {periodRate ? (
+              <p className="rounded-xl bg-white px-3 py-2 font-semibold text-slate-800 shadow-sm">
+                Effective for {monthName(trackerMonth)} {trackerYear}: {inr(periodRate.amount)}
+                <span className="ml-2 font-normal text-slate-500">
+                  (from {monthName(periodRate.effectiveFromMonth)} {periodRate.effectiveFromYear})
+                </span>
+              </p>
+            ) : (
+              <p className="rounded-xl bg-amber-50 px-3 py-2 text-amber-800">
+                No society amount covers {monthName(trackerMonth)} {trackerYear} yet. Set one above.
+              </p>
+            )}
           </div>
-          <button className="btn-primary !bg-orange-500 hover:!bg-orange-600" disabled={rateBusy}>
-            {rateBusy ? 'Saving…' : 'Save amount'}
-          </button>
-        </form>
-        <div className="mt-4 flex flex-wrap gap-3 text-sm">
-          {periodRate ? (
-            <p className="rounded-xl bg-white px-3 py-2 font-semibold text-slate-800 shadow-sm">
-              Effective for {monthName(trackerMonth)} {trackerYear}: {inr(periodRate.amount)}
-              <span className="ml-2 font-normal text-slate-500">
-                (from {monthName(periodRate.effectiveFromMonth)} {periodRate.effectiveFromYear})
-              </span>
-            </p>
-          ) : (
-            <p className="rounded-xl bg-amber-50 px-3 py-2 text-amber-800">
-              No society amount covers {monthName(trackerMonth)} {trackerYear} yet. Set one above.
-            </p>
+          {rates.length > 0 && (
+            <div className="mt-4 table-scroll">
+              <p className="mb-2 text-xs font-bold uppercase tracking-[.12em] text-slate-400">Amount timeline</p>
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b text-left text-gray-500">
+                    <th className="py-2 pr-4">Effective from</th>
+                    <th className="py-2 pr-4">Amount</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {rates.map((r) => (
+                    <tr key={r.id} className="border-b last:border-0">
+                      <td className="py-2 pr-4">{monthName(r.effectiveFromMonth)} {r.effectiveFromYear}</td>
+                      <td className="py-2 pr-4 font-semibold">{inr(r.amount)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
-        {rates.length > 0 && (
-          <div className="mt-4 table-scroll">
-            <p className="mb-2 text-xs font-bold uppercase tracking-[.12em] text-slate-400">Amount timeline</p>
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b text-left text-gray-500">
-                  <th className="py-2 pr-4">Effective from</th>
-                  <th className="py-2 pr-4">Amount</th>
-                </tr>
-              </thead>
-              <tbody>
-                {rates.map((r) => (
-                  <tr key={r.id} className="border-b last:border-0">
-                    <td className="py-2 pr-4">{monthName(r.effectiveFromMonth)} {r.effectiveFromYear}</td>
-                    <td className="py-2 pr-4 font-semibold">{inr(r.amount)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
+      )}
 
+      {isVariable && (
+        <div className="card border-orange-100 bg-gradient-to-br from-white to-orange-50/40">
+          <SectionTitle
+            title="Default amount per flat / shop"
+            subtitle="Different amounts per flat. Set from a start month — past recorded payments stay unchanged."
+          />
+          <p className="mt-1 text-xs font-semibold text-slate-500">
+            Billing mode: <span className="text-teal-700">Variable per flat</span>
+            {' · '}
+            {defaultsConfiguredCount}/{members.length} members covered for {monthName(trackerMonth)} {trackerYear}
+          </p>
+
+          <div className="mt-3 grid gap-3 md:grid-cols-[1fr_1fr_1fr_auto] md:items-end">
+            <div>
+              <label className="label">Starts from month</label>
+              <select
+                className="input"
+                value={memberRateForm.effectiveFromMonth}
+                onChange={(e) => setMemberRateForm({
+                  ...memberRateForm,
+                  effectiveFromMonth: Number(e.target.value),
+                })}
+              >
+                {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
+                  <option key={m} value={m}>{monthName(m)}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="label">Starts from year</label>
+              <input
+                type="number"
+                className="input"
+                required
+                value={memberRateForm.effectiveFromYear}
+                onChange={(e) => setMemberRateForm({
+                  ...memberRateForm,
+                  effectiveFromYear: Number(e.target.value),
+                })}
+              />
+            </div>
+            <div>
+              <label className="label">Fill all with (₹)</label>
+              <input
+                type="number"
+                className="input"
+                min="1"
+                step="1"
+                placeholder="e.g. 3000"
+                value={bulkFillAmount}
+                onChange={(e) => setBulkFillAmount(e.target.value)}
+              />
+            </div>
+            <button type="button" className="btn-secondary" onClick={applyBulkFill} disabled={members.length === 0}>
+              Fill all
+            </button>
+          </div>
+
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              className="btn-primary !bg-orange-500 hover:!bg-orange-600"
+              disabled={defaultsBusy || members.length === 0}
+              onClick={saveMemberDefaults}
+            >
+              {defaultsBusy
+                ? 'Saving…'
+                : `Save amounts from ${monthName(memberRateForm.effectiveFromMonth)} ${memberRateForm.effectiveFromYear}`}
+            </button>
+            <p className="text-xs text-slate-500">
+              Editing the form above only affects the selected start month. Earlier recorded payments are not changed.
+            </p>
+          </div>
+
+          {members.length === 0 ? (
+            <p className="mt-4 text-sm text-slate-500">Add members in the directory first, then set their amounts here.</p>
+          ) : (
+            <div className="mt-4 table-scroll">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b text-left text-gray-500">
+                    <th className="py-2 pr-4">Member</th>
+                    <th className="py-2 pr-4">Flat / shop</th>
+                    <th className="py-2 pr-4">
+                      Amount from {monthName(memberRateForm.effectiveFromMonth)} {memberRateForm.effectiveFromYear} (₹)
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {members
+                    .slice()
+                    .sort((a, b) => String(a.flatNumber).localeCompare(String(b.flatNumber)))
+                    .map((m) => (
+                      <tr key={m.id} className="border-b last:border-0">
+                        <td className="py-2.5 pr-4">
+                          <p className="font-semibold text-slate-950">{m.fullName}</p>
+                          <p className="text-xs text-slate-400">{m.mobile || 'No mobile'}</p>
+                        </td>
+                        <td className="py-2.5 pr-4 font-medium">{m.flatNumber}</td>
+                        <td className="py-2.5 pr-4">
+                          <input
+                            type="number"
+                            className="input w-36"
+                            min="1"
+                            step="1"
+                            placeholder="Amount"
+                            value={defaultDrafts[m.id] ?? ''}
+                            onChange={(e) => setDefaultDrafts((prev) => ({ ...prev, [m.id]: e.target.value }))}
+                          />
+                        </td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          <div className="mt-4 flex flex-wrap gap-3 text-sm">
+            {periodRows.some((r) => r.amount > 0) ? (
+              <p className="rounded-xl bg-white px-3 py-2 font-semibold text-slate-800 shadow-sm">
+                Tracker month {monthName(trackerMonth)} {trackerYear}: amounts come from each member’s effective timeline
+              </p>
+            ) : (
+              <p className="rounded-xl bg-amber-50 px-3 py-2 text-amber-800">
+                No member amounts cover {monthName(trackerMonth)} {trackerYear} yet. Set amounts from a start month above.
+              </p>
+            )}
+          </div>
+
+          {memberDefaults.length > 0 && (
+            <div className="mt-4 table-scroll">
+              <p className="mb-2 text-xs font-bold uppercase tracking-[.12em] text-slate-400">Amount timeline</p>
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b text-left text-gray-500">
+                    <th className="py-2 pr-4">Member / flat</th>
+                    <th className="py-2 pr-4">Effective from</th>
+                    <th className="py-2 pr-4">Amount</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {memberDefaults.map((d) => {
+                    const member = membersById[d.memberId]
+                    return (
+                      <tr key={d.id} className="border-b last:border-0">
+                        <td className="py-2 pr-4">
+                          <span className="font-semibold text-slate-900">{member?.fullName || 'Member'}</span>
+                          <span className="text-slate-500"> · {d.flatNumber}</span>
+                        </td>
+                        <td className="py-2 pr-4">{monthName(d.effectiveFromMonth)} {d.effectiveFromYear}</td>
+                        <td className="py-2 pr-4 font-semibold">{inr(d.amount)}</td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
+
+      {!needsModeChoice && (
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-1">
           <div className="card">
@@ -480,16 +859,13 @@ export default function MaintenanceTracker() {
               <div>
                 <label className="label">Amount (₹)</label>
                 <input name="amount" type="number" className="input" value={form.amount} onChange={update} required />
-                {effectiveAmountFor(rates, form.billingYear, form.billingMonth) && (
+                {suggested != null && (
                   <button
                     type="button"
                     className="mt-1 text-xs font-semibold text-orange-600"
-                    onClick={() => setForm({
-                      ...form,
-                      amount: String(effectiveAmountFor(rates, form.billingYear, form.billingMonth).amount),
-                    })}
+                    onClick={() => setForm({ ...form, amount: String(suggested) })}
                   >
-                    Use society rate ({inr(effectiveAmountFor(rates, form.billingYear, form.billingMonth).amount)})
+                    Use default ({inr(suggested)})
                   </button>
                 )}
               </div>
@@ -595,8 +971,11 @@ export default function MaintenanceTracker() {
               }
             />
             <p className="mb-4 text-sm text-slate-500">
-              All members for {monthName(trackerMonth)} {trackerYear}. Amount comes from the society timeline
-              {periodRate ? ` (${inr(periodRate.amount)})` : ''}. Already recorded payments keep their original amount.
+              All members for {monthName(trackerMonth)} {trackerYear}.{' '}
+              {isVariable
+                ? 'Amount comes from each member’s default when not yet recorded.'
+                : `Amount comes from the society timeline${periodRate ? ` (${inr(periodRate.amount)})` : ''}.`}
+              {' '}Already recorded payments keep their original amount.
               Default status is <span className="font-semibold text-amber-700">not paid</span> until marked paid.
               Payment mode appears only for paid members.
             </p>
@@ -668,6 +1047,7 @@ export default function MaintenanceTracker() {
           </div>
         </div>
       </div>
+      )}
     </div>
   )
 }

@@ -14,5 +14,9 @@ public class ApiExceptions {
         public BadRequestException(String message) { super(message); }
     }
 
+    public static class ForbiddenException extends RuntimeException {
+        public ForbiddenException(String message) { super(message); }
+    }
+
     private ApiExceptions() {}
 }
