@@ -21,7 +21,7 @@ const values = [
 ]
 
 const longTerm = [
-  ['One platform', 'Replace scattered spreadsheets, WhatsApp threads and paper registers with a single society operating system.'],
+  ['One platform', 'Replace scattered spreadsheets, WhatsApp threads and paper registers with a single society management system.'],
   ['Built on transparency', 'Every payment, expense, approval and notice is securely recorded, helping committees build trust with residents through complete visibility.'],
   ['Grow with you', 'Whether your society has 20 apartments or 2,000, SocietyWale scales with your community while keeping operations simple and organized.'],
 ]
@@ -119,7 +119,7 @@ export default function About() {
               <a className="font-semibold text-orange-600 hover:text-orange-700" href={mailtoHref()}>{SITE_EMAIL}</a>
               {' '}or call{' '}
               <a className="font-semibold text-orange-600 hover:text-orange-700" href={telHref(SITE_PHONES[0].digits)}>
-                +91 {SITE_PHONES[0].label}
+                +91 {SITE_PHONES[1].label}
               </a>
               .
             </p>

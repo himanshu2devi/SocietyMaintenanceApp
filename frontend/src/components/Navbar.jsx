@@ -118,11 +118,6 @@ export default function Navbar() {
     navigate('/login')
   }
 
-  function goToMemberNotices() {
-    setOpen(false)
-    navigate('/member', { state: { focusNotices: true } })
-  }
-
   function closeMenu() {
     setOpen(false)
   }
@@ -167,9 +162,9 @@ export default function Navbar() {
           {isAuthenticated ? (
             <>
               {!isAdmin && (
-                <button
-                  type="button"
-                  onClick={goToMemberNotices}
+                <Link
+                  to="/member"
+                  state={{ focusNotices: true }}
                   className="relative grid h-10 w-10 place-items-center rounded-xl border border-slate-200 text-slate-700 transition hover:bg-slate-50"
                   aria-label={unreadNotices > 0 ? `${unreadNotices} unread notices` : 'Notices'}
                   title="Notices"
@@ -180,7 +175,7 @@ export default function Navbar() {
                       {unreadNotices > 9 ? '9+' : unreadNotices}
                     </span>
                   )}
-                </button>
+                </Link>
               )}
               <div className="relative" ref={profileRef}>
                 <button
@@ -240,9 +235,9 @@ export default function Navbar() {
 
         <div className="flex items-center gap-2 lg:hidden">
           {isAuthenticated && !isAdmin && (
-            <button
-              type="button"
-              onClick={goToMemberNotices}
+            <Link
+              to="/member"
+              state={{ focusNotices: true }}
               className="relative grid h-10 w-10 place-items-center rounded-xl border border-slate-200 text-slate-700"
               aria-label={unreadNotices > 0 ? `${unreadNotices} unread notices` : 'Notices'}
             >
@@ -252,7 +247,7 @@ export default function Navbar() {
                   {unreadNotices > 9 ? '9+' : unreadNotices}
                 </span>
               )}
-            </button>
+            </Link>
           )}
           {isAuthenticated && (
             <Link

@@ -68,7 +68,7 @@ export default function Contact() {
         <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:py-20">
           <p className="eyebrow">Contact</p>
           <h1 className="mt-4 max-w-2xl text-4xl font-extrabold tracking-tight text-slate-950 sm:text-5xl">
-            We’re here to help your society get started.
+            We’re here to help your society get digital.
           </h1>
           <p className="mt-5 max-w-xl text-base leading-7 text-slate-600">
             Questions about onboarding, committee roles or member access? Email us, call us, or send a message — we’ll respond as soon as we can.
