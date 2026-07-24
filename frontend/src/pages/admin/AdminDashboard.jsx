@@ -65,9 +65,9 @@ export default function AdminDashboard() {
   const ActiveComponent = tabs.find((t) => t.id === active).component
 
   return (
-    <div className="grid min-w-0 gap-4 lg:grid-cols-[200px_minmax(0,1fr)] lg:gap-6 xl:grid-cols-[220px_minmax(0,1fr)]">
-      <aside className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm shadow-slate-900/[.03] lg:min-h-[calc(100dvh-150px)]">
-        <div className="border-b border-slate-100 px-3 pb-4 pt-2">
+    <div className="grid w-full min-w-0 max-w-full gap-4 lg:grid-cols-[200px_minmax(0,1fr)] lg:gap-6 xl:grid-cols-[220px_minmax(0,1fr)]">
+      <aside className="min-w-0 max-w-full overflow-hidden rounded-2xl border border-slate-200 bg-white p-3 shadow-sm shadow-slate-900/[.03] lg:min-h-[calc(100dvh-150px)]">
+        <div className="border-b border-slate-100 px-2 pb-4 pt-2 sm:px-3">
           <p className="text-xs font-bold uppercase tracking-[.14em] text-slate-400">Committee workspace</p>
           <p className="mt-2 break-words text-sm font-bold leading-snug text-slate-900">{user?.societyName || 'Your society'}</p>
           {user?.societyCode && (
@@ -77,7 +77,7 @@ export default function AdminDashboard() {
           <p className="mt-0.5 text-xs font-semibold text-slate-400">Admin</p>
         </div>
         <nav
-          className="-mx-1 mt-3 flex gap-1 overflow-x-auto overscroll-x-contain px-1 pb-1 lg:mx-0 lg:grid lg:gap-1 lg:overflow-visible lg:px-0 lg:pb-0"
+          className="mt-3 flex w-full max-w-full gap-1 overflow-x-auto overscroll-x-contain pb-1 [-webkit-overflow-scrolling:touch] [scrollbar-width:thin] lg:grid lg:gap-1 lg:overflow-visible lg:pb-0"
           aria-label="Committee sections"
         >
           {tabs.map((tab) => (
@@ -85,12 +85,12 @@ export default function AdminDashboard() {
               key={tab.id}
               type="button"
               onClick={() => setActive(tab.id)}
-              className={`flex shrink-0 items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm font-semibold transition lg:gap-3 lg:py-3 ${
+              className={`flex shrink-0 items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm font-semibold transition lg:w-full lg:gap-3 lg:py-3 ${
                 active === tab.id ? 'bg-orange-50 text-orange-700' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-950'
               }`}
             >
               <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-white text-base shadow-sm">{tab.icon}</span>
-              <span className="whitespace-nowrap lg:flex-1 lg:whitespace-normal">{tab.label}</span>
+              <span className="whitespace-nowrap lg:min-w-0 lg:flex-1 lg:whitespace-normal lg:break-words">{tab.label}</span>
               {tab.id === 'claims' && pendingClaims > 0 && (
                 <span className="rounded-full bg-orange-600 px-2 py-0.5 text-[11px] font-bold text-white">
                   {pendingClaims}
@@ -100,8 +100,8 @@ export default function AdminDashboard() {
           ))}
         </nav>
       </aside>
-      <section className="min-w-0">
-        <div className="mb-5 flex flex-col gap-3 border-b border-slate-200 pb-4 sm:mb-6 sm:flex-row sm:items-end sm:justify-between sm:pb-5">
+      <section className="min-w-0 max-w-full">
+        <div className="mb-5 flex flex-col gap-2 border-b border-slate-200 pb-4 sm:mb-6 sm:flex-row sm:items-end sm:justify-between sm:gap-3 sm:pb-5">
           <div className="min-w-0">
             <p className="break-words text-xs font-bold uppercase tracking-[.14em] text-orange-600">
               {user?.societyName || 'SocietyWale admin'}
@@ -109,7 +109,9 @@ export default function AdminDashboard() {
             </p>
             <h1 className="mt-1 text-xl font-extrabold tracking-tight text-slate-950 sm:text-2xl">{tabs.find((tab) => tab.id === active).label}</h1>
           </div>
-          <p className="shrink-0 text-sm text-slate-500">Committee manages records. Members view and participate securely.</p>
+          <p className="max-w-full text-sm leading-6 text-slate-500 sm:max-w-xs lg:max-w-sm">
+            Committee manages records. Members view and participate securely.
+          </p>
         </div>
         <ActiveComponent
           onNavigate={setActive}
@@ -130,10 +132,10 @@ function Overview({ onNavigate, pendingClaims = 0 }) {
   ]
 
   return (
-    <div className="space-y-6">
+    <div className="min-w-0 max-w-full space-y-6">
       {pendingClaims > 0 && (
-        <div className="flex flex-col gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
+        <div className="flex flex-col gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+          <div className="min-w-0">
             <p className="font-bold text-amber-950">
               {pendingClaims} payment claim{pendingClaims === 1 ? '' : 's'} waiting for verification
             </p>
@@ -141,18 +143,18 @@ function Overview({ onNavigate, pendingClaims = 0 }) {
               Members notified after paying. Approve to mark Maintenance paid and keep both views in sync.
             </p>
           </div>
-          <button type="button" className="btn-primary shrink-0" onClick={() => onNavigate('claims')}>
+          <button type="button" className="btn-primary w-full shrink-0 sm:w-auto" onClick={() => onNavigate('claims')}>
             Review claims
           </button>
         </div>
       )}
 
-      <div className="rounded-3xl bg-[linear-gradient(135deg,#102A43_0%,#173e62_55%,#0f766e_150%)] p-7 text-white sm:p-9">
+      <div className="min-w-0 overflow-hidden rounded-2xl bg-[linear-gradient(135deg,#102A43_0%,#173e62_55%,#0f766e_150%)] p-5 text-white sm:rounded-3xl sm:p-7 md:p-9">
         <p className="text-xs font-bold uppercase tracking-[.15em] text-orange-300">Operations overview</p>
-        <h2 className="mt-3 max-w-2xl text-2xl font-extrabold leading-tight sm:text-3xl">
+        <h2 className="mt-3 max-w-2xl text-xl font-extrabold leading-tight break-words sm:text-2xl md:text-3xl">
           Your society command centre for collections, communication and compliance-ready records.
         </h2>
-        <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-200">
+        <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-200 break-words">
           Use this workspace to keep member data current, verify payments, publish notices, log expenses, close complaints and prepare AGM-friendly reports — without scattered spreadsheets.
         </p>
         <div className="mt-6 flex flex-wrap gap-2">
@@ -178,9 +180,9 @@ function Overview({ onNavigate, pendingClaims = 0 }) {
           </a>
         </div>
       </div>
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {steps.map(([number, title, copy, target]) => (
-          <article key={number} className="card">
+          <article key={number} className="card min-w-0">
             <span className="grid h-9 w-9 place-items-center rounded-xl bg-orange-50 text-sm font-extrabold text-orange-600">{number}</span>
             <h3 className="mt-4 font-bold text-slate-950">{title}</h3>
             <p className="mt-2 text-sm leading-6 text-slate-600">{copy}</p>

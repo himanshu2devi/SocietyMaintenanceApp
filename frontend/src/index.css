@@ -102,7 +102,7 @@
 
   /* Horizontal scroll region for wide tables on phone / 13" laptop */
   .table-scroll {
-    @apply -mx-1 overflow-x-auto overscroll-x-contain;
+    @apply -mx-1 max-w-full min-w-0 overflow-x-auto overscroll-x-contain;
   }
 
   .ai-fab {

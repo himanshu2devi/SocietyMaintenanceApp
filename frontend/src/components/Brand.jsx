@@ -20,10 +20,10 @@ export function BrandMark({ className = 'h-10 w-10' }) {
 
 export function Brand({ compact = false, light = false }) {
   return (
-    <Link to="/" className="group inline-flex items-center gap-2.5" aria-label="SocietyWale home">
-      <BrandMark className="h-9 w-9 transition-transform duration-200 group-hover:scale-105" />
+    <Link to="/" className="group inline-flex min-w-0 max-w-full items-center gap-2 sm:gap-2.5" aria-label="SocietyWale home">
+      <BrandMark className="h-8 w-8 shrink-0 transition-transform duration-200 group-hover:scale-105 sm:h-9 sm:w-9" />
       {!compact && (
-        <span className={`text-lg font-extrabold tracking-tight ${light ? 'text-white' : 'text-slate-950'}`}>
+        <span className={`truncate text-base font-extrabold tracking-tight sm:text-lg ${light ? 'text-white' : 'text-slate-950'}`}>
           Society<span className="text-orange-500">Wale</span>
         </span>
       )}

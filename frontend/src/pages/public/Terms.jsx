@@ -59,15 +59,15 @@ export default function Terms() {
 
 export function LegalPage({ eyebrow, title, updated, children }) {
   return (
-    <div>
+    <div className="w-full min-w-0">
       <section className="border-b border-slate-200 bg-[#fff9f6]">
-        <div className="mx-auto max-w-3xl px-4 py-14 sm:px-6 lg:py-16">
+        <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-14 lg:py-16">
           <p className="eyebrow">{eyebrow}</p>
-          <h1 className="mt-4 text-4xl font-extrabold tracking-tight text-slate-950">{title}</h1>
+          <h1 className="mt-4 break-words text-2xl font-extrabold tracking-tight text-slate-950 sm:text-3xl md:text-4xl">{title}</h1>
           <p className="mt-3 text-sm text-slate-500">Last updated {updated}</p>
         </div>
       </section>
-      <section className="mx-auto max-w-3xl space-y-5 px-4 py-12 text-sm leading-7 text-slate-600 sm:px-6 lg:py-16 [&_h2]:mt-8 [&_h2]:text-base [&_h2]:font-bold [&_h2]:text-slate-950">
+      <section className="mx-auto max-w-3xl space-y-5 px-4 py-10 text-sm leading-7 text-slate-600 sm:px-6 sm:py-12 lg:py-16 [&_a]:break-all [&_h2]:mt-8 [&_h2]:text-base [&_h2]:font-bold [&_h2]:text-slate-950">
         {children}
       </section>
     </div>

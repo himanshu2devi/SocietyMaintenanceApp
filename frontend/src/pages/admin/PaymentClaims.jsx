@@ -73,13 +73,13 @@ export default function PaymentClaims({ onNavigate, onClaimsChanged }) {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="min-w-0 max-w-full space-y-4">
       <div className="card">
         <SectionTitle
           title="Payment claims"
           subtitle="Members notify after paying. Verify, then approve — Maintenance updates automatically."
           action={
-            <select className="input w-40" value={filter} onChange={(e) => setFilter(e.target.value)}>
+            <select className="input w-full sm:w-40" value={filter} onChange={(e) => setFilter(e.target.value)}>
               <option value="SUBMITTED">Submitted</option>
               <option value="APPROVED">Approved</option>
               <option value="REJECTED">Rejected</option>
@@ -89,7 +89,7 @@ export default function PaymentClaims({ onNavigate, onClaimsChanged }) {
         />
         <Alert type="error">{error}</Alert>
         <div className="table-scroll">
-          <table className="w-full text-sm">
+          <table className="w-full min-w-[56rem] text-sm">
             <thead>
               <tr className="border-b text-left text-gray-500">
                 <th className="py-2 pr-4">Member</th>

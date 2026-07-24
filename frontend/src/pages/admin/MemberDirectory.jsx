@@ -140,7 +140,7 @@ export default function MemberDirectory() {
   const activeCount = members.filter((m) => m.active !== false).length
 
   return (
-    <div className="grid gap-6 lg:grid-cols-3">
+    <div className="grid min-w-0 max-w-full grid-cols-1 gap-6 lg:grid-cols-3">
       <div className="lg:col-span-1">
         <div className="card">
           <SectionTitle title="Add Member" subtitle="Register a resident" />
@@ -180,7 +180,7 @@ export default function MemberDirectory() {
         <div className="card">
           <SectionTitle title="Member Directory" subtitle={`${activeCount} active · ${members.length} total`} />
           <div className="table-scroll">
-            <table className="w-full text-sm">
+            <table className="w-full min-w-[48rem] text-sm">
               <thead>
                 <tr className="border-b text-left text-gray-500">
                   <th className="py-2 pr-4">Name</th>
@@ -197,7 +197,7 @@ export default function MemberDirectory() {
                     <td className="py-3 pr-4 font-medium">{m.fullName}</td>
                     <td className="py-3 pr-4">{m.flatNumber}</td>
                     <td className="py-3 pr-4">{m.mobile}</td>
-                    <td className="py-3 pr-4 text-gray-500">{m.email || '—'}</td>
+                    <td className="break-all py-3 pr-4 text-gray-500">{m.email || '—'}</td>
                     <td className="py-3 pr-4">
                       <StatusBadge status={m.active === false ? 'INACTIVE' : 'ACTIVE'} />
                     </td>

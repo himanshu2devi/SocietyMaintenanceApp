@@ -59,7 +59,7 @@ export default function ExpenseLogger() {
   const total = expenses.reduce((sum, e) => sum + Number(e.amount), 0)
 
   return (
-    <div className="grid gap-6 lg:grid-cols-3">
+    <div className="grid min-w-0 max-w-full grid-cols-1 gap-6 lg:grid-cols-3">
       <div className="lg:col-span-1">
         <div className="card">
           <SectionTitle title="Log Expense" subtitle="Record a society expense" />
@@ -81,7 +81,7 @@ export default function ExpenseLogger() {
               <label className="label">Description</label>
               <textarea name="description" rows="2" className="input" value={form.description} onChange={update} />
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div>
                 <label className="label">Amount (₹)</label>
                 <input name="amount" type="number" className="input" value={form.amount} onChange={update} required />
@@ -121,7 +121,7 @@ export default function ExpenseLogger() {
             subtitle={`Total: ₹${total.toLocaleString('en-IN')}`}
           />
           <div className="table-scroll">
-            <table className="w-full text-sm">
+            <table className="w-full min-w-[40rem] text-sm">
               <thead>
                 <tr className="border-b text-left text-gray-500">
                   <th className="py-2 pr-4">Date</th>

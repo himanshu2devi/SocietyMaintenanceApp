@@ -76,11 +76,11 @@ export default function FinancialReports() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-white to-slate-50 px-5 py-6 sm:px-7">
+    <div className="min-w-0 max-w-full space-y-6">
+      <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-white to-slate-50 px-4 py-5 sm:px-7 sm:py-6">
         <p className="text-xs font-bold uppercase tracking-[.14em] text-orange-600">SocietyWale reports</p>
-        <h1 className="mt-2 text-2xl font-extrabold tracking-tight text-slate-950 sm:text-3xl">Financial Reports</h1>
-        <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
+        <h1 className="mt-2 text-xl font-extrabold tracking-tight text-slate-950 sm:text-2xl md:text-3xl">Financial Reports</h1>
+        <p className="mt-2 max-w-2xl break-words text-sm leading-6 text-slate-500">
           Generate monthly or annual statements for {user?.societyName || 'your society'}, then download a branded PDF. Members can view; committee manages source data in Maintenance and Expenses.
         </p>
       </div>
@@ -90,29 +90,29 @@ export default function FinancialReports() {
       <div className="card">
         <SectionTitle title="Report filters" subtitle="Choose period, then generate" />
         <div className="grid gap-4 xl:grid-cols-[1fr_auto]">
-          <div className="flex flex-wrap items-end gap-3">
-            <div>
+          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
+            <div className="min-w-0 w-full sm:w-auto">
               <label className="label">Year</label>
-              <input type="number" className="input w-28" value={year} onChange={(e) => setYear(Number(e.target.value))} />
+              <input type="number" className="input w-full sm:w-28" value={year} onChange={(e) => setYear(Number(e.target.value))} />
             </div>
-            <div>
+            <div className="min-w-0 w-full sm:w-auto">
               <label className="label">Month</label>
-              <select className="input w-40" value={month} onChange={(e) => setMonth(Number(e.target.value))}>
+              <select className="input w-full sm:w-40" value={month} onChange={(e) => setMonth(Number(e.target.value))}>
                 {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
                   <option key={m} value={m}>{monthName(m)}</option>
                 ))}
               </select>
             </div>
-            <button className="btn-primary" disabled={busy === 'monthly'} onClick={loadMonthly}>
+            <button className="btn-primary w-full sm:w-auto" disabled={busy === 'monthly'} onClick={loadMonthly}>
               {busy === 'monthly' ? 'Generating…' : 'Generate monthly'}
             </button>
           </div>
-          <div className="flex flex-wrap items-end gap-3 border-t border-slate-100 pt-4 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
-            <div>
+          <div className="flex flex-col gap-3 border-t border-slate-100 pt-4 sm:flex-row sm:flex-wrap sm:items-end lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
+            <div className="min-w-0 w-full sm:w-auto">
               <label className="label">Opening balance (₹)</label>
-              <input type="number" className="input w-40" value={openingBalance} onChange={(e) => setOpeningBalance(Number(e.target.value))} />
+              <input type="number" className="input w-full sm:w-40" value={openingBalance} onChange={(e) => setOpeningBalance(Number(e.target.value))} />
             </div>
-            <button className="btn-secondary" disabled={busy === 'annual'} onClick={loadAnnual}>
+            <button className="btn-secondary w-full sm:w-auto" disabled={busy === 'annual'} onClick={loadAnnual}>
               {busy === 'annual' ? 'Generating…' : 'Generate annual'}
             </button>
           </div>
@@ -151,7 +151,7 @@ export default function FinancialReports() {
           {monthly.expenseBreakdown?.length > 0 && (
             <>
               <h3 className="mb-2 mt-6 text-sm font-semibold text-slate-700">Expense breakdown</h3>
-              <table className="w-full text-sm">
+              <table className="w-full min-w-[32rem] text-sm">
                 <thead>
                   <tr className="border-b text-left text-gray-500">
                     <th className="py-2">Category</th>
@@ -173,7 +173,7 @@ export default function FinancialReports() {
             <>
               <h3 className="mb-2 mt-6 text-sm font-semibold text-slate-700">Expense details</h3>
               <div className="table-scroll">
-                <table className="w-full text-sm">
+                <table className="w-full min-w-[36rem] text-sm">
                   <thead>
                     <tr className="border-b text-left text-gray-500">
                       <th className="py-2 pr-3">Date</th>
@@ -224,7 +224,7 @@ export default function FinancialReports() {
             <Stat label="Closing" value={inr(annual.closingBalance)} tone={annual.closingBalance >= 0 ? 'text-teal-800' : 'text-red-700'} bg="bg-slate-50" />
           </div>
           <div className="mt-6 table-scroll">
-            <table className="w-full text-sm">
+            <table className="w-full min-w-[28rem] text-sm">
               <thead>
                 <tr className="border-b text-left text-gray-500">
                   <th className="py-2 pr-4">Month</th>

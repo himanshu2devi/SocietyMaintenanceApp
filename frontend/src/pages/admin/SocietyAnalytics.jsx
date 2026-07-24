@@ -299,19 +299,19 @@ export default function SocietyAnalytics() {
   const periodLabel = view === 'yearly' ? `Year ${year}` : `${monthName(month)} ${year}`
 
   return (
-    <div className="space-y-6">
+    <div className="min-w-0 max-w-full space-y-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <p className="text-xs font-bold uppercase tracking-[.14em] text-orange-600">
+        <div className="min-w-0">
+          <p className="break-words text-xs font-bold uppercase tracking-[.14em] text-orange-600">
             {user?.societyName || 'Society'} analytics
             {user?.societyCode ? ` · ${user.societyCode}` : ''}
           </p>
-          <h1 className="mt-1 text-2xl font-extrabold tracking-tight text-slate-950 sm:text-3xl">Analytics</h1>
+          <h1 className="mt-1 text-xl font-extrabold tracking-tight text-slate-950 sm:text-2xl md:text-3xl">Analytics</h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
             Live, period-based overview synced with maintenance, expenses, claims and complaints.
           </p>
         </div>
-        <button type="button" className="btn-secondary shrink-0" onClick={load} disabled={loading}>
+        <button type="button" className="btn-secondary w-full shrink-0 sm:w-auto" onClick={load} disabled={loading}>
           {loading ? 'Refreshing…' : 'Refresh'}
         </button>
       </div>
@@ -351,7 +351,7 @@ export default function SocietyAnalytics() {
             {view === 'monthly' && (
               <div>
                 <label className="label">Month</label>
-                <select className="input w-40" value={month} onChange={(e) => setMonth(Number(e.target.value))}>
+                <select className="input w-full sm:w-40" value={month} onChange={(e) => setMonth(Number(e.target.value))}>
                   {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
                     <option key={m} value={m}>{monthName(m)}</option>
                   ))}
@@ -449,9 +449,9 @@ export default function SocietyAnalytics() {
           <p className="mt-1 text-sm text-slate-500">
             {view === 'yearly' ? 'Paid vs pending for the year' : 'Paid vs pending for selected month'}
           </p>
-          <div className="mt-5 flex items-center gap-5">
+          <div className="mt-5 flex flex-col items-center gap-4 sm:flex-row sm:items-center sm:gap-5">
             <ProgressRing value={loading ? 0 : stats.collectedPct} />
-            <div className="min-w-0 flex-1 space-y-2 text-sm">
+            <div className="min-w-0 w-full flex-1 space-y-2 text-sm">
               <LegendDot color="bg-orange-500" label="Paid flats" value={loading ? '—' : stats.paidFlats} />
               <LegendDot color="bg-slate-200" label="Pending flats" value={loading ? '—' : stats.pendingFlats} />
               <LegendDot

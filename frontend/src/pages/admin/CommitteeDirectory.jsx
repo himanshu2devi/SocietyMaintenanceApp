@@ -50,7 +50,7 @@ export default function CommitteeDirectory() {
   }
 
   return (
-    <div className="grid gap-6 lg:grid-cols-3">
+    <div className="grid min-w-0 max-w-full grid-cols-1 gap-6 lg:grid-cols-3">
       <div className="card lg:col-span-1">
         <SectionTitle title="Add committee member" subtitle="Chairman, secretary, treasurer" />
         <Alert type="error">{error}</Alert>
@@ -82,7 +82,7 @@ export default function CommitteeDirectory() {
       <div className="card lg:col-span-2">
         <SectionTitle title="Committee directory" subtitle="Visible to all society members" />
         <div className="table-scroll">
-          <table className="w-full text-sm">
+          <table className="w-full min-w-[40rem] text-sm">
             <thead>
               <tr className="border-b text-left text-gray-500">
                 <th className="py-2 pr-4">Name</th>
@@ -97,7 +97,10 @@ export default function CommitteeDirectory() {
                 <tr key={item.id} className="border-b last:border-0">
                   <td className="py-2 pr-4 font-medium">{item.fullName}</td>
                   <td className="py-2 pr-4">{item.title.replaceAll('_', ' ')}</td>
-                  <td className="py-2 pr-4 text-gray-600">{item.mobile || '—'}{item.email ? ` · ${item.email}` : ''}</td>
+                  <td className="max-w-[14rem] py-2 pr-4 text-gray-600">
+                    <span className="block">{item.mobile || '—'}</span>
+                    {item.email ? <span className="block break-all text-xs text-slate-500">{item.email}</span> : null}
+                  </td>
                   <td className="py-2 pr-4">{item.active ? 'Active' : 'Inactive'}</td>
                   <td className="py-2 pr-4 text-right">
                     {item.active && (

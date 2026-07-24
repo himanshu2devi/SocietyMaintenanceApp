@@ -11,7 +11,7 @@ export default function AuthShell({ children, title, description, step }) {
   }
 
   return (
-    <div className="grid min-h-[calc(100dvh-72px)] lg:grid-cols-[minmax(260px,0.85fr)_minmax(0,1.15fr)]">
+    <div className="grid min-h-[calc(100dvh-3.5rem)] lg:min-h-[calc(100dvh-72px)] lg:grid-cols-[minmax(260px,0.85fr)_minmax(0,1.15fr)]">
       <aside className="relative hidden overflow-hidden bg-slate-950 px-8 py-12 text-white xl:px-10 lg:block">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_14%_16%,rgba(255,122,69,.28),transparent_24%),radial-gradient(circle_at_88%_82%,rgba(15,157,138,.2),transparent_29%)]" />
         <div className="relative mx-auto flex h-full max-w-md flex-col">

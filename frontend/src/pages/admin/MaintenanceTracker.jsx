@@ -633,7 +633,7 @@ export default function MaintenanceTracker() {
           {rates.length > 0 && (
             <div className="mt-4 table-scroll">
               <p className="mb-2 text-xs font-bold uppercase tracking-[.12em] text-slate-400">Amount timeline</p>
-              <table className="w-full text-sm">
+              <table className="w-full min-w-[20rem] text-sm">
                 <thead>
                   <tr className="border-b text-left text-gray-500">
                     <th className="py-2 pr-4">Effective from</th>
@@ -715,7 +715,7 @@ export default function MaintenanceTracker() {
           <div className="mt-3 flex flex-wrap items-center gap-2">
             <button
               type="button"
-              className="btn-primary !bg-orange-500 hover:!bg-orange-600"
+              className="btn-primary w-full !bg-orange-500 text-left hover:!bg-orange-600 sm:w-auto"
               disabled={defaultsBusy || members.length === 0}
               onClick={saveMemberDefaults}
             >
@@ -732,7 +732,7 @@ export default function MaintenanceTracker() {
             <p className="mt-4 text-sm text-slate-500">Add members in the directory first, then set their amounts here.</p>
           ) : (
             <div className="mt-4 table-scroll">
-              <table className="w-full text-sm">
+              <table className="w-full min-w-[36rem] text-sm">
                 <thead>
                   <tr className="border-b text-left text-gray-500">
                     <th className="py-2 pr-4">Member</th>
@@ -786,7 +786,7 @@ export default function MaintenanceTracker() {
           {memberDefaults.length > 0 && (
             <div className="mt-4 table-scroll">
               <p className="mb-2 text-xs font-bold uppercase tracking-[.12em] text-slate-400">Amount timeline</p>
-              <table className="w-full text-sm">
+              <table className="w-full min-w-[28rem] text-sm">
                 <thead>
                   <tr className="border-b text-left text-gray-500">
                     <th className="py-2 pr-4">Member / flat</th>
@@ -816,7 +816,7 @@ export default function MaintenanceTracker() {
       )}
 
       {!needsModeChoice && (
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="grid min-w-0 max-w-full grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="lg:col-span-1">
           <div className="card">
             <SectionTitle title="Record Maintenance" subtitle="Pick a member, then mark paid or pending" />
@@ -842,7 +842,7 @@ export default function MaintenanceTracker() {
                   <p>{membersById[form.memberId].email || 'No email'}</p>
                 </div>
               )}
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <div>
                   <label className="label">Year</label>
                   <input name="billingYear" type="number" className="input" value={form.billingYear} onChange={update} />
@@ -877,9 +877,9 @@ export default function MaintenanceTracker() {
                 </select>
                 <p className="mt-1 text-xs text-slate-400">Required when marking paid.</p>
               </div>
-              <div className="flex gap-2">
-                <button className="btn-success flex-1" disabled={busy} onClick={() => submit('PAID')}>Mark Paid</button>
-                <button className="btn-warning flex-1" disabled={busy} onClick={() => submit('PENDING')}>Mark Pending</button>
+              <div className="flex flex-col gap-2 sm:flex-row">
+                <button className="btn-success w-full sm:flex-1" disabled={busy} onClick={() => submit('PAID')}>Mark Paid</button>
+                <button className="btn-warning w-full sm:flex-1" disabled={busy} onClick={() => submit('PENDING')}>Mark Pending</button>
               </div>
             </form>
           </div>
@@ -892,7 +892,7 @@ export default function MaintenanceTracker() {
               action={
                 <div className="flex flex-wrap gap-2">
                   <input
-                    className="input w-44"
+                    className="input w-full sm:w-44"
                     placeholder="Search name / flat"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
@@ -980,7 +980,7 @@ export default function MaintenanceTracker() {
               Payment mode appears only for paid members.
             </p>
             <div className="table-scroll">
-              <table className="w-full text-sm">
+              <table className="w-full min-w-[52rem] text-sm">
                 <thead>
                   <tr className="border-b text-left text-gray-500">
                     <th className="py-2 pr-4">Member</th>
@@ -1023,7 +1023,7 @@ export default function MaintenanceTracker() {
                           type="button"
                           disabled={trackerBusyKey === row.key}
                           onClick={() => togglePeriodStatus(row)}
-                          className={row.status === 'PENDING' ? 'btn-success' : 'btn-secondary'}
+                          className={`${row.status === 'PENDING' ? 'btn-success' : 'btn-secondary'} !px-2.5 !py-1.5 !text-xs`}
                         >
                           {trackerBusyKey === row.key
                             ? 'Updating…'

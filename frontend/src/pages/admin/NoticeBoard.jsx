@@ -193,7 +193,7 @@ export default function NoticeBoard() {
     <div className="space-y-6">
       <Alert type="error">{error}</Alert>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid min-w-0 max-w-full grid-cols-1 gap-6 lg:grid-cols-2">
         <div className="card">
           <SectionTitle
             title={editingNoticeId ? 'Edit announcement' : 'Post announcement'}
@@ -294,15 +294,15 @@ export default function NoticeBoard() {
         </div>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid min-w-0 max-w-full grid-cols-1 gap-6 lg:grid-cols-2">
         <div className="card">
           <SectionTitle title="Notice board" subtitle={`${notices.length} notices`} />
           <ul className="space-y-3">
             {notices.map((n) => (
               <li key={n.id} className="rounded-xl border border-slate-100 p-4">
                 <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <h4 className="font-semibold text-slate-950">{n.title}</h4>
+                  <div className="min-w-0">
+                    <h4 className="break-words font-semibold text-slate-950">{n.title}</h4>
                     <p className="mt-1 text-xs font-medium text-slate-500">
                       {formatNoticeDate(n.createdAt)}
                       {n.createdByName ? ` · ${n.createdByName}` : ''}
@@ -310,7 +310,7 @@ export default function NoticeBoard() {
                   </div>
                   <span className={`badge shrink-0 ${priorityColor[n.priority] || ''}`}>{n.priority}</span>
                 </div>
-                <p className="mt-2 text-sm leading-6 text-slate-600">{n.body}</p>
+                <p className="mt-2 break-words text-sm leading-6 text-slate-600">{n.body}</p>
                 <div className="mt-3 flex flex-wrap gap-2">
                   {n.notifiedAt ? (
                     <span className="inline-flex items-center rounded-lg bg-emerald-50 px-2.5 py-1.5 text-xs font-bold text-emerald-700">

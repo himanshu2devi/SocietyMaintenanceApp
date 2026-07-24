@@ -140,19 +140,19 @@ export default function AiAssistant() {
       {open && (
         <div className="ai-panel-enter flex h-[min(440px,calc(100dvh-8rem))] w-[min(100vw-1.5rem,380px)] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl shadow-slate-900/20">
           <div className="bg-[linear-gradient(135deg,#102A43,#0f766e)] px-4 py-3 text-white">
-            <div className="flex items-center gap-3">
-              <span className="relative grid h-9 w-9 place-items-center overflow-hidden rounded-full bg-gradient-to-br from-orange-400 to-teal-600 text-white shadow">
+            <div className="flex min-w-0 items-center gap-3">
+              <span className="relative grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-full bg-gradient-to-br from-orange-400 to-teal-600 text-white shadow">
                 <span className="absolute inset-0 animate-pulse bg-white/10" aria-hidden="true" />
                 <AiIcon className="relative h-5 w-5" />
               </span>
-              <div>
-                <p className="flex items-center gap-2 text-sm font-bold">
+              <div className="min-w-0 flex-1">
+                <p className="flex flex-wrap items-center gap-2 text-sm font-bold">
                   SocietyWale AI
                   <span className="rounded-full bg-white/15 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-teal-100">
                     Smart
                   </span>
                 </p>
-                <p className="text-xs text-teal-100">
+                <p className="truncate text-xs text-teal-100">
                   {configured === false ? 'Setup pending · contact support' : 'Ask about features, onboarding & support'}
                 </p>
               </div>
@@ -200,16 +200,16 @@ export default function AiAssistant() {
                 </button>
               ))}
             </div>
-            <form onSubmit={onSubmit} className="flex gap-2">
+            <form onSubmit={onSubmit} className="flex min-w-0 gap-2">
               <input
-                className="input !py-2 text-sm"
+                className="input min-w-0 flex-1 !py-2 text-sm"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="Ask the AI assistant…"
                 maxLength={1000}
                 disabled={busy}
               />
-              <button type="submit" className="btn-primary !px-3 !py-2 text-sm" disabled={busy}>
+              <button type="submit" className="btn-primary shrink-0 !px-3 !py-2 text-sm" disabled={busy}>
                 Send
               </button>
             </form>

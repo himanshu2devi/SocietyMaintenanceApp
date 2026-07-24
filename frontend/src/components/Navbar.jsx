@@ -130,7 +130,7 @@ export default function Navbar() {
       role="banner"
     >
       <div className="mx-auto flex h-14 min-w-0 max-w-7xl items-center justify-between gap-3 px-3 sm:h-[72px] sm:px-6">
-        <div className="min-w-0 shrink">
+        <div className="min-w-0 max-w-[42%] shrink overflow-hidden sm:max-w-none">
           <Brand />
         </div>
 

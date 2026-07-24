@@ -108,7 +108,7 @@ export default function App() {
 }
 
 function AppPage({ children }) {
-  return <div className="mx-auto w-full min-w-0 max-w-7xl px-3 py-5 sm:px-6 sm:py-6 lg:px-6 lg:py-8">{children}</div>
+  return <div className="mx-auto w-full min-w-0 max-w-7xl overflow-x-clip px-3 py-5 sm:px-6 sm:py-6 lg:px-6 lg:py-8">{children}</div>
 }
 
 function AuthPage({ children }) {

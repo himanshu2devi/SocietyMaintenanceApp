@@ -4,15 +4,15 @@ import { SITE_EMAIL, SITE_PHONES, mailtoHref, telHref } from '../utils/siteConta
 
 export default function Footer() {
   return (
-    <footer className="mt-auto border-t border-slate-200 bg-white" role="contentinfo">
-      <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:gap-10 sm:px-6 sm:py-12 md:grid-cols-2 lg:grid-cols-[1.5fr_repeat(3,1fr)]">
-        <div>
+    <footer className="mt-auto w-full min-w-0 border-t border-slate-200 bg-white" role="contentinfo">
+      <div className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-8 px-4 py-10 sm:gap-10 sm:px-6 sm:py-12 md:grid-cols-2 lg:grid-cols-[1.5fr_repeat(3,1fr)]">
+        <div className="min-w-0">
           <Brand />
           <p className="mt-4 max-w-sm text-sm leading-6 text-slate-500">
             Society management software for Indian housing societies. Maintenance, members, notices, expenses, complaints, audit-ready records and more in one place.
           </p>
           <address className="mt-5 not-italic space-y-1.5 text-sm text-slate-600">
-            <a className="block font-semibold text-slate-800 transition hover:text-orange-600" href={mailtoHref()}>
+            <a className="block break-all font-semibold text-slate-800 transition hover:text-orange-600" href={mailtoHref()}>
               {SITE_EMAIL}
             </a>
             {SITE_PHONES.map((phone) => (

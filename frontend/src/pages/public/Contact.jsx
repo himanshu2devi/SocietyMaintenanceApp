@@ -63,25 +63,25 @@ export default function Contact() {
   }
 
   return (
-    <div>
+    <div className="w-full min-w-0">
       <section className="border-b border-slate-200 bg-[#fff9f6]">
-        <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:py-20">
+        <div className="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 sm:py-16 lg:py-20">
           <p className="eyebrow">Contact</p>
-          <h1 className="mt-4 max-w-2xl text-4xl font-extrabold tracking-tight text-slate-950 sm:text-5xl">
+          <h1 className="mt-4 max-w-2xl text-3xl font-extrabold tracking-tight text-slate-950 sm:text-4xl md:text-5xl">
             We’re here to help your society get digital.
           </h1>
-          <p className="mt-5 max-w-xl text-base leading-7 text-slate-600">
+          <p className="mt-4 max-w-xl text-sm leading-7 text-slate-600 sm:mt-5 sm:text-base">
             Questions about onboarding, committee roles or member access? Email us, call us, or send a message — we’ll respond as soon as we can.
           </p>
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 lg:grid-cols-[1fr_1.1fr] lg:py-20">
-        <div className="space-y-5">
-          <div className="rounded-2xl border border-slate-200 bg-white p-6">
+      <section className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-8 px-4 py-10 sm:gap-10 sm:px-6 sm:py-14 lg:grid-cols-[1fr_1.1fr] lg:py-20">
+        <div className="min-w-0 space-y-5">
+          <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6">
             <p className="text-xs font-bold uppercase tracking-[.14em] text-orange-600">Email</p>
             <a
-              className="mt-2 block text-sm font-semibold text-slate-900 transition hover:text-orange-600"
+              className="mt-2 block break-all text-sm font-semibold text-slate-900 transition hover:text-orange-600"
               href={mailtoHref('SocietyWale enquiry')}
             >
               {SITE_EMAIL}
@@ -89,7 +89,7 @@ export default function Contact() {
             <p className="mt-1 text-sm text-slate-500">Typical reply within 1–2 business days.</p>
           </div>
 
-          <div className="rounded-2xl border border-slate-200 bg-white p-6">
+          <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6">
             <p className="text-xs font-bold uppercase tracking-[.14em] text-orange-600">Call / WhatsApp</p>
             <ul className="mt-3 space-y-3">
               {SITE_PHONES.map((phone) => (
@@ -111,7 +111,7 @@ export default function Contact() {
             <p className="mt-3 text-sm text-slate-500">Available for onboarding help and product questions.</p>
           </div>
 
-          <div className="rounded-2xl border border-slate-200 bg-white p-6">
+          <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6">
             <p className="text-xs font-bold uppercase tracking-[.14em] text-orange-600">Support</p>
             <h2 className="mt-2 text-xl font-bold text-slate-950">Committee onboarding</h2>
             <p className="mt-2 text-sm leading-6 text-slate-600">
@@ -129,9 +129,9 @@ export default function Contact() {
           </p>
         </div>
 
-        <div className="card">
+        <div className="card min-w-0 w-full">
           <h2 className="text-lg font-extrabold text-slate-950">Send a message</h2>
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="mt-1 break-words text-sm text-slate-500">
             Submit the form to open your email app with a ready message to {SITE_EMAIL}.
           </p>
           <div className="mt-4">

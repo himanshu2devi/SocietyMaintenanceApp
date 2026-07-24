@@ -65,7 +65,7 @@ export default function AuditDocuments() {
   }
 
   return (
-    <div className="grid gap-6 lg:grid-cols-3">
+    <div className="grid min-w-0 max-w-full grid-cols-1 gap-6 lg:grid-cols-3">
       <div className="card lg:col-span-1">
         <SectionTitle title="Add audit report" subtitle="Monthly / annual files for members to view" />
         <Alert type="error">{error}</Alert>
@@ -82,7 +82,7 @@ export default function AuditDocuments() {
               <option value="OTHER">Other</option>
             </select>
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div>
               <label className="label">Year</label>
               <input type="number" className="input" value={form.periodYear} onChange={(e) => setForm({ ...form, periodYear: e.target.value })} required />
@@ -127,9 +127,9 @@ export default function AuditDocuments() {
                   </p>
                   {doc.description && <p className="mt-2 text-sm text-slate-600">{doc.description}</p>}
                 </div>
-                <div className="flex gap-2">
-                  <a className="btn-secondary !py-2" href={doc.documentUrl} target="_blank" rel="noreferrer">Open / download</a>
-                  <button type="button" className="text-sm font-semibold text-red-600" onClick={() => remove(doc.id)}>Delete</button>
+                <div className="flex w-full flex-wrap gap-2 sm:w-auto">
+                  <a className="btn-secondary w-full !py-2 sm:w-auto" href={doc.documentUrl} target="_blank" rel="noreferrer">Open / download</a>
+                  <button type="button" className="text-sm font-semibold text-red-600 sm:px-1" onClick={() => remove(doc.id)}>Delete</button>
                 </div>
               </div>
             </li>

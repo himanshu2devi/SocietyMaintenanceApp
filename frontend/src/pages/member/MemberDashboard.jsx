@@ -273,16 +273,16 @@ export default function MemberDashboard() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="min-w-0 max-w-full space-y-6">
       <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm shadow-slate-900/[.03]">
-        <div className="bg-[linear-gradient(135deg,#102A43_0%,#173e62_55%,#0f766e_140%)] px-5 py-5 text-white sm:px-7 sm:py-6">
+        <div className="bg-[linear-gradient(135deg,#102A43_0%,#173e62_55%,#0f766e_140%)] px-4 py-5 text-white sm:px-7 sm:py-6">
           <div className="flex items-start justify-between gap-3">
-            <div>
-              <p className="text-xs font-bold uppercase tracking-[.14em] text-orange-300">
+            <div className="min-w-0">
+              <p className="break-words text-xs font-bold uppercase tracking-[.14em] text-orange-300">
                 {user?.societyName || 'My society'}
                 {user?.societyCode ? ` · ${user.societyCode}` : ''}
               </p>
-              <h1 className="mt-3 text-2xl font-extrabold tracking-tight sm:text-3xl">{user?.fullName || 'Member'}</h1>
+              <h1 className="mt-3 break-words text-xl font-extrabold tracking-tight sm:text-2xl md:text-3xl">{user?.fullName || 'Member'}</h1>
               <p className="mt-1 text-sm text-slate-200">Resident access · view records and notify payments</p>
             </div>
             <button
@@ -307,17 +307,17 @@ export default function MemberDashboard() {
           </div>
         </div>
         <div className="grid gap-px bg-slate-100 sm:grid-cols-3">
-          <div className="bg-white px-5 py-4">
+          <div className="min-w-0 bg-white px-4 py-4 sm:px-5">
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Email</p>
-            <p className="mt-1 text-sm font-semibold text-slate-900">{user?.email || '—'}</p>
+            <p className="mt-1 break-all text-sm font-semibold text-slate-900">{user?.email || '—'}</p>
           </div>
-          <div className="bg-white px-5 py-4">
+          <div className="min-w-0 bg-white px-4 py-4 sm:px-5">
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Mobile</p>
-            <p className="mt-1 text-sm font-semibold text-slate-900">{user?.mobile || '—'}</p>
+            <p className="mt-1 break-words text-sm font-semibold text-slate-900">{user?.mobile || '—'}</p>
           </div>
-          <div className="bg-white px-5 py-4">
+          <div className="min-w-0 bg-white px-4 py-4 sm:px-5">
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Flat</p>
-            <p className="mt-1 text-sm font-semibold text-slate-900">{user?.flatNumber || '—'}</p>
+            <p className="mt-1 break-words text-sm font-semibold text-slate-900">{user?.flatNumber || '—'}</p>
           </div>
         </div>
       </div>
@@ -331,7 +331,7 @@ export default function MemberDashboard() {
               <p className="font-bold">{unreadNotices} new notice{unreadNotices === 1 ? '' : 's'} from committee.</p>
               <p className="mt-1 text-sky-900/80">Open Latest Notices to review the announcement.</p>
             </div>
-            <button type="button" className="btn-primary shrink-0 !bg-sky-700 hover:!bg-sky-800" onClick={openNotices}>
+            <button type="button" className="btn-primary w-full shrink-0 !bg-sky-700 hover:!bg-sky-800 sm:w-auto" onClick={openNotices}>
               View notices
             </button>
           </div>
@@ -350,7 +350,7 @@ export default function MemberDashboard() {
           title="Claim payment"
           subtitle="Tell committee you have paid. They will verify and mark Maintenance paid."
           action={
-            <button type="button" className="btn-primary" onClick={() => setShowClaimForm((v) => !v)}>
+            <button type="button" className="btn-primary w-full sm:w-auto" onClick={() => setShowClaimForm((v) => !v)}>
               {showClaimForm ? 'Hide form' : 'Claim payment'}
             </button>
           }
@@ -429,80 +429,82 @@ export default function MemberDashboard() {
         )}
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <div className="card"><p className="text-sm text-gray-500">Pending Dues</p><p className="mt-1 text-2xl font-bold text-amber-600">{pending.length}</p></div>
         <div className="card"><p className="text-sm text-gray-500">My Records</p><p className="mt-1 text-2xl font-bold">{charges.length}</p></div>
         <div className="card"><p className="text-sm text-gray-500">Notices</p><p className="mt-1 text-2xl font-bold text-orange-600">{notices.length}</p></div>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <div className="card">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <div className="card min-w-0">
           <SectionTitle title="My Maintenance" subtitle="Status stays in sync after claim approval" />
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b text-left text-gray-500">
-                <th className="py-2 pr-4">Period</th>
-                <th className="py-2 pr-4">Amount</th>
-                <th className="py-2 pr-4">Status</th>
-                <th className="py-2 pr-4">Payment mode</th>
-                <th className="py-2 pr-4">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {charges.map((c) => {
-                const claimed = submittedPeriods.has(`${c.billingYear}-${c.billingMonth}`)
-                return (
-                  <tr key={c.id} className="border-b last:border-0">
-                    <td className="py-2 pr-4">{periodLabel(c)}</td>
-                    <td className="py-2 pr-4">₹{Number(c.amount).toLocaleString('en-IN')}</td>
-                    <td className="py-2 pr-4">
-                      <StatusBadge status={c.status} />
-                      {c.status === 'PENDING' && claimed && (
-                        <p className="mt-1 text-[11px] font-medium text-amber-700">Claim submitted</p>
-                      )}
-                    </td>
-                    <td className="py-2 pr-4">
-                      {c.status === 'PAID' ? formatPaymentMode(c.paymentMode) : '—'}
-                    </td>
-                    <td className="py-2 pr-4">
-                      <div className="flex flex-wrap gap-2">
-                        {c.status === 'PAID' && (
-                          <button
-                            type="button"
-                            className="btn-secondary !py-1.5 !text-xs"
-                            onClick={() => downloadMaintenanceReceipt(c)}
-                          >
-                            Download receipt
-                          </button>
+          <div className="table-scroll">
+            <table className="w-full min-w-[36rem] text-sm">
+              <thead>
+                <tr className="border-b text-left text-gray-500">
+                  <th className="py-2 pr-4">Period</th>
+                  <th className="py-2 pr-4">Amount</th>
+                  <th className="py-2 pr-4">Status</th>
+                  <th className="py-2 pr-4">Payment mode</th>
+                  <th className="py-2 pr-4">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {charges.map((c) => {
+                  const claimed = submittedPeriods.has(`${c.billingYear}-${c.billingMonth}`)
+                  return (
+                    <tr key={c.id} className="border-b last:border-0">
+                      <td className="py-2 pr-4">{periodLabel(c)}</td>
+                      <td className="py-2 pr-4">₹{Number(c.amount).toLocaleString('en-IN')}</td>
+                      <td className="py-2 pr-4">
+                        <StatusBadge status={c.status} />
+                        {c.status === 'PENDING' && claimed && (
+                          <p className="mt-1 text-[11px] font-medium text-amber-700">Claim submitted</p>
                         )}
-                        {c.status === 'PENDING' && !claimed && (
-                          <button type="button" className="btn-primary !py-1.5 !text-xs" onClick={() => startClaimForCharge(c)}>
-                            Claim payment
-                          </button>
-                        )}
-                        {c.status === 'PENDING' && (
-                          <button type="button" className="btn-secondary !py-1.5 !text-xs" onClick={() => notifyAdminWhatsApp(c)}>WhatsApp</button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                )
-              })}
-              {charges.length === 0 && <tr><td colSpan="5" className="py-6 text-center text-gray-400">No maintenance records yet. Use Claim payment above for the current month.</td></tr>}
-            </tbody>
-          </table>
+                      </td>
+                      <td className="py-2 pr-4">
+                        {c.status === 'PAID' ? formatPaymentMode(c.paymentMode) : '—'}
+                      </td>
+                      <td className="py-2 pr-4">
+                        <div className="flex flex-wrap gap-2">
+                          {c.status === 'PAID' && (
+                            <button
+                              type="button"
+                              className="btn-secondary !py-1.5 !text-xs"
+                              onClick={() => downloadMaintenanceReceipt(c)}
+                            >
+                              Download receipt
+                            </button>
+                          )}
+                          {c.status === 'PENDING' && !claimed && (
+                            <button type="button" className="btn-primary !py-1.5 !text-xs" onClick={() => startClaimForCharge(c)}>
+                              Claim payment
+                            </button>
+                          )}
+                          {c.status === 'PENDING' && (
+                            <button type="button" className="btn-secondary !py-1.5 !text-xs" onClick={() => notifyAdminWhatsApp(c)}>WhatsApp</button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                })}
+                {charges.length === 0 && <tr><td colSpan="5" className="py-6 text-center text-gray-400">No maintenance records yet. Use Claim payment above for the current month.</td></tr>}
+              </tbody>
+            </table>
+          </div>
         </div>
 
-        <div className="card">
+        <div className="card min-w-0">
           <SectionTitle title="Society bank accounts" subtitle="Pay here — online payment coming later" />
           <div className="space-y-3">
             {accounts.map((a) => (
               <article key={a.id} className="rounded-xl border border-slate-100 p-4">
-                <p className="font-bold">{a.accountName}{a.primaryAccount ? ' · Primary' : ''}</p>
-                <p className="mt-1 text-sm text-slate-600">{a.bankName}</p>
-                <p className="mt-2 text-sm">A/C {a.accountNumber}</p>
-                <p className="text-sm">IFSC {a.ifscCode}</p>
-                {a.upiId && <p className="text-sm">UPI {a.upiId}</p>}
+                <p className="font-bold break-words">{a.accountName}{a.primaryAccount ? ' · Primary' : ''}</p>
+                <p className="mt-1 break-words text-sm text-slate-600">{a.bankName}</p>
+                <p className="mt-2 break-all text-sm">A/C {a.accountNumber}</p>
+                <p className="break-all text-sm">IFSC {a.ifscCode}</p>
+                {a.upiId && <p className="break-all text-sm">UPI {a.upiId}</p>}
               </article>
             ))}
             {accounts.length === 0 && <p className="text-sm text-gray-400">Committee has not published bank details yet.</p>}
@@ -510,31 +512,31 @@ export default function MemberDashboard() {
         </div>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <div className="card">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <div className="card min-w-0">
           <SectionTitle title="Committee contacts" />
           <ul className="space-y-3">
             {committee.map((m) => (
               <li key={m.id} className="rounded-xl border border-slate-100 p-3">
-                <p className="font-semibold">{m.fullName}</p>
+                <p className="font-semibold break-words">{m.fullName}</p>
                 <p className="text-xs uppercase tracking-wide text-orange-600">{m.title.replaceAll('_', ' ')}</p>
-                <p className="mt-1 text-sm text-slate-600">{m.mobile || '—'}{m.email ? ` · ${m.email}` : ''}</p>
+                <p className="mt-1 break-words text-sm text-slate-600">{m.mobile || '—'}{m.email ? ` · ${m.email}` : ''}</p>
               </li>
             ))}
             {committee.length === 0 && <p className="text-sm text-gray-400">No committee contacts published.</p>}
           </ul>
         </div>
 
-        <div className="card">
+        <div className="card min-w-0">
           <SectionTitle title="Audit reports" subtitle="View / download only" action={<Link to="/reports" className="text-sm font-bold text-orange-600">Financial reports →</Link>} />
           <ul className="space-y-3">
             {docs.map((doc) => (
-              <li key={doc.id} className="flex items-start justify-between gap-3 rounded-xl border border-slate-100 p-3">
-                <div>
-                  <p className="font-semibold">{doc.title}</p>
+              <li key={doc.id} className="flex flex-col gap-3 rounded-xl border border-slate-100 p-3 sm:flex-row sm:items-start sm:justify-between">
+                <div className="min-w-0">
+                  <p className="font-semibold break-words">{doc.title}</p>
                   <p className="text-xs text-slate-500">{doc.periodType} · {doc.periodMonth ? `${monthName(doc.periodMonth)} ` : ''}{doc.periodYear}</p>
                 </div>
-                <a className="btn-secondary !py-1.5 !text-xs" href={doc.documentUrl} target="_blank" rel="noreferrer">Download</a>
+                <a className="btn-secondary w-full !py-1.5 !text-xs sm:w-auto" href={doc.documentUrl} target="_blank" rel="noreferrer">Download</a>
               </li>
             ))}
             {docs.length === 0 && <p className="text-sm text-gray-400">No audit files yet.</p>}
@@ -542,44 +544,46 @@ export default function MemberDashboard() {
         </div>
       </div>
 
-      <div className="card">
+      <div className="card min-w-0">
         <SectionTitle
           title="My payment claims"
           subtitle="Submitted to committee · status stays in sync with Maintenance after approval"
         />
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b text-left text-gray-500">
-              <th className="py-2 pr-4">Period</th>
-              <th className="py-2 pr-4">Amount</th>
-              <th className="py-2 pr-4">Mode</th>
-              <th className="py-2 pr-4">Reference</th>
-              <th className="py-2 pr-4">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {claims.map((c) => (
-              <tr key={c.id} className="border-b last:border-0">
-                <td className="py-2 pr-4">{periodLabel(c)}</td>
-                <td className="py-2 pr-4">₹{Number(c.amount).toLocaleString('en-IN')}</td>
-                <td className="py-2 pr-4">{formatPaymentMode(c.paymentMode)}</td>
-                <td className="py-2 pr-4">{c.referenceNumber || '—'}</td>
-                <td className="py-2 pr-4"><StatusBadge status={c.status} /></td>
+        <div className="table-scroll">
+          <table className="w-full min-w-[32rem] text-sm">
+            <thead>
+              <tr className="border-b text-left text-gray-500">
+                <th className="py-2 pr-4">Period</th>
+                <th className="py-2 pr-4">Amount</th>
+                <th className="py-2 pr-4">Mode</th>
+                <th className="py-2 pr-4">Reference</th>
+                <th className="py-2 pr-4">Status</th>
               </tr>
-            ))}
-            {claims.length === 0 && (
-              <tr>
-                <td colSpan="5" className="py-6 text-center text-gray-400">
-                  No claims yet. Use <span className="font-semibold text-slate-600">Claim payment</span> above after you pay.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {claims.map((c) => (
+                <tr key={c.id} className="border-b last:border-0">
+                  <td className="py-2 pr-4">{periodLabel(c)}</td>
+                  <td className="py-2 pr-4">₹{Number(c.amount).toLocaleString('en-IN')}</td>
+                  <td className="py-2 pr-4">{formatPaymentMode(c.paymentMode)}</td>
+                  <td className="break-all py-2 pr-4">{c.referenceNumber || '—'}</td>
+                  <td className="py-2 pr-4"><StatusBadge status={c.status} /></td>
+                </tr>
+              ))}
+              {claims.length === 0 && (
+                <tr>
+                  <td colSpan="5" className="py-6 text-center text-gray-400">
+                    No claims yet. Use <span className="font-semibold text-slate-600">Claim payment</span> above after you pay.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <div className="card" ref={noticesSectionRef}>
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <div className="card min-w-0" ref={noticesSectionRef}>
           <SectionTitle
             title="Latest Notices"
             subtitle={unreadNotices > 0 ? `${unreadNotices} unread` : undefined}
@@ -595,26 +599,26 @@ export default function MemberDashboard() {
             {notices.slice(0, 5).map((n) => (
               <li key={n.id} className={`rounded-lg border p-3 ${n.unread ? 'border-sky-200 bg-sky-50/60' : 'border-gray-100'}`}>
                 <div className="flex items-start justify-between gap-2">
-                  <h4 className="font-semibold">
+                  <h4 className="min-w-0 font-semibold break-words">
                     {n.title}
                     {n.unread && <span className="ml-2 text-[11px] font-bold uppercase tracking-wide text-sky-700">New</span>}
                   </h4>
                   <span className="shrink-0 text-[11px] font-medium text-slate-400">{formatNoticeDate(n.createdAt)}</span>
                 </div>
-                <p className="mt-1 text-sm text-gray-600">{n.body}</p>
+                <p className="mt-1 break-words text-sm text-gray-600">{n.body}</p>
               </li>
             ))}
             {notices.length === 0 && <p className="text-sm text-gray-400">No notices yet.</p>}
           </ul>
         </div>
-        <div className="card">
+        <div className="card min-w-0">
           <SectionTitle title="Society Rules" />
           <ul className="grid gap-3">
             {rules.map((r) => (
               <li key={r.id} className="rounded-lg border border-gray-100 p-3">
                 <span className="badge bg-orange-50 text-orange-700">{r.category}</span>
-                <h4 className="mt-1 font-semibold">{r.title}</h4>
-                <p className="mt-1 text-sm text-gray-600">{r.ruleText}</p>
+                <h4 className="mt-1 font-semibold break-words">{r.title}</h4>
+                <p className="mt-1 break-words text-sm text-gray-600">{r.ruleText}</p>
               </li>
             ))}
             {rules.length === 0 && <p className="text-sm text-gray-400">No rules yet.</p>}

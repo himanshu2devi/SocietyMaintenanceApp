@@ -12,19 +12,19 @@ export default function Profile() {
   const { user, isAdmin } = useAuth()
 
   return (
-    <div className="mx-auto max-w-3xl space-y-6">
+    <div className="mx-auto w-full min-w-0 max-w-3xl space-y-6">
       <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
-        <div className="bg-[linear-gradient(135deg,#102A43_0%,#173e62_55%,#0f766e_150%)] px-6 py-8 text-white sm:px-8">
-          <div className="flex items-center gap-4">
-            <div className="grid h-16 w-16 place-items-center rounded-2xl bg-white/15 text-xl font-extrabold tracking-wide">
+        <div className="bg-[linear-gradient(135deg,#102A43_0%,#173e62_55%,#0f766e_150%)] px-4 py-6 text-white sm:px-8 sm:py-8">
+          <div className="flex items-center gap-3 sm:gap-4">
+            <div className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-white/15 text-lg font-extrabold tracking-wide sm:h-16 sm:w-16 sm:text-xl">
               {initials(user?.fullName)}
             </div>
-            <div>
+            <div className="min-w-0">
               <p className="text-xs font-bold uppercase tracking-[.14em] text-orange-300">
                 {isAdmin ? 'Committee admin' : 'Society member'}
               </p>
-              <h1 className="mt-1 text-2xl font-extrabold tracking-tight sm:text-3xl">{user?.fullName || 'Profile'}</h1>
-              <p className="mt-1 text-sm text-slate-200">{user?.email}</p>
+              <h1 className="mt-1 break-words text-xl font-extrabold tracking-tight sm:text-2xl md:text-3xl">{user?.fullName || 'Profile'}</h1>
+              <p className="mt-1 break-all text-sm text-slate-200">{user?.email}</p>
             </div>
           </div>
         </div>
@@ -39,11 +39,11 @@ export default function Profile() {
         </div>
       </div>
 
-      <div className="flex flex-wrap gap-3">
-        <Link to={isAdmin ? '/admin' : '/member'} className="btn-primary">
+      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+        <Link to={isAdmin ? '/admin' : '/member'} className="btn-primary w-full justify-center sm:w-auto">
           Back to dashboard
         </Link>
-        <Link to="/contact" className="btn-secondary">
+        <Link to="/contact" className="btn-secondary w-full justify-center sm:w-auto">
           Need help?
         </Link>
       </div>
@@ -53,9 +53,9 @@ export default function Profile() {
 
 function Field({ label, value }) {
   return (
-    <div className="bg-white px-5 py-4 sm:px-6">
+    <div className="min-w-0 bg-white px-4 py-4 sm:px-6">
       <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">{label}</p>
-      <p className="mt-1 text-sm font-semibold text-slate-900">{value}</p>
+      <p className="mt-1 break-words text-sm font-semibold text-slate-900">{value}</p>
     </div>
   )
 }
