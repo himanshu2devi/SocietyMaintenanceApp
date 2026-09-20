@@ -8,17 +8,10 @@ import {
   email,
   firstError,
   hasErrors,
-  mobile,
   personName,
   text,
 } from '../../utils/validation'
-import {
-  SITE_EMAIL,
-  SITE_PHONES,
-  mailtoHref,
-  telHref,
-  whatsappHref,
-} from '../../utils/siteContact'
+import { SITE_EMAIL, mailtoHref } from '../../utils/siteContact'
 
 export default function Contact() {
   const [sent, setSent] = useState(false)
@@ -26,7 +19,6 @@ export default function Contact() {
   const [form, setForm] = useState({
     name: '',
     email: '',
-    mobile: '',
     society: '',
     city: '',
     preferredPeriod: '',
@@ -46,9 +38,6 @@ export default function Contact() {
     const errors = collectErrors({
       name: personName(form.name, 'Name'),
       email: email(form.email),
-      mobile: form.mobile.trim()
-        ? mobile(form.mobile)
-        : '',
       society: text(form.society, 'Society name', { required: false, max: 150 }),
       city: text(form.city, 'City', { required: false, max: 80 }),
       message: text(form.message, 'Requirements', { min: 10, max: 2000 }),
@@ -64,7 +53,7 @@ export default function Contact() {
       await identityApi.post('/payments/contact-enquiry', {
         name: form.name.trim(),
         email: form.email.trim(),
-        mobile: form.mobile.trim() || '',
+        mobile: '',
         societyName: form.society.trim() || null,
         city: form.city.trim() || null,
         preferredPeriod: form.preferredPeriod || null,
@@ -74,7 +63,6 @@ export default function Contact() {
       setForm({
         name: '',
         email: '',
-        mobile: '',
         society: '',
         city: '',
         preferredPeriod: '',
@@ -96,7 +84,7 @@ export default function Contact() {
             Tell us about your society — we&apos;ll finalise pricing with you.
           </h1>
           <p className="mt-4 max-w-xl text-sm leading-7 text-slate-600 sm:mt-5 sm:text-base">
-            Share your details and expectations. Our team will contact you to discuss requirements, agree an amount,
+            Share your details and expectations. Our team will contact you by email to discuss requirements, agree an amount,
             and whether you want 3 months, 6 months, or 1 year. Payment happens only on SocietyWale after that.
           </p>
         </div>
@@ -113,27 +101,6 @@ export default function Contact() {
               {SITE_EMAIL}
             </a>
             <p className="mt-1 text-sm text-slate-500">Enquiries from this form are delivered here.</p>
-          </div>
-
-          <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6">
-            <p className="text-xs font-bold uppercase tracking-[.14em] text-orange-600">Call / WhatsApp</p>
-            <ul className="mt-3 space-y-3">
-              {SITE_PHONES.map((phone) => (
-                <li key={phone.digits} className="flex flex-wrap items-center gap-3">
-                  <a className="text-sm font-semibold text-slate-900 transition hover:text-orange-600" href={telHref(phone.digits)}>
-                    +91 {phone.label}
-                  </a>
-                  <a
-                    className="text-xs font-bold uppercase tracking-wide text-emerald-700 hover:text-emerald-800"
-                    href={whatsappHref(phone.digits, 'Hello SocietyWale, I would like a custom quote for our society.')}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    WhatsApp
-                  </a>
-                </li>
-              ))}
-            </ul>
           </div>
 
           <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6">
@@ -161,7 +128,7 @@ export default function Contact() {
             <Alert type="error">{error}</Alert>
             {sent && (
               <Alert type="success">
-                Enquiry sent. We will contact you shortly. You can also call +91 {SITE_PHONES[0].label}.
+                Enquiry sent. We will reply by email shortly at the address you provided.
               </Alert>
             )}
           </div>
@@ -171,17 +138,10 @@ export default function Contact() {
               <input name="name" className="input" value={form.name} onChange={update} placeholder="Your name" maxLength={120} />
               {fieldErrors.name && <p className="mt-1 text-xs font-medium text-red-600">{fieldErrors.name}</p>}
             </div>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div>
-                <label className="label">Email</label>
-                <input name="email" type="email" className="input" value={form.email} onChange={update} placeholder="you@example.com" />
-                {fieldErrors.email && <p className="mt-1 text-xs font-medium text-red-600">{fieldErrors.email}</p>}
-              </div>
-              <div>
-                <label className="label">Mobile (optional)</label>
-                <input name="mobile" className="input" value={form.mobile} onChange={update} placeholder="10-digit mobile" maxLength={10} inputMode="numeric" />
-                {fieldErrors.mobile && <p className="mt-1 text-xs font-medium text-red-600">{fieldErrors.mobile}</p>}
-              </div>
+            <div>
+              <label className="label">Email</label>
+              <input name="email" type="email" className="input" value={form.email} onChange={update} placeholder="you@example.com" />
+              {fieldErrors.email && <p className="mt-1 text-xs font-medium text-red-600">{fieldErrors.email}</p>}
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div>

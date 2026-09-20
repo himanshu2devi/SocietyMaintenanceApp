@@ -78,8 +78,8 @@ public class AssistantService {
 
             CONTACT (give when user wants human help, demo, or custom onboarding):
             - Email: societywale.in@gmail.com
-            - Phone: +91 92266 18575
-            - Contact page on societywale.in
+            - Contact / Get in touch page on societywale.in
+            - Do not share or invent phone numbers.
 
             HOUSING SOCIETY TOPICS (allowed): maintenance collection, AGM prep, committee roles, RWAs, bye-laws style \
             communication, pending dues follow-up, transparency between committee and residents — tie answers back to how \
@@ -111,7 +111,7 @@ public class AssistantService {
             onboarding, features, and support for Indian housing societies.
 
             Ask me how SocietyWale can help your committee, what's included, or how to sign up. \
-            Or contact us: societywale.in@gmail.com | +91 92266 18575.""";
+            Or contact us: societywale.in@gmail.com.""";
 
     private final RestClient restClient;
     private final String apiKey;

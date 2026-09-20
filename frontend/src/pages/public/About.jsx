@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { SITE_EMAIL, SITE_PHONES, mailtoHref, telHref } from '../../utils/siteContact'
+import { SITE_EMAIL, mailtoHref } from '../../utils/siteContact'
 
 const values = [
   {
@@ -117,10 +117,8 @@ export default function About() {
             <p className="mt-2 break-words text-sm text-slate-600">
               Email{' '}
               <a className="break-all font-semibold text-orange-600 hover:text-orange-700" href={mailtoHref()}>{SITE_EMAIL}</a>
-              {' '}or call{' '}
-              <a className="font-semibold text-orange-600 hover:text-orange-700" href={telHref(SITE_PHONES[0].digits)}>
-                +91 {SITE_PHONES[0].label}
-              </a>
+              {' '}or use our{' '}
+              <Link className="font-semibold text-orange-600 hover:text-orange-700" to="/contact">contact form</Link>
               .
             </p>
           </div>

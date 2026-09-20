@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { Brand } from './Brand'
-import { SITE_EMAIL, SITE_PHONES, mailtoHref, telHref } from '../utils/siteContact'
+import { SITE_EMAIL, mailtoHref } from '../utils/siteContact'
 
 export default function Footer() {
   return (
@@ -15,15 +15,6 @@ export default function Footer() {
             <a className="block break-all font-semibold text-slate-800 transition hover:text-orange-600" href={mailtoHref()}>
               {SITE_EMAIL}
             </a>
-            {SITE_PHONES.map((phone) => (
-              <a
-                key={phone.digits}
-                className="block transition hover:text-orange-600"
-                href={telHref(phone.digits)}
-              >
-                +91 {phone.label}
-              </a>
-            ))}
           </address>
           <p className="mt-5 text-sm font-semibold text-slate-700">Made for Indian societies with❤</p>
         </div>

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { SITE_EMAIL, SITE_PHONES, mailtoHref } from '../utils/siteContact'
+import { SITE_EMAIL, mailtoHref } from '../utils/siteContact'
 import { AssistantService } from '../api/services'
 import { getApiErrorMessage } from '../utils/apiError'
 
@@ -175,7 +175,7 @@ export default function AiAssistant() {
           ...prev,
           {
             role: 'bot',
-            text: `The live assistant is not connected yet. Email ${SITE_EMAIL} or call +91 ${SITE_PHONES[0].label}.`,
+            text: `The live assistant is not connected yet. Email ${SITE_EMAIL} or use the Contact page.`,
             link: { href: mailtoHref('SocietyWale enquiry'), label: 'Email us' },
           },
         ])

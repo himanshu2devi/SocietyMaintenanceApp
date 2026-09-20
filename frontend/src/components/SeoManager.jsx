@@ -24,7 +24,7 @@ const PAGE_SEO = {
   '/contact': {
     title: 'Contact SocietyWale — Talk to Our Team in India',
     description:
-      'Contact SocietyWale for demos, onboarding and committee support. Email societywale.in@gmail.com or call +91 92266 18575.',
+      'Contact SocietyWale for demos, onboarding and committee support. Email societywale.in@gmail.com.',
   },
   '/terms': {
     title: 'Terms of Use — SocietyWale',
