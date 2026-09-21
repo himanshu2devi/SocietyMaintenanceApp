@@ -1,10 +1,15 @@
-# Production API hostnames (unchanged DNS → EC2). Frontend branding is on Vercel.
-identity.societywale.in {
-	encode gzip
-	reverse_proxy identity:8081
-}
+# SocietySimplify API reverse proxy on EC2 Elastic IP (path-based).
+# Vercel rewrites /identity/* and /core/* → this host so the site stays on
+# https://societysimplify.vercel.app with no old brand DNS names.
 
-core.societywale.in {
+:80 {
 	encode gzip
-	reverse_proxy core:8082
+
+	handle_path /identity* {
+		reverse_proxy identity:8081
+	}
+
+	handle_path /core* {
+		reverse_proxy core:8082
+	}
 }

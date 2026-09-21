@@ -7,6 +7,10 @@
 # Frontend (Vercel): after git push, ensure Vercel deploys commit on main — NOT "Redeploy" of an old
 # deployment. Use Vercel → Deployments → Create Deployment → branch main, or set up VERCEL_DEPLOY_HOOK
 # in GitHub Actions secrets (see .github/workflows/vercel-production.yml).
+#
+# Vercel env (Production):
+#   VITE_IDENTITY_URL=https://societysimplify.vercel.app/identity/api/v1
+#   VITE_CORE_URL=https://societysimplify.vercel.app/core/api/v1
 $ErrorActionPreference = "Stop"
 $root = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 $key = Join-Path $root "satara-key.pem"
@@ -29,9 +33,10 @@ cd deploy/aws
 if grep -q '^OPENAI_API_KEY=' .env 2>/dev/null; then echo 'OPENAI_API_KEY present'; else echo 'WARNING: add OPENAI_API_KEY to deploy/aws/.env on server'; fi
 docker compose up -d --build identity core caddy
 docker compose ps
-curl -sf https://identity.societywale.in/actuator/health || true
-curl -sf https://core.societywale.in/actuator/health || true
-curl -sf https://core.societywale.in/api/v1/assistant/status || true
+# Health via containers (no old brand hostnames)
+docker compose exec -T identity curl -sf http://127.0.0.1:8081/actuator/health || true
+docker compose exec -T core curl -sf http://127.0.0.1:8082/actuator/health || true
+docker compose exec -T core curl -sf http://127.0.0.1:8082/api/v1/assistant/status || true
 echo DEPLOY_DONE
 '@
 
