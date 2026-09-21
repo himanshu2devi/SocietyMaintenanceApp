@@ -8,6 +8,14 @@
     { "source": "/index", "destination": "/", "permanent": true }
   ],
   "rewrites": [
+    {
+      "source": "/identity/:path*",
+      "destination": "http://43.205.184.92/identity/:path*"
+    },
+    {
+      "source": "/core/:path*",
+      "destination": "http://43.205.184.92/core/:path*"
+    },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }

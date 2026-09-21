@@ -1,6 +1,6 @@
--- Neon free tier: use ONE database (Societywale).
+-- Neon free tier: use ONE database (SocietySimplify Neon DB).
 -- Do NOT create identity_db / core_db on free plans.
 --
 -- Your app tables should already exist from the schema SQL files you ran.
 -- Both Spring Boot services connect to the same database:
---   jdbc:postgresql://HOST/Societywale?sslmode=require
+--   jdbc:postgresql://HOST/neondb?sslmode=require

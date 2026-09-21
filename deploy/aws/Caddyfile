@@ -1,24 +1,15 @@
-# Replace hostnames with your real API DNS (A records to EC2 Elastic IP).
-# Do NOT use *.vercel.app for APIs — Vercel hosts the React frontend only.
-# Example once DNS is ready: identity.yourdomain.com / core.yourdomain.com
+# SocietySimplify API reverse proxy on EC2 (path-based; no brand hostnames).
+# Vercel rewrites /identity/* and /core/* to this host so the browser stays on
+# https://societysimplify.vercel.app (avoids mixed-content and old DNS names).
 
-identity.example.com {
+:80 {
 	encode gzip
-	reverse_proxy identity:8081
-}
 
-core.example.com {
-	encode gzip
-	reverse_proxy core:8082
-}
+	handle_path /identity* {
+		reverse_proxy identity:8081
+	}
 
-# Temporary HTTP access by public IP (optional). Comment out after HTTPS domains work.
-# Replace YOUR_EC2_PUBLIC_IP with the instance Elastic IP, e.g. 13.228.x.x
-# http://YOUR_EC2_PUBLIC_IP {
-# 	handle_path /identity* {
-# 		reverse_proxy identity:8081
-# 	}
-# 	handle_path /core* {
-# 		reverse_proxy core:8082
-# 	}
-# }
+	handle_path /core* {
+		reverse_proxy core:8082
+	}
+}

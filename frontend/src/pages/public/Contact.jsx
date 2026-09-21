@@ -8,6 +8,7 @@ import {
   email,
   firstError,
   hasErrors,
+  mobile,
   personName,
   text,
 } from '../../utils/validation'
@@ -19,6 +20,7 @@ export default function Contact() {
   const [form, setForm] = useState({
     name: '',
     email: '',
+    mobile: '',
     society: '',
     city: '',
     preferredPeriod: '',
@@ -38,6 +40,7 @@ export default function Contact() {
     const errors = collectErrors({
       name: personName(form.name, 'Name'),
       email: email(form.email),
+      mobile: mobile(form.mobile),
       society: text(form.society, 'Society name', { required: false, max: 150 }),
       city: text(form.city, 'City', { required: false, max: 80 }),
       message: text(form.message, 'Requirements', { min: 10, max: 2000 }),
@@ -53,7 +56,7 @@ export default function Contact() {
       await identityApi.post('/payments/contact-enquiry', {
         name: form.name.trim(),
         email: form.email.trim(),
-        mobile: '',
+        mobile: form.mobile.trim().replace(/\s+/g, ''),
         societyName: form.society.trim() || null,
         city: form.city.trim() || null,
         preferredPeriod: form.preferredPeriod || null,
@@ -63,6 +66,7 @@ export default function Contact() {
       setForm({
         name: '',
         email: '',
+        mobile: '',
         society: '',
         city: '',
         preferredPeriod: '',
@@ -138,10 +142,25 @@ export default function Contact() {
               <input name="name" className="input" value={form.name} onChange={update} placeholder="Your name" maxLength={120} />
               {fieldErrors.name && <p className="mt-1 text-xs font-medium text-red-600">{fieldErrors.name}</p>}
             </div>
-            <div>
-              <label className="label">Email</label>
-              <input name="email" type="email" className="input" value={form.email} onChange={update} placeholder="you@example.com" />
-              {fieldErrors.email && <p className="mt-1 text-xs font-medium text-red-600">{fieldErrors.email}</p>}
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <label className="label">Email</label>
+                <input name="email" type="email" className="input" value={form.email} onChange={update} placeholder="you@example.com" />
+                {fieldErrors.email && <p className="mt-1 text-xs font-medium text-red-600">{fieldErrors.email}</p>}
+              </div>
+              <div>
+                <label className="label">Mobile</label>
+                <input
+                  name="mobile"
+                  className="input"
+                  value={form.mobile}
+                  onChange={update}
+                  inputMode="numeric"
+                  placeholder="10-digit mobile"
+                  maxLength={10}
+                />
+                {fieldErrors.mobile && <p className="mt-1 text-xs font-medium text-red-600">{fieldErrors.mobile}</p>}
+              </div>
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div>

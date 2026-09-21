@@ -1,6 +1,6 @@
 -- Fix empty-string emails that break uq_users_society_email
 -- (PostgreSQL allows multiple NULLs in a UNIQUE column, but not multiple '')
--- Run once in Neon SQL Editor on Societywale
+-- Run once in Neon SQL Editor on SocietySimplify Neon DB
 
 UPDATE users
 SET email = NULL

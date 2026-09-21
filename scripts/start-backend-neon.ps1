@@ -1,4 +1,4 @@
-# Start Identity (8081) and/or Core (8082) against Neon Societywale.
+# Start Identity (8081) and/or Core (8082) against Neon SocietySimplify Neon DB.
 # Usage:
 #   .\scripts\start-backend-neon.ps1              # starts both
 #   .\scripts\start-backend-neon.ps1 -Service identity
@@ -59,7 +59,7 @@ if (-not $mvn) {
 
 function Start-Service([string]$Name, [string]$Dir) {
     Write-Host ""
-    Write-Host "Starting $Name with Neon Societywale..." -ForegroundColor Cyan
+    Write-Host "Starting $Name with Neon SocietySimplify Neon DB..." -ForegroundColor Cyan
     Write-Host "  DB_URL = $env:DB_URL"
     Set-Location $Dir
     & mvn spring-boot:run

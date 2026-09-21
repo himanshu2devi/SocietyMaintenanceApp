@@ -78,7 +78,8 @@ public class PaymentDtos {
             @NotBlank(message = "Email is required")
             @Email
             String email,
-            @Pattern(regexp = "^$|^[6-9]\\d{9}$", message = "Enter a valid 10-digit Indian mobile number")
+            @NotBlank(message = "Mobile number is required")
+            @Pattern(regexp = "^[6-9]\\d{9}$", message = "Enter a valid 10-digit Indian mobile number")
             String mobile,
             @Size(max = 150)
             String societyName,

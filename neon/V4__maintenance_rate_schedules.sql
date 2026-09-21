@@ -1,5 +1,5 @@
 -- Timeline-based society maintenance rates (additive only)
--- Run once in Neon SQL Editor on Societywale
+-- Run once in Neon SQL Editor on SocietySimplify Neon DB
 
 CREATE TABLE IF NOT EXISTS maintenance_rate_schedules (
     id                      UUID PRIMARY KEY DEFAULT gen_random_uuid(),

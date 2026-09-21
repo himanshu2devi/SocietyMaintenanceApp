@@ -1,6 +1,6 @@
 -- =============================================================================
 -- ADDITIVE ONLY — do not alter existing tables
--- Run once in Neon SQL Editor against database: Societywale
+-- Run once in Neon SQL Editor against database: SocietySimplify Neon DB
 -- =============================================================================
 
 CREATE TABLE IF NOT EXISTS committee_profiles (

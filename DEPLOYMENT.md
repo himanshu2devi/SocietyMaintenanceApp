@@ -4,7 +4,7 @@
 |-------|----------|--------|
 | Frontend | **Vercel** (keep) | `https://societysimplify.vercel.app` + later `societysimplify.vercel.app` |
 | Backend ×2 | **AWS EC2 + Docker Compose** (recommended) | Always-on, no Render free-tier sleep |
-| Database | **Neon** (keep) | Same `Societywale` DB — no data migration |
+| Database | **Neon** (keep) | Same `SocietySimplify Neon DB` DB — no data migration |
 
 Render free cold-starts are slow for Spring Boot. AWS EC2 keeps both JVMs warm.
 
@@ -77,7 +77,7 @@ nano .env
 Fill:
 
 ```text
-DB_URL=jdbc:postgresql://ep-….neon.tech/Societywale?sslmode=require
+DB_URL=jdbc:postgresql://ep-….neon.tech/neondb?sslmode=require
 DB_USER=neondb_owner
 DB_PASSWORD=your_neon_password
 JWT_SECRET=same_long_secret_as_before
@@ -191,7 +191,7 @@ docker compose up -d --build
 ## G) Env cheat sheet (AWS `.env`)
 
 ```text
-DB_URL=jdbc:postgresql://HOST/Societywale?sslmode=require
+DB_URL=jdbc:postgresql://HOST/neondb?sslmode=require
 DB_USER=neondb_owner
 DB_PASSWORD=***
 JWT_SECRET=***

@@ -1,5 +1,5 @@
 -- SAME vs VARIABLE maintenance billing (additive only)
--- Run once in Neon SQL Editor on Societywale (optional if Hibernate ddl-auto=update)
+-- Run once in Neon SQL Editor on SocietySimplify Neon DB (optional if Hibernate ddl-auto=update)
 
 CREATE TABLE IF NOT EXISTS society_maintenance_settings (
     id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
