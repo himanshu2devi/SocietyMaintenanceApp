@@ -168,18 +168,18 @@ export default function RegisterMember() {
             <p className="mt-1 break-words text-xs text-slate-500">{SIGNUP_PASSWORD_HINT}</p>
             {fieldErrors.password && <p className="mt-1 text-xs font-medium text-red-600">{fieldErrors.password}</p>}
           </div>
-          <button className="btn-primary w-full !bg-orange-500 !py-3 hover:!bg-orange-600" disabled={loading || societiesLoading}>
+          <button className="btn-primary w-full !bg-teal-600 !py-3 hover:!bg-teal-700" disabled={loading || societiesLoading}>
             {loading ? 'Creating account…' : 'Create member account'}
           </button>
         </form>
         <p className="border-t border-slate-100 pt-5 text-center text-sm text-slate-500">
           Already registered?{' '}
-          <Link to="/login" className="font-bold text-orange-600 hover:text-orange-700">Sign in</Link>
+          <Link to="/login" className="font-bold text-teal-700 hover:text-teal-800">Sign in</Link>
           {' · '}
-          <Link to="/forgot-password" className="font-bold text-orange-600 hover:text-orange-700">Forgot password</Link>
+          <Link to="/forgot-password" className="font-bold text-teal-700 hover:text-teal-800">Forgot password</Link>
           <br />
           Committee admin?{' '}
-          <Link to="/register" className="font-bold text-orange-600 hover:text-orange-700">Register a society</Link>
+          <Link to="/register" className="font-bold text-teal-700 hover:text-teal-800">Register a society</Link>
         </p>
       </div>
     </AuthShell>

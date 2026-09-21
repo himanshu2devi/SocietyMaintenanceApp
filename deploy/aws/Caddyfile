@@ -1,12 +1,13 @@
-# Replace hostnames with your real DNS (GoDaddy → A records to EC2 Elastic IP).
-# Until DNS is ready, use the temporary http:// block with your EC2 public IP.
+# Replace hostnames with your real API DNS (A records to EC2 Elastic IP).
+# Do NOT use *.vercel.app for APIs — Vercel hosts the React frontend only.
+# Example once DNS is ready: identity.yourdomain.com / core.yourdomain.com
 
-identity.societywale.in {
+identity.example.com {
 	encode gzip
 	reverse_proxy identity:8081
 }
 
-core.societywale.in {
+core.example.com {
 	encode gzip
 	reverse_proxy core:8082
 }

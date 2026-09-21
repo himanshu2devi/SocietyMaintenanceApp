@@ -102,7 +102,7 @@ public class SocietyAiService {
         String priorityHint = blankToNull(req.priorityHint());
 
         String system = """
-                You draft housing-society notices for Indian RWAs / cooperative societies using SocietyWale.
+                You draft housing-society notices for Indian RWAs / cooperative societies using SocietySimplify.
                 Return ONLY valid JSON with keys: title, body, priority.
                 priority must be one of: LOW, NORMAL, HIGH, URGENT.
                 title: max 120 characters, clear subject.
@@ -218,7 +218,7 @@ public class SocietyAiService {
         }
 
         String system = """
-                You are SocietyWale operations coach for an Indian housing society secretary.
+                You are SocietySimplify operations coach for an Indian housing society secretary.
                 Given structured stats, write a short actionable digest.
                 Return ONLY valid JSON: { "summary": "..." }.
                 summary: 2–4 short sentences.

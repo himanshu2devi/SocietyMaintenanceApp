@@ -281,7 +281,7 @@ export default function MemberDirectory() {
       {editForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 p-4">
           <form onSubmit={handleUpdate} className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl" noValidate>
-            <p className="text-xs font-bold uppercase tracking-[.14em] text-orange-600">Edit member</p>
+            <p className="text-xs font-bold uppercase tracking-[.14em] text-teal-700">Edit member</p>
             <h3 className="mt-2 text-xl font-extrabold text-slate-950">Update details</h3>
             <div className="mt-4 space-y-3">
               <div>

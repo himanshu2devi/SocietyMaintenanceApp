@@ -160,7 +160,7 @@ export default function PaymentClaims({ onNavigate, onClaimsChanged }) {
       {approvePrompt && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 p-4">
           <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl shadow-slate-900/20">
-            <p className="text-xs font-bold uppercase tracking-[.14em] text-orange-600">Payment approved</p>
+            <p className="text-xs font-bold uppercase tracking-[.14em] text-teal-700">Payment approved</p>
             <h3 className="mt-2 text-xl font-extrabold text-slate-950">Update this payment in Maintenance</h3>
             <p className="mt-3 text-sm leading-6 text-slate-600">
               {approvePrompt.memberName} (Flat {approvePrompt.flatNumber}) · {periodLabel(approvePrompt)} ·{' '}

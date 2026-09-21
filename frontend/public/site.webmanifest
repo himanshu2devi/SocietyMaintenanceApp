@@ -1,11 +1,11 @@
 {
-  "name": "SocietyWale",
-  "short_name": "SocietyWale",
-  "description": "AI-powered society management software for Indian housing societies",
+  "name": "SocietySimplify",
+  "short_name": "SocietySimplify",
+  "description": "Society management software for Indian housing societies",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#000000",
-  "theme_color": "#FF7A45",
+  "background_color": "#F0FDFA",
+  "theme_color": "#0D9488",
   "icons": [
     {
       "src": "/icon-192.png",

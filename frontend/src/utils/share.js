@@ -59,7 +59,7 @@ export function buildNoticeWhatsAppText(notice, societyName = 'Society') {
     `Date: ${formatNoticeDate(notice.createdAt)}`,
     notice.createdByName ? `Posted by: ${notice.createdByName}` : null,
     '',
-    'Shared via SocietyWale',
+    'Shared via SocietySimplify',
   ].filter(Boolean).join('\n')
 }
 
@@ -71,7 +71,7 @@ function startPdfDoc(title, societyName) {
   doc.setFont('helvetica', 'bold')
   doc.setFontSize(11)
   doc.setTextColor(234, 88, 12)
-  doc.text('SOCIETYWALE', margin, 40)
+  doc.text('SOCIETYSIMPLIFY', margin, 40)
 
   doc.setFontSize(16)
   doc.setTextColor(15, 23, 42)
@@ -95,7 +95,7 @@ function addFooter(doc) {
     doc.setFontSize(9)
     doc.setTextColor(148, 163, 184)
     doc.text(
-      'Confidential society financial report · Powered by societywale.in',
+      'Confidential society financial report · Powered by societysimplify.vercel.app',
       48,
       doc.internal.pageSize.getHeight() - 28,
     )

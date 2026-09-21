@@ -44,11 +44,11 @@ public class MaintenanceReceiptPdfService {
     private final String supportEmail;
 
     public MaintenanceReceiptPdfService(
-            @Value("${app.mail.app-url:https://societywale.in}") String appUrl,
-            @Value("${app.mail.from:societywale.in@gmail.com}") String supportEmail) {
+            @Value("${app.mail.app-url:https://societysimplify.vercel.app}") String appUrl,
+            @Value("${app.mail.from:contact.societysimplify@gmail.com}") String supportEmail) {
         this.appUrl = normalizeAppUrl(appUrl);
         this.supportEmail = supportEmail == null || supportEmail.isBlank()
-                ? "societywale.in@gmail.com"
+                ? "contact.societysimplify@gmail.com"
                 : supportEmail.trim();
     }
 
@@ -77,7 +77,7 @@ public class MaintenanceReceiptPdfService {
             brandLine.setSpacingAfter(4f);
             document.add(brandLine);
 
-            Paragraph tagline = new Paragraph("Maintenance payment receipt · societywale.in", small);
+            Paragraph tagline = new Paragraph("Maintenance payment receipt · societysimplify.vercel.app", small);
             tagline.setSpacingAfter(16f);
             document.add(tagline);
 
@@ -118,7 +118,7 @@ public class MaintenanceReceiptPdfService {
             }));
 
             Paragraph note = new Paragraph(
-                    "This receipt confirms maintenance payment recorded in SocietyWale for the period above. "
+                    "This receipt confirms maintenance payment recorded in SocietySimplify for the period above. "
                             + "This is a computer-generated document and does not require a signature.",
                     body);
             note.setSpacingBefore(18f);
@@ -126,7 +126,7 @@ public class MaintenanceReceiptPdfService {
             document.add(note);
 
             Paragraph footer = new Paragraph(
-                    "SocietyWale · " + appUrl + " · " + supportEmail,
+                    "SocietySimplify · " + appUrl + " · " + supportEmail,
                     small);
             footer.setAlignment(Element.ALIGN_CENTER);
             document.add(footer);
@@ -142,7 +142,7 @@ public class MaintenanceReceiptPdfService {
         String flat = charge.getFlatNumber() == null
                 ? "flat"
                 : charge.getFlatNumber().replaceAll("[^A-Za-z0-9_-]", "");
-        return "SocietyWale-Maintenance-Receipt-"
+        return "SocietySimplify-Maintenance-Receipt-"
                 + flat + "-"
                 + charge.getBillingYear()
                 + String.format(Locale.ROOT, "%02d", charge.getBillingMonth())
@@ -227,10 +227,10 @@ public class MaintenanceReceiptPdfService {
     }
 
     private static String normalizeAppUrl(String url) {
-        if (url == null || url.isBlank()) return "https://societywale.in";
+        if (url == null || url.isBlank()) return "https://societysimplify.vercel.app";
         String cleaned = url.trim().replaceAll("/+$", "");
         if (cleaned.contains("localhost") || cleaned.contains("127.0.0.1")) {
-            return "https://societywale.in";
+            return "https://societysimplify.vercel.app";
         }
         return cleaned;
     }

@@ -1,7 +1,7 @@
 from PIL import Image
 from pathlib import Path
 
-src = Path(r"C:\Z_Business\society-app\SocietyMaintenanceApp\frontend\public\images\societywale-logo.png")
+src = Path(r"C:\Z_Business\society-app\SocietyMaintenanceApp\frontend\public\images\societysimplify-logo.png")
 out_dir = Path(r"C:\Z_Business\society-app\SocietyMaintenanceApp\frontend\public")
 im = Image.open(src).convert("RGBA")
 w, h = im.size

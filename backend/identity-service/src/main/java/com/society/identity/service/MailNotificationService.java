@@ -33,9 +33,9 @@ public class MailNotificationService {
             JavaMailSender mailSender,
             PaymentReceiptPdfService paymentReceiptPdfService,
             @Value("${app.mail.enabled:false}") boolean enabled,
-            @Value("${app.mail.from:societywale.in@gmail.com}") String fromAddress,
-            @Value("${app.mail.owner-inbox:societywale.in@gmail.com}") String ownerInbox,
-            @Value("${app.mail.app-url:https://societywale.in}") String appUrl) {
+            @Value("${app.mail.from:contact.societysimplify@gmail.com}") String fromAddress,
+            @Value("${app.mail.owner-inbox:contact.societysimplify@gmail.com}") String ownerInbox,
+            @Value("${app.mail.app-url:https://societysimplify.vercel.app}") String appUrl) {
         this.mailSender = mailSender;
         this.paymentReceiptPdfService = paymentReceiptPdfService;
         this.enabled = enabled;
@@ -83,11 +83,11 @@ public class MailNotificationService {
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
             helper.setFrom(fromAddress);
             helper.setTo(adminEmail);
-            helper.setSubject("Welcome to SocietyWale — payment confirmed · " + societyName);
+            helper.setSubject("Welcome to SocietySimplify — payment confirmed · " + societyName);
             helper.setText("""
                     Dear %s,
 
-                    Welcome to SocietyWale — your society workspace is ready.
+                    Welcome to SocietySimplify — your society workspace is ready.
 
                     ----------------------------------------
                     WORKSPACE
@@ -105,7 +105,7 @@ public class MailNotificationService {
                     Amount: %s
                     Paid at: %s
 
-                    Your official SocietyWale payment receipt is attached as a PDF.
+                    Your official SocietySimplify payment receipt is attached as a PDF.
 
                     ----------------------------------------
                     NEXT STEPS
@@ -118,7 +118,7 @@ public class MailNotificationService {
                     Need help? Reply to this email or write to %s.
 
                     Warm regards,
-                    Team SocietyWale
+                    Team SocietySimplify
                     %s
                     """.formatted(
                     adminName,
@@ -150,7 +150,7 @@ public class MailNotificationService {
             SimpleMailMessage owner = new SimpleMailMessage();
             owner.setFrom(fromAddress);
             owner.setTo(ownerInbox);
-            owner.setSubject("[SocietyWale] New paid society — " + societyName);
+            owner.setSubject("[SocietySimplify] New paid society — " + societyName);
             owner.setText("""
                     New society signup (payment received)
 
@@ -197,11 +197,11 @@ public class MailNotificationService {
             SimpleMailMessage welcome = new SimpleMailMessage();
             welcome.setFrom(fromAddress);
             welcome.setTo(memberEmail);
-            welcome.setSubject("Welcome to " + societyName + " on SocietyWale");
+            welcome.setSubject("Welcome to " + societyName + " on SocietySimplify");
             welcome.setText("""
                     Dear %s,
 
-                    Welcome to SocietyWale.
+                    Welcome to SocietySimplify.
 
                     You have joined:
                     • Society: %s
@@ -217,7 +217,7 @@ public class MailNotificationService {
                     Questions? Contact your society committee, or email %s.
 
                     Warm regards,
-                    Team SocietyWale
+                    Team SocietySimplify
                     %s
                     """.formatted(
                     memberName,
@@ -247,7 +247,7 @@ public class MailNotificationService {
             msg.setReplyTo(req.email().trim());
             String society = req.societyName() == null || req.societyName().isBlank()
                     ? "—" : req.societyName().trim();
-            msg.setSubject("[SocietyWale] Pricing enquiry — " + society);
+            msg.setSubject("[SocietySimplify] Pricing enquiry — " + society);
             msg.setText("""
                     New Get-in-touch enquiry (dynamic pricing)
 
@@ -262,7 +262,7 @@ public class MailNotificationService {
                     %s
 
                     ---
-                    Reply to the customer email above to continue the discussion, then complete payment on SocietyWale.
+                    Reply to the customer email above to continue the discussion, then complete payment on SocietySimplify.
                     """.formatted(
                     req.name().trim(),
                     req.email().trim(),
@@ -308,11 +308,11 @@ public class MailNotificationService {
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
             helper.setFrom(fromAddress);
             helper.setTo(adminEmail);
-            helper.setSubject("SocietyWale subscription renewed — " + societyName);
+            helper.setSubject("SocietySimplify subscription renewed — " + societyName);
             helper.setText("""
                     Dear %s,
 
-                    Thank you — your SocietyWale subscription payment is confirmed.
+                    Thank you — your SocietySimplify subscription payment is confirmed.
 
                     Society: %s
                     Society code: %s
@@ -325,7 +325,7 @@ public class MailNotificationService {
                     Sign in: %s/login
 
                     Warm regards,
-                    Team SocietyWale
+                    Team SocietySimplify
                     """.formatted(
                     adminName, societyName, societyCode, plan, amount, paidAt, expires, appUrl), false);
 
@@ -345,7 +345,7 @@ public class MailNotificationService {
             SimpleMailMessage owner = new SimpleMailMessage();
             owner.setFrom(fromAddress);
             owner.setTo(ownerInbox);
-            owner.setSubject("[SocietyWale] Renewal paid — " + societyName);
+            owner.setSubject("[SocietySimplify] Renewal paid — " + societyName);
             owner.setText("""
                     Subscription renewed
 
@@ -364,11 +364,11 @@ public class MailNotificationService {
 
     private static String normalizeAppUrl(String url) {
         if (url == null || url.isBlank()) {
-            return "https://societywale.in";
+            return "https://societysimplify.vercel.app";
         }
         String cleaned = url.trim().replaceAll("/+$", "");
         if (cleaned.contains("localhost") || cleaned.contains("127.0.0.1")) {
-            return "https://societywale.in";
+            return "https://societysimplify.vercel.app";
         }
         return cleaned;
     }

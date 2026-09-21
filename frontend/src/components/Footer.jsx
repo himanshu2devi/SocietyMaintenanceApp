@@ -12,7 +12,7 @@ export default function Footer() {
             Society management software for Indian housing societies. Maintenance, members, notices, expenses, complaints, audit-ready records and more in one place.
           </p>
           <address className="mt-5 not-italic space-y-1.5 text-sm text-slate-600">
-            <a className="block break-all font-semibold text-slate-800 transition hover:text-orange-600" href={mailtoHref()}>
+            <a className="block break-all font-semibold text-slate-800 transition hover:text-teal-700" href={mailtoHref()}>
               {SITE_EMAIL}
             </a>
           </address>
@@ -45,8 +45,8 @@ export default function Footer() {
       </div>
       <div className="border-t border-slate-100">
         <div className="mx-auto flex max-w-7xl flex-col gap-1 px-4 py-5 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-          <p>© {new Date().getFullYear()} SocietyWale. All rights reserved.</p>
-          <p>Serving housing societies &amp; RWAs across India · societywale.in</p>
+          <p>© {new Date().getFullYear()} SocietySimplify. All rights reserved.</p>
+          <p>Serving housing societies &amp; RWAs across India · societysimplify.vercel.app</p>
         </div>
       </div>
     </footer>
@@ -60,7 +60,7 @@ function FooterColumn({ title, links }) {
       <ul className="mt-4 space-y-3">
         {links.map(([label, to]) => (
           <li key={label}>
-            <Link className="text-sm text-slate-500 transition hover:text-orange-600" to={to}>{label}</Link>
+            <Link className="text-sm text-slate-500 transition hover:text-teal-700" to={to}>{label}</Link>
           </li>
         ))}
       </ul>

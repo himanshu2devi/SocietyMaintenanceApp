@@ -9,13 +9,13 @@ export default function Terms() {
       updated="13 July 2026"
     >
       <p>
-        SocietyWale provides digital society-management tools for housing society committees and residents in India —
+        SocietySimplify provides digital society-management tools for housing society committees and residents in India —
         including member records, maintenance tracking, payment claims, expenses, notices, bank details and reports.
         By creating an account or using the service, you agree to these terms.
       </p>
       <h2>Nature of the service</h2>
       <p>
-        SocietyWale is a software platform (SaaS) that helps societies organise operational records.
+        SocietySimplify is a software platform (SaaS) that helps societies organise operational records.
         We are not a chartered accountant, auditor, legal adviser or government authority.
         Your managing committee remains responsible for compliance with applicable cooperative society laws,
         model bye-laws, AGM/audit obligations and any state-specific rules that apply to your society.
@@ -37,7 +37,7 @@ export default function Terms() {
         Society workspace subscriptions are paid digitally (for example via Razorpay) at signup. Access to the
         administrator dashboard is granted only after successful payment. Fees, offer pricing and checkout amount are
         shown before you pay. <strong>Successful payments are non-refundable</strong> as set out in our{' '}
-        <Link className="font-semibold text-orange-600" to="/refund-policy">
+        <Link className="font-semibold text-teal-700" to="/refund-policy">
           Refund &amp; Cancellation Policy
         </Link>
         . Operational records entered by your society remain yours to export or retain as permitted by law.
@@ -50,8 +50,8 @@ export default function Terms() {
       <h2>Contact</h2>
       <p>
         Questions about these terms? Email{' '}
-        <a className="font-semibold text-orange-600" href={mailtoHref('Terms of use enquiry')}>{SITE_EMAIL}</a>
-        {' '}or visit our <Link className="font-semibold text-orange-600" to="/contact">Contact</Link> page.
+        <a className="font-semibold text-teal-700" href={mailtoHref('Terms of use enquiry')}>{SITE_EMAIL}</a>
+        {' '}or visit our <Link className="font-semibold text-teal-700" to="/contact">Contact</Link> page.
       </p>
     </LegalPage>
   )
@@ -60,7 +60,7 @@ export default function Terms() {
 export function LegalPage({ eyebrow, title, updated, children }) {
   return (
     <div className="w-full min-w-0">
-      <section className="border-b border-slate-200 bg-[#fff9f6]">
+      <section className="border-b border-slate-200 bg-[#f0fdfa]">
         <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-14 lg:py-16">
           <p className="eyebrow">{eyebrow}</p>
           <h1 className="mt-4 break-words text-2xl font-extrabold tracking-tight text-slate-950 sm:text-3xl md:text-4xl">{title}</h1>

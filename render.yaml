@@ -1,4 +1,4 @@
-# Render Blueprint — SocietyWale backends (Docker)
+# Render Blueprint — SocietySimplify backends (Docker)
 # Docs: https://render.com/docs/blueprint-spec
 #
 # Create TWO Web Services from this repo (or use Blueprint).
@@ -6,7 +6,7 @@
 
 services:
   - type: web
-    name: societywale-identity
+    name: societysimplify-identity
     runtime: docker
     plan: free
     rootDir: backend/identity-service
@@ -27,7 +27,7 @@ services:
         sync: false
 
   - type: web
-    name: societywale-core
+    name: societysimplify-core
     runtime: docker
     plan: free
     rootDir: backend/core-service

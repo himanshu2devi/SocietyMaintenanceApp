@@ -218,7 +218,7 @@ export default function ComplaintBoard() {
                   <div className="flex flex-wrap gap-2">
                     <span className={`badge ${statusTone[item.status] || ''}`}>{String(item.status || '').replace('_', ' ')}</span>
                     <span className={`badge ${priorityTone[item.priority] || ''}`}>{item.priority}</span>
-                    <span className="badge bg-orange-50 text-orange-700">{item.category}</span>
+                    <span className="badge bg-teal-50 text-teal-800">{item.category}</span>
                   </div>
                   <h4 className="mt-2 font-semibold text-slate-950">{item.title}</h4>
                   <p className="mt-1 text-xs font-medium text-slate-500">

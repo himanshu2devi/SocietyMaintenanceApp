@@ -179,7 +179,7 @@ export default function RegisterSociety() {
     }
 
     if (paymentsEnabled === false) {
-      setError('Online payments are not available right now. Please contact SocietyWale or try again shortly.')
+      setError('Online payments are not available right now. Please contact SocietySimplify or try again shortly.')
       return
     }
 
@@ -214,7 +214,7 @@ export default function RegisterSociety() {
         orderId: order.orderId,
         amountPaise: order.amountPaise,
         currency: order.currency,
-        description: order.planLabel || 'SocietyWale workspace',
+        description: order.planLabel || 'SocietySimplify workspace',
         prefill: {
           name: payload.adminName,
           email: payload.adminEmail,
@@ -258,15 +258,15 @@ export default function RegisterSociety() {
     <AuthShell
       step="Pay & set up your workspace"
       title="Create your society account"
-      description="After discussing pricing with SocietyWale, choose 3 months, 6 months, or 1 year, enter the agreed amount, and pay securely on this page only."
+      description="After discussing pricing with SocietySimplify, choose 3 months, 6 months, or 1 year, enter the agreed amount, and pay securely on this page only."
     >
       <div className="space-y-5">
         <Alert type="error">{error}</Alert>
         {info && <Alert type="success">{info}</Alert>}
 
-        <div className="rounded-2xl border border-orange-200 bg-gradient-to-br from-orange-50 to-white p-4 shadow-sm">
-          <p className="text-xs font-bold uppercase tracking-[0.12em] text-orange-700">
-            SocietyWale plans
+        <div className="rounded-2xl border border-teal-200 bg-gradient-to-br from-teal-50 to-white p-4 shadow-sm">
+          <p className="text-xs font-bold uppercase tracking-[0.12em] text-teal-800">
+            SocietySimplify plans
           </p>
 
           <div className="mt-4 grid gap-2 sm:grid-cols-3">
@@ -280,8 +280,8 @@ export default function RegisterSociety() {
                   onClick={() => setBillingPeriod(plan.value)}
                   className={`rounded-xl border px-3 py-3 text-left transition ${
                     selected
-                      ? 'border-orange-500 bg-orange-50 ring-2 ring-orange-200'
-                      : 'border-slate-200 bg-white hover:border-orange-200'
+                      ? 'border-teal-600 bg-teal-50 ring-2 ring-teal-200'
+                      : 'border-slate-200 bg-white hover:border-teal-200'
                   }`}
                 >
                   <p className="text-sm font-extrabold text-slate-950">{plan.title}</p>
@@ -292,7 +292,7 @@ export default function RegisterSociety() {
           </div>
 
           <div className="mt-4">
-            <p>Discuss with societywale experts for the final amount.</p><br />
+            <p>Discuss with societysimplify experts for the final amount.</p><br />
             <label className="label" htmlFor="amountRupees">Agreed amount (₹)</label>
             <input
               id="amountRupees"
@@ -317,7 +317,7 @@ export default function RegisterSociety() {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4" noValidate>
-          <div className="rounded-2xl bg-orange-50 p-4">
+          <div className="rounded-2xl bg-teal-50 p-4">
             <p className="text-sm font-bold text-slate-900">1. Society details</p>
             <p className="mt-1 text-xs leading-5 text-slate-600">
               Use a unique combination of city and society registration number to create a society code.
@@ -384,7 +384,7 @@ export default function RegisterSociety() {
           />
 
           <button
-            className="btn-primary w-full !bg-orange-500 !py-3 hover:!bg-orange-600"
+            className="btn-primary w-full !bg-teal-600 !py-3 hover:!bg-teal-700"
             disabled={busy || !acceptedTerms}
           >
             {paying
@@ -396,17 +396,17 @@ export default function RegisterSociety() {
                   : 'Pay and Sign Up'}
           </button>
           <p className="text-center text-[11px] leading-4 text-slate-500">
-            Secure Razorpay checkout on SocietyWale only. Receipt is emailed after successful payment.
+            Secure Razorpay checkout on SocietySimplify only. Receipt is emailed after successful payment.
           </p>
         </form>
 
         <p className="border-t border-slate-100 pt-5 text-center text-sm text-slate-500">
           Already registered?{' '}
-          <Link to="/login" className="font-bold text-orange-600 hover:text-orange-700">
+          <Link to="/login" className="font-bold text-teal-700 hover:text-teal-800">
             Sign in
           </Link>
           {' · '}
-          <Link to="/renew" className="font-bold text-orange-600 hover:text-orange-700">
+          <Link to="/renew" className="font-bold text-teal-700 hover:text-teal-800">
             Renew subscription
           </Link>
         </p>

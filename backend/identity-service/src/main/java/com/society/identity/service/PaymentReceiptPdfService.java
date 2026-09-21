@@ -22,7 +22,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
 /**
- * Generates a professional SocietyWale payment receipt PDF for paid society signup.
+ * Generates a professional SocietySimplify payment receipt PDF for paid society signup.
  */
 @Service
 public class PaymentReceiptPdfService {
@@ -38,11 +38,11 @@ public class PaymentReceiptPdfService {
     private final String supportEmail;
 
     public PaymentReceiptPdfService(
-            @Value("${app.mail.app-url:https://societywale.in}") String appUrl,
-            @Value("${app.mail.from:societywale.in@gmail.com}") String supportEmail) {
+            @Value("${app.mail.app-url:https://societysimplify.vercel.app}") String appUrl,
+            @Value("${app.mail.from:contact.societysimplify@gmail.com}") String supportEmail) {
         this.appUrl = normalizeAppUrl(appUrl);
         this.supportEmail = supportEmail == null || supportEmail.isBlank()
-                ? "societywale.in@gmail.com"
+                ? "contact.societysimplify@gmail.com"
                 : supportEmail.trim();
     }
 
@@ -73,7 +73,7 @@ public class PaymentReceiptPdfService {
             brandLine.setSpacingAfter(4f);
             document.add(brandLine);
 
-            Paragraph tagline = new Paragraph("Official payment receipt · societywale.in", small);
+            Paragraph tagline = new Paragraph("Official payment receipt · societysimplify.vercel.app", small);
             tagline.setSpacingAfter(16f);
             document.add(tagline);
 
@@ -128,7 +128,7 @@ public class PaymentReceiptPdfService {
             }));
 
             Paragraph note = new Paragraph(
-                    "This receipt confirms payment received by SocietyWale for activation of your society workspace. "
+                    "This receipt confirms payment received by SocietySimplify for activation of your society workspace. "
                             + "This is a computer-generated document and does not require a signature. "
                             + "Subscription fees are non-refundable as per our Refund & Cancellation Policy.",
                     body);
@@ -137,7 +137,7 @@ public class PaymentReceiptPdfService {
             document.add(note);
 
             Paragraph footer = new Paragraph(
-                    "SocietyWale · " + appUrl + " · " + supportEmail + " · Sign in: " + appUrl + "/login",
+                    "SocietySimplify · " + appUrl + " · " + supportEmail + " · Sign in: " + appUrl + "/login",
                     small);
             footer.setAlignment(Element.ALIGN_CENTER);
             document.add(footer);
@@ -156,7 +156,7 @@ public class PaymentReceiptPdfService {
     public String filename(String receiptNumber, String societyCode) {
         String code = societyCode == null ? "society" : societyCode.replaceAll("[^A-Za-z0-9_-]", "");
         String receipt = receiptNumber == null ? "receipt" : receiptNumber.replaceAll("[^A-Za-z0-9_-]", "");
-        return "SocietyWale-Payment-Receipt-" + code + "-" + receipt + ".pdf";
+        return "SocietySimplify-Payment-Receipt-" + code + "-" + receipt + ".pdf";
     }
 
     private static Paragraph sectionHeading(String text, Font font) {
@@ -201,11 +201,11 @@ public class PaymentReceiptPdfService {
 
     private static String normalizeAppUrl(String url) {
         if (url == null || url.isBlank()) {
-            return "https://societywale.in";
+            return "https://societysimplify.vercel.app";
         }
         String cleaned = url.trim().replaceAll("/+$", "");
         if (cleaned.contains("localhost") || cleaned.contains("127.0.0.1")) {
-            return "https://societywale.in";
+            return "https://societysimplify.vercel.app";
         }
         return cleaned;
     }

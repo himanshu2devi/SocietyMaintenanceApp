@@ -1,10 +1,10 @@
 import { useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 
-const SITE = 'https://societywale.in'
-const DEFAULT_TITLE = 'SocietyWale — Society Management Software for Indian Housing Societies'
+const SITE = 'https://societysimplify.vercel.app'
+const DEFAULT_TITLE = 'SocietySimplify — Society Management Software for Indian Housing Societies'
 const DEFAULT_DESC =
-  'SocietyWale is society management software for Indian housing societies and RWAs. Track maintenance, members, notices, expenses, complaints and audit-ready reports in one secure workspace.'
+  'SocietySimplify is society management software for Indian housing societies and RWAs. Track maintenance, members, notices, expenses, complaints and audit-ready reports in one secure workspace.'
 
 const PAGE_SEO = {
   '/': {
@@ -12,49 +12,49 @@ const PAGE_SEO = {
     description: DEFAULT_DESC,
   },
   '/#faq': {
-    title: 'SocietyWale FAQs — Society Management Software India',
+    title: 'SocietySimplify FAQs — Society Management Software India',
     description:
-      'Common questions about SocietyWale for Indian housing societies: getting started, members, maintenance, complaints and support.',
+      'Common questions about SocietySimplify for Indian housing societies: getting started, members, maintenance, complaints and support.',
   },
   '/about': {
-    title: 'About SocietyWale — Built for Indian Housing Societies',
+    title: 'About SocietySimplify — Built for Indian Housing Societies',
     description:
-      'Learn how SocietyWale helps managing committees run maintenance, members, notices, expenses and complaints with clear, audit-friendly records.',
+      'Learn how SocietySimplify helps managing committees run maintenance, members, notices, expenses and complaints with clear, audit-friendly records.',
   },
   '/contact': {
-    title: 'Contact SocietyWale — Talk to Our Team in India',
+    title: 'Contact SocietySimplify — Talk to Our Team in India',
     description:
-      'Contact SocietyWale for demos, onboarding and committee support. Email societywale.in@gmail.com.',
+      'Contact SocietySimplify for demos, onboarding and committee support. Email contact.societysimplify@gmail.com.',
   },
   '/terms': {
-    title: 'Terms of Use — SocietyWale',
-    description: 'Terms of use for SocietyWale society management software used by Indian housing societies and RWAs.',
+    title: 'Terms of Use — SocietySimplify',
+    description: 'Terms of use for SocietySimplify society management software used by Indian housing societies and RWAs.',
   },
   '/privacy': {
-    title: 'Privacy Policy — SocietyWale',
+    title: 'Privacy Policy — SocietySimplify',
     description:
-      'Privacy policy for SocietyWale. How we process society and resident data as a service provider under Indian data protection expectations.',
+      'Privacy policy for SocietySimplify. How we process society and resident data as a service provider under Indian data protection expectations.',
   },
   '/refund-policy': {
-    title: 'Refund & Cancellation Policy — SocietyWale',
+    title: 'Refund & Cancellation Policy — SocietySimplify',
     description:
-      'SocietyWale refund and cancellation policy for annual society workspace subscriptions. Fees are non-refundable after successful payment.',
+      'SocietySimplify refund and cancellation policy for annual society workspace subscriptions. Fees are non-refundable after successful payment.',
   },
   '/login': {
-    title: 'Sign in — SocietyWale',
-    description: 'Sign in to your SocietyWale society workspace.',
+    title: 'Sign in — SocietySimplify',
+    description: 'Sign in to your SocietySimplify society workspace.',
   },
   '/register': {
-    title: 'Create Society Workspace — SocietyWale',
-    description: 'Register your housing society on SocietyWale and start managing maintenance, members and records.',
+    title: 'Create Society Workspace — SocietySimplify',
+    description: 'Register your housing society on SocietySimplify and start managing maintenance, members and records.',
   },
   '/register-member': {
-    title: 'Member Signup — SocietyWale',
-    description: 'Join your housing society workspace on SocietyWale using your society code.',
+    title: 'Member Signup — SocietySimplify',
+    description: 'Join your housing society workspace on SocietySimplify using your society code.',
   },
   '/profile': {
-    title: 'My Profile — SocietyWale',
-    description: 'View your SocietyWale profile and society workspace details.',
+    title: 'My Profile — SocietySimplify',
+    description: 'View your SocietySimplify profile and society workspace details.',
   },
 }
 

@@ -9,4 +9,4 @@ Disallow: /register-member
 Disallow: /forgot-password
 Disallow: /profile
 
-Sitemap: https://societywale.in/sitemap.xml
+Sitemap: https://societysimplify.vercel.app/sitemap.xml

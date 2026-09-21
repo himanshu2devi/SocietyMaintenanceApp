@@ -41,7 +41,7 @@ public class PaymentController {
     public ResponseEntity<MessageResponse> contactEnquiry(@Valid @RequestBody ContactEnquiryRequest req) {
         mailNotificationService.sendContactEnquiry(req);
         return ResponseEntity.ok(new MessageResponse(
-                "Thanks — your enquiry was sent to SocietyWale. We will contact you shortly."));
+                "Thanks — your enquiry was sent to SocietySimplify. We will contact you shortly."));
     }
 
     @PostMapping("/razorpay/webhook")

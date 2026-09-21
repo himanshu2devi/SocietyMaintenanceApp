@@ -197,7 +197,7 @@ export default function MemberDashboard() {
       const url = window.URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
-      a.download = `SocietyWale-Maintenance-Receipt-${charge.flatNumber || 'flat'}-${charge.billingYear}${String(charge.billingMonth).padStart(2, '0')}.pdf`
+      a.download = `SocietySimplify-Maintenance-Receipt-${charge.flatNumber || 'flat'}-${charge.billingYear}${String(charge.billingMonth).padStart(2, '0')}.pdf`
       document.body.appendChild(a)
       a.click()
       a.remove()
@@ -278,7 +278,7 @@ export default function MemberDashboard() {
         <div className="bg-[linear-gradient(135deg,#102A43_0%,#173e62_55%,#0f766e_140%)] px-4 py-5 text-white sm:px-7 sm:py-6">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
-              <p className="break-words text-xs font-bold uppercase tracking-[.14em] text-orange-300">
+              <p className="break-words text-xs font-bold uppercase tracking-[.14em] text-teal-300">
                 {user?.societyName || 'My society'}
                 {user?.societyCode ? ` · ${user.societyCode}` : ''}
               </p>
@@ -294,7 +294,7 @@ export default function MemberDashboard() {
             >
               🔔
               {unreadNotices > 0 && (
-                <span className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-orange-500 px-1 text-[11px] font-bold text-white">
+                <span className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-teal-600 px-1 text-[11px] font-bold text-white">
                   {unreadNotices > 9 ? '9+' : unreadNotices}
                 </span>
               )}
@@ -345,7 +345,7 @@ export default function MemberDashboard() {
         </div>
       )}
 
-      <div className="card border-orange-100 bg-gradient-to-br from-white to-orange-50/50">
+      <div className="card border-teal-100 bg-gradient-to-br from-white to-teal-50/50">
         <SectionTitle
           title="Claim payment"
           subtitle="Tell committee you have paid. They will verify and mark Maintenance paid."
@@ -432,7 +432,7 @@ export default function MemberDashboard() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <div className="card"><p className="text-sm text-gray-500">Pending Dues</p><p className="mt-1 text-2xl font-bold text-amber-600">{pending.length}</p></div>
         <div className="card"><p className="text-sm text-gray-500">My Records</p><p className="mt-1 text-2xl font-bold">{charges.length}</p></div>
-        <div className="card"><p className="text-sm text-gray-500">Notices</p><p className="mt-1 text-2xl font-bold text-orange-600">{notices.length}</p></div>
+        <div className="card"><p className="text-sm text-gray-500">Notices</p><p className="mt-1 text-2xl font-bold text-teal-700">{notices.length}</p></div>
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
@@ -519,7 +519,7 @@ export default function MemberDashboard() {
             {committee.map((m) => (
               <li key={m.id} className="rounded-xl border border-slate-100 p-3">
                 <p className="font-semibold break-words">{m.fullName}</p>
-                <p className="text-xs uppercase tracking-wide text-orange-600">{m.title.replaceAll('_', ' ')}</p>
+                <p className="text-xs uppercase tracking-wide text-teal-700">{m.title.replaceAll('_', ' ')}</p>
                 <p className="mt-1 break-words text-sm text-slate-600">{m.mobile || '—'}{m.email ? ` · ${m.email}` : ''}</p>
               </li>
             ))}
@@ -528,7 +528,7 @@ export default function MemberDashboard() {
         </div>
 
         <div className="card min-w-0">
-          <SectionTitle title="Audit reports" subtitle="View / download only" action={<Link to="/reports" className="text-sm font-bold text-orange-600">Financial reports →</Link>} />
+          <SectionTitle title="Audit reports" subtitle="View / download only" action={<Link to="/reports" className="text-sm font-bold text-teal-700">Financial reports →</Link>} />
           <ul className="space-y-3">
             {docs.map((doc) => (
               <li key={doc.id} className="flex flex-col gap-3 rounded-xl border border-slate-100 p-3 sm:flex-row sm:items-start sm:justify-between">
@@ -589,7 +589,7 @@ export default function MemberDashboard() {
             subtitle={unreadNotices > 0 ? `${unreadNotices} unread` : undefined}
             action={
               unreadNotices > 0 ? (
-                <button type="button" className="text-sm font-bold text-orange-600" onClick={openNotices}>
+                <button type="button" className="text-sm font-bold text-teal-700" onClick={openNotices}>
                   Mark as read
                 </button>
               ) : null
@@ -616,7 +616,7 @@ export default function MemberDashboard() {
           <ul className="grid gap-3">
             {rules.map((r) => (
               <li key={r.id} className="rounded-lg border border-gray-100 p-3">
-                <span className="badge bg-orange-50 text-orange-700">{r.category}</span>
+                <span className="badge bg-teal-50 text-teal-800">{r.category}</span>
                 <h4 className="mt-1 font-semibold break-words">{r.title}</h4>
                 <p className="mt-1 break-words text-sm text-gray-600">{r.ruleText}</p>
               </li>

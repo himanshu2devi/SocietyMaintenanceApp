@@ -39,7 +39,7 @@ public class PaymentDtos {
             String adminEmail,
             @NotNull(message = "Agreed amount is required")
             @Min(value = 100, message = "Amount must be at least ₹1")
-            @Max(value = 50_000_000, message = "Amount looks too high — contact SocietyWale support")
+            @Max(value = 50_000_000, message = "Amount looks too high — contact SocietySimplify support")
             Long amountPaise,
             @NotNull(message = "Select a plan: 3 months, 6 months, or 1 year")
             BillingPeriod billingPeriod
@@ -54,7 +54,7 @@ public class PaymentDtos {
             String adminEmail,
             @NotNull(message = "Agreed amount is required")
             @Min(value = 100, message = "Amount must be at least ₹1")
-            @Max(value = 50_000_000, message = "Amount looks too high — contact SocietyWale support")
+            @Max(value = 50_000_000, message = "Amount looks too high — contact SocietySimplify support")
             Long amountPaise,
             @NotNull(message = "Select a plan: 3 months, 6 months, or 1 year")
             BillingPeriod billingPeriod

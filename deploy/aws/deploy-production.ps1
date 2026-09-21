@@ -1,4 +1,4 @@
-# Deploy latest SocietyWale to production (backend EC2 + notes for Vercel frontend).
+# Deploy latest SocietySimplify to production (backend EC2 + notes for Vercel frontend).
 # Prerequisites: satara-key.pem in repo root (gitignored), SSH port 22 open for YOUR IP in AWS SG.
 #
 # Usage:
@@ -29,8 +29,8 @@ cd deploy/aws
 if grep -q '^OPENAI_API_KEY=' .env 2>/dev/null; then echo 'OPENAI_API_KEY present'; else echo 'WARNING: add OPENAI_API_KEY to deploy/aws/.env on server'; fi
 docker compose up -d --build core
 docker compose ps
-curl -sf https://core.societywale.in/actuator/health || true
-curl -sf https://core.societywale.in/api/v1/assistant/status || true
+curl -sf https://CORE_API_HOST/actuator/health || true
+curl -sf https://CORE_API_HOST/api/v1/assistant/status || true
 echo DEPLOY_DONE
 '@
 

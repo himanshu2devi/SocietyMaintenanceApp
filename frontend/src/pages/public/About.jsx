@@ -23,16 +23,16 @@ const values = [
 const longTerm = [
   ['One platform', 'Replace scattered spreadsheets, WhatsApp threads and paper registers with a single society management system.'],
   ['Built on transparency', 'Every payment, expense, approval and notice is securely recorded, helping committees build trust with residents through complete visibility.'],
-  ['Grow with you', 'Whether your society has 20 apartments or 2,000, SocietyWale scales with your community while keeping operations simple and organized.'],
+  ['Grow with you', 'Whether your society has 20 apartments or 2,000, SocietySimplify scales with your community while keeping operations simple and organized.'],
 ]
 
 export default function About() {
   return (
     <div className="w-full min-w-0">
-      <section className="relative isolate overflow-hidden border-b border-slate-200 bg-[#fff9f6]">
+      <section className="relative isolate overflow-hidden border-b border-slate-200 bg-[#f0fdfa]">
         <div className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-8 px-4 py-12 sm:gap-12 sm:px-6 sm:py-16 lg:grid-cols-2 lg:items-center lg:py-24">
           <div className="min-w-0">
-            <p className="eyebrow">About SocietyWale</p>
+            <p className="eyebrow">About SocietySimplify</p>
             <h1 className="mt-5 max-w-xl text-3xl font-extrabold leading-tight tracking-tight text-slate-950 sm:text-4xl md:text-5xl">
               A clearer management solution for housing societies.
             </h1>
@@ -40,7 +40,7 @@ export default function About() {
               We help committees run maintenance, expenses, notices and member records with transparency residents can trust — so everyday society work stays organised for the long term.
             </p>
             <div className="mt-6 flex w-full flex-col gap-3 sm:mt-8 sm:flex-row sm:flex-wrap">
-              <Link to="/register" className="btn-primary w-full justify-center !bg-orange-500 hover:!bg-orange-600 sm:w-auto">Start free</Link>
+              <Link to="/register" className="btn-primary w-full justify-center !bg-teal-600 hover:!bg-teal-700 sm:w-auto">Start free</Link>
               <Link to="/contact" className="btn-secondary w-full justify-center sm:w-auto">Talk to us</Link>
             </div>
           </div>
@@ -52,7 +52,7 @@ export default function About() {
               loading="lazy"
             />
             <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/80 to-transparent p-4 text-white sm:p-6">
-              <p className="text-xs font-bold uppercase tracking-[.14em] text-orange-300">Built for India</p>
+              <p className="text-xs font-bold uppercase tracking-[.14em] text-teal-300">Built for India</p>
               <p className="mt-1 text-sm font-semibold">Committees · Residents · Everyday accountability</p>
             </div>
           </div>
@@ -65,14 +65,14 @@ export default function About() {
             <p className="eyebrow">Vision</p>
             <h2 className="mt-4 text-xl font-extrabold text-slate-950 sm:text-2xl">A better way to manage every housing society in India.</h2>
             <p className="mt-4 text-sm leading-7 text-slate-600">
-            We envision housing societies where committee members, residents and service staff work together through one trusted digital workspace. From maintenance collections to notices, expenses and records, SocietyWale aims to make community management simple, transparent and accessible for every society.
+            We envision housing societies where committee members, residents and service staff work together through one trusted digital workspace. From maintenance collections to notices, expenses and records, SocietySimplify aims to make community management simple, transparent and accessible for every society.
             </p>
           </article>
           <article className="rounded-3xl border border-slate-200 bg-white p-5 sm:p-8">
             <p className="eyebrow">Mission</p>
             <h2 className="mt-4 text-xl font-extrabold text-slate-950 sm:text-2xl">Making society management simpler, faster and more transparent.</h2>
             <p className="mt-4 text-sm leading-7 text-slate-600">
-            Our mission is to help housing societies replace spreadsheets, paper registers and scattered WhatsApp conversations with one secure platform. SocietyWale empowers committee members to manage finances, maintenance, communication and day-to-day operations while giving residents complete visibility into their community.
+            Our mission is to help housing societies replace spreadsheets, paper registers and scattered WhatsApp conversations with one secure platform. SocietySimplify empowers committee members to manage finances, maintenance, communication and day-to-day operations while giving residents complete visibility into their community.
             </p>
           </article>
         </div>
@@ -81,7 +81,7 @@ export default function About() {
       <section className="border-y border-slate-200 bg-white">
         <div className="mx-auto w-full max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:py-20">
           <p className="eyebrow">Our values</p>
-          <h2 className="section-title mt-5">The principles behind SocietyWale.</h2>
+          <h2 className="section-title mt-5">The principles behind SocietySimplify.</h2>
           <div className="mt-8 grid grid-cols-1 gap-4 sm:mt-10 sm:grid-cols-2 lg:grid-cols-4">
             {values.map((item) => (
               <div key={item.title} className="rounded-2xl border border-slate-100 bg-slate-50 p-4 sm:p-6">
@@ -97,7 +97,7 @@ export default function About() {
         <p className="eyebrow">Long-term purpose</p>
         <h2 className="section-title mt-5">All-in-one digital platform for housing societies.</h2>
         <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-600">
-        SocietyWale is built to simplify everyday society management for committees and residents. As communities grow, we help them stay organized with transparent finances, reliable communication and secure records all from one platform.
+        SocietySimplify is built to simplify everyday society management for committees and residents. As communities grow, we help them stay organized with transparent finances, reliable communication and secure records all from one platform.
         </p>
         <div className="mt-8 grid grid-cols-1 gap-4 sm:mt-10 lg:grid-cols-3">
           {longTerm.map(([title, body]) => (
@@ -109,21 +109,21 @@ export default function About() {
         </div>
       </section>
 
-      <section className="border-t border-slate-200 bg-[#fff9f6]">
+      <section className="border-t border-slate-200 bg-[#f0fdfa]">
         <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-10 sm:px-6 sm:py-14 lg:flex-row lg:items-center lg:justify-between lg:py-16">
           <div className="min-w-0">
             <p className="eyebrow">Talk to the team</p>
             <h2 className="mt-3 text-xl font-extrabold text-slate-950 sm:text-2xl">Ready to set up your society?</h2>
             <p className="mt-2 break-words text-sm text-slate-600">
               Email{' '}
-              <a className="break-all font-semibold text-orange-600 hover:text-orange-700" href={mailtoHref()}>{SITE_EMAIL}</a>
+              <a className="break-all font-semibold text-teal-700 hover:text-teal-800" href={mailtoHref()}>{SITE_EMAIL}</a>
               {' '}or use our{' '}
-              <Link className="font-semibold text-orange-600 hover:text-orange-700" to="/contact">contact form</Link>
+              <Link className="font-semibold text-teal-700 hover:text-teal-800" to="/contact">contact form</Link>
               .
             </p>
           </div>
           <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:flex-wrap">
-            <Link to="/register" className="btn-primary w-full justify-center !bg-orange-500 hover:!bg-orange-600 sm:w-auto">Create workspace</Link>
+            <Link to="/register" className="btn-primary w-full justify-center !bg-teal-600 hover:!bg-teal-700 sm:w-auto">Create workspace</Link>
             <Link to="/contact" className="btn-secondary w-full justify-center sm:w-auto">Contact us</Link>
           </div>
         </div>

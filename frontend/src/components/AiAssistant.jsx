@@ -5,14 +5,14 @@ import { AssistantService } from '../api/services'
 import { getApiErrorMessage } from '../utils/apiError'
 
 const STARTERS = [
-  'What does SocietyWale do?',
-  'How can SocietyWale help my society?',
+  'What does SocietySimplify do?',
+  'How can SocietySimplify help my society?',
   'How do we get started?',
   'What is the pricing?',
 ]
 
 const WELCOME =
-  'Namaste! I represent SocietyWale — your AI-powered society management platform for Indian housing societies. Ask about features, how we help committees and residents, signup, pricing, or support.'
+  'Namaste! I represent SocietySimplify — your AI-powered society management platform for Indian housing societies. Ask about features, how we help committees and residents, signup, pricing, or support.'
 
 /** Render **bold**, bullet lines, and paragraphs for bot replies — no raw markdown in UI. */
 function formatInline(text) {
@@ -176,7 +176,7 @@ export default function AiAssistant() {
           {
             role: 'bot',
             text: `The live assistant is not connected yet. Email ${SITE_EMAIL} or use the Contact page.`,
-            link: { href: mailtoHref('SocietyWale enquiry'), label: 'Email us' },
+            link: { href: mailtoHref('SocietySimplify enquiry'), label: 'Email us' },
           },
         ])
       } else {
@@ -208,19 +208,19 @@ export default function AiAssistant() {
         <div className="ai-panel-enter flex h-[min(560px,calc(100dvh-5.5rem))] w-[min(100vw-1.5rem,400px)] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl shadow-slate-900/20">
           <div className="bg-[linear-gradient(135deg,#102A43,#0f766e)] px-4 py-3 text-white">
             <div className="flex min-w-0 items-center gap-3">
-              <span className="relative grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-full bg-gradient-to-br from-orange-400 to-teal-600 text-white shadow">
+              <span className="relative grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-full bg-gradient-to-br from-teal-400 to-teal-600 text-white shadow">
                 <span className="absolute inset-0 animate-pulse bg-white/10" aria-hidden="true" />
                 <AiIcon className="relative h-5 w-5" />
               </span>
               <div className="min-w-0 flex-1">
                 <p className="flex flex-wrap items-center gap-2 text-sm font-bold">
-                  SocietyWale AI
+                  SocietySimplify AI
                   <span className="rounded-full bg-white/15 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-teal-100">
                     Smart
                   </span>
                 </p>
                 <p className="truncate text-xs text-teal-100">
-                  {configured === false ? 'Setup pending · contact support' : 'Official SocietyWale guide · features, signup & support'}
+                  {configured === false ? 'Setup pending · contact support' : 'Official SocietySimplify guide · features, signup & support'}
                 </p>
               </div>
             </div>
@@ -231,7 +231,7 @@ export default function AiAssistant() {
                 key={`${m.role}-${i}`}
                 className={`max-w-[92%] rounded-2xl px-3.5 py-2.5 text-sm leading-6 ${
                   m.role === 'user'
-                    ? 'ml-auto bg-orange-500 text-white shadow-sm'
+                    ? 'ml-auto bg-teal-600 text-white shadow-sm'
                     : 'border border-slate-100 bg-slate-50/90 text-slate-700 shadow-sm'
                 }`}
               >
@@ -241,12 +241,12 @@ export default function AiAssistant() {
                   <BotMessageContent text={m.text} />
                 )}
                 {m.link?.to && (
-                  <Link to={m.link.to} className="mt-2 inline-block text-xs font-bold text-orange-600 hover:text-orange-700">
+                  <Link to={m.link.to} className="mt-2 inline-block text-xs font-bold text-teal-700 hover:text-teal-800">
                     {m.link.label} →
                   </Link>
                 )}
                 {m.link?.href && (
-                  <a href={m.link.href} className="mt-2 inline-block text-xs font-bold text-orange-600 hover:text-orange-700">
+                  <a href={m.link.href} className="mt-2 inline-block text-xs font-bold text-teal-700 hover:text-teal-800">
                     {m.link.label} →
                   </a>
                 )}
@@ -267,7 +267,7 @@ export default function AiAssistant() {
                   type="button"
                   disabled={busy}
                   onClick={() => ask(s)}
-                  className="rounded-full border border-slate-200 px-2.5 py-1 text-[11px] font-semibold text-slate-600 hover:border-orange-200 hover:text-orange-700 disabled:opacity-50"
+                  className="rounded-full border border-slate-200 px-2.5 py-1 text-[11px] font-semibold text-slate-600 hover:border-teal-200 hover:text-teal-800 disabled:opacity-50"
                 >
                   {s}
                 </button>
@@ -296,7 +296,7 @@ export default function AiAssistant() {
           type="button"
           onClick={() => setOpen((v) => !v)}
           className={`ai-fab ${open ? '!animate-none' : ''}`}
-          aria-label={open ? 'Close AI assistant' : 'Open SocietyWale AI assistant'}
+          aria-label={open ? 'Close AI assistant' : 'Open SocietySimplify AI assistant'}
           aria-expanded={open}
         >
           {!open && (

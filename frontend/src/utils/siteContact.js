@@ -1,5 +1,5 @@
-/** Public SocietyWale contact details shown on marketing pages. */
-export const SITE_EMAIL = 'societywale.in@gmail.com'
+/** Public SocietySimplify contact details shown on marketing pages. */
+export const SITE_EMAIL = 'contact.societysimplify@gmail.com'
 
 export function mailtoHref(subject, body) {
   const params = new URLSearchParams()

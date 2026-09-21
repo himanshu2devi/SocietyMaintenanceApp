@@ -529,7 +529,7 @@ export default function MaintenanceTracker() {
   return (
     <div className="space-y-6">
       {needsModeChoice && (
-        <div className="card border-orange-100 bg-gradient-to-br from-white to-orange-50/40">
+        <div className="card border-teal-100 bg-gradient-to-br from-white to-teal-50/40">
           <SectionTitle
             title="How is maintenance billed?"
             subtitle="One-time setup for your society. Pick how monthly maintenance amounts work for flats and shops."
@@ -539,9 +539,9 @@ export default function MaintenanceTracker() {
               type="button"
               disabled={modeBusy}
               onClick={() => chooseBillingMode('SAME')}
-              className="rounded-2xl border border-slate-200 bg-white p-5 text-left transition hover:border-orange-300 hover:shadow-sm"
+              className="rounded-2xl border border-slate-200 bg-white p-5 text-left transition hover:border-teal-300 hover:shadow-sm"
             >
-              <p className="text-sm font-bold uppercase tracking-[0.12em] text-orange-600">Option 1</p>
+              <p className="text-sm font-bold uppercase tracking-[0.12em] text-teal-700">Option 1</p>
               <p className="mt-2 text-lg font-extrabold text-slate-950">Same for every flat / shop</p>
               <p className="mt-2 text-sm leading-6 text-slate-600">
                 One society amount applies to all members. You can still change the amount from a start month later
@@ -552,7 +552,7 @@ export default function MaintenanceTracker() {
               type="button"
               disabled={modeBusy}
               onClick={() => chooseBillingMode('VARIABLE')}
-              className="rounded-2xl border border-slate-200 bg-white p-5 text-left transition hover:border-orange-300 hover:shadow-sm"
+              className="rounded-2xl border border-slate-200 bg-white p-5 text-left transition hover:border-teal-300 hover:shadow-sm"
             >
               <p className="text-sm font-bold uppercase tracking-[0.12em] text-teal-700">Option 2</p>
               <p className="mt-2 text-lg font-extrabold text-slate-950">Different per flat / shop</p>
@@ -567,13 +567,13 @@ export default function MaintenanceTracker() {
       )}
 
       {isSame && (
-        <div className="card border-orange-100 bg-gradient-to-br from-white to-orange-50/40">
+        <div className="card border-teal-100 bg-gradient-to-br from-white to-teal-50/40">
           <SectionTitle
             title="Society maintenance amount"
             subtitle="Same amount for every flat. Set from a start month — past recorded payments stay unchanged."
           />
           <p className="mt-1 text-xs font-semibold text-slate-500">
-            Billing mode: <span className="text-orange-700">Same for all</span>
+            Billing mode: <span className="text-teal-800">Same for all</span>
           </p>
           <form onSubmit={saveSocietyRate} className="mt-3 grid gap-3 md:grid-cols-[1fr_1fr_1fr_auto] md:items-end">
             <div>
@@ -611,7 +611,7 @@ export default function MaintenanceTracker() {
                 onChange={(e) => setRateForm({ ...rateForm, effectiveFromYear: Number(e.target.value) })}
               />
             </div>
-            <button className="btn-primary !bg-orange-500 hover:!bg-orange-600" disabled={rateBusy}>
+            <button className="btn-primary !bg-teal-600 hover:!bg-teal-700" disabled={rateBusy}>
               {rateBusy ? 'Saving…' : 'Save amount'}
             </button>
           </form>
@@ -654,7 +654,7 @@ export default function MaintenanceTracker() {
       )}
 
       {isVariable && (
-        <div className="card border-orange-100 bg-gradient-to-br from-white to-orange-50/40">
+        <div className="card border-teal-100 bg-gradient-to-br from-white to-teal-50/40">
           <SectionTitle
             title="Default amount per flat / shop"
             subtitle="Different amounts per flat. Set from a start month — past recorded payments stay unchanged."
@@ -714,7 +714,7 @@ export default function MaintenanceTracker() {
           <div className="mt-3 flex flex-wrap items-center gap-2">
             <button
               type="button"
-              className="btn-primary w-full !bg-orange-500 text-left hover:!bg-orange-600 sm:w-auto"
+              className="btn-primary w-full !bg-teal-600 text-left hover:!bg-teal-700 sm:w-auto"
               disabled={defaultsBusy || members.length === 0}
               onClick={saveMemberDefaults}
             >
@@ -862,7 +862,7 @@ export default function MaintenanceTracker() {
                 {suggested != null && (
                   <button
                     type="button"
-                    className="mt-1 text-xs font-semibold text-orange-600"
+                    className="mt-1 text-xs font-semibold text-teal-700"
                     onClick={() => setForm({ ...form, amount: String(suggested) })}
                   >
                     Use default ({inr(suggested)})
@@ -911,7 +911,7 @@ export default function MaintenanceTracker() {
                   type="button"
                   onClick={() => setFlatFilter(row.flatNumber)}
                   className={`min-w-0 rounded-xl border px-3 py-2.5 text-left transition ${
-                    flatFilter === row.flatNumber ? 'border-orange-300 bg-orange-50/50' : 'border-slate-100 hover:border-orange-200'
+                    flatFilter === row.flatNumber ? 'border-teal-300 bg-teal-50/50' : 'border-slate-100 hover:border-teal-200'
                   }`}
                 >
                   <div className="flex min-w-0 flex-col gap-0.5">

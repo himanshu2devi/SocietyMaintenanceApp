@@ -61,7 +61,7 @@ export default function RenewSubscription() {
         orderId: order.orderId,
         amountPaise: order.amountPaise,
         currency: order.currency,
-        description: order.planLabel || 'SocietyWale renewal',
+        description: order.planLabel || 'SocietySimplify renewal',
         prefill: { email: adminEmail.trim() },
       })
 
@@ -82,7 +82,7 @@ export default function RenewSubscription() {
       }
       navigate(data?.user?.role === 'ADMIN' ? '/admin' : '/member', { replace: true })
     } catch (err) {
-      setError(err?.message || getApiErrorMessage(err, 'Renewal failed. Try again or contact SocietyWale.'))
+      setError(err?.message || getApiErrorMessage(err, 'Renewal failed. Try again or contact SocietySimplify.'))
     } finally {
       setPaying(false)
     }
@@ -91,8 +91,8 @@ export default function RenewSubscription() {
   return (
     <AuthShell
       step="Renew access"
-      title="Renew your SocietyWale subscription"
-      description="After your plan ends, pay the agreed amount on this page to continue. Choose 3 months, 6 months, or 1 year. Payment only via SocietyWale Razorpay."
+      title="Renew your SocietySimplify subscription"
+      description="After your plan ends, pay the agreed amount on this page to continue. Choose 3 months, 6 months, or 1 year. Payment only via SocietySimplify Razorpay."
     >
       <form className="space-y-4" onSubmit={handleSubmit} noValidate>
         {error && <Alert type="error">{error}</Alert>}
@@ -120,8 +120,8 @@ export default function RenewSubscription() {
                 onClick={() => setBillingPeriod(plan.value)}
                 className={`rounded-xl border px-3 py-2.5 text-sm font-bold transition ${
                   billingPeriod === plan.value
-                    ? 'border-orange-500 bg-orange-50 text-orange-700'
-                    : 'border-slate-200 bg-white text-slate-700 hover:border-orange-200'
+                    ? 'border-teal-600 bg-teal-50 text-teal-800'
+                    : 'border-slate-200 bg-white text-slate-700 hover:border-teal-200'
                 }`}
               >
                 {plan.label}
@@ -137,19 +137,19 @@ export default function RenewSubscription() {
             value={amountRupees}
             onChange={(e) => setAmountRupees(e.target.value.replace(/[^\d.]/g, '').slice(0, 10))}
             disabled={paying}
-            placeholder="Amount finalised with SocietyWale"
+            placeholder="Amount finalised with SocietySimplify"
           />
           {fieldErrors.amountRupees && <p className="mt-1 text-xs text-red-600">{fieldErrors.amountRupees}</p>}
         </div>
 
-        <button type="submit" className="btn-primary w-full !bg-orange-500 !py-3 hover:!bg-orange-600" disabled={paying}>
+        <button type="submit" className="btn-primary w-full !bg-teal-600 !py-3 hover:!bg-teal-700" disabled={paying}>
           {paying ? 'Processing…' : 'Pay and renew'}
         </button>
 
         <p className="text-center text-sm text-slate-500">
-          <Link to="/login" className="font-bold text-orange-600">Sign in</Link>
+          <Link to="/login" className="font-bold text-teal-700">Sign in</Link>
           {' · '}
-          <Link to="/contact" className="font-bold text-orange-600">Get in touch</Link>
+          <Link to="/contact" className="font-bold text-teal-700">Get in touch</Link>
         </p>
       </form>
     </AuthShell>

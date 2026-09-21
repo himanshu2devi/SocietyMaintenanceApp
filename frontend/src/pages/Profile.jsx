@@ -20,7 +20,7 @@ export default function Profile() {
               {initials(user?.fullName)}
             </div>
             <div className="min-w-0">
-              <p className="text-xs font-bold uppercase tracking-[.14em] text-orange-300">
+              <p className="text-xs font-bold uppercase tracking-[.14em] text-teal-300">
                 {isAdmin ? 'Committee admin' : 'Society member'}
               </p>
               <h1 className="mt-1 break-words text-xl font-extrabold tracking-tight sm:text-2xl md:text-3xl">{user?.fullName || 'Profile'}</h1>
@@ -35,7 +35,7 @@ export default function Profile() {
           <Field label="Society" value={user?.societyName || '—'} />
           <Field label="Society code" value={user?.societyCode || 'Sign out and sign in again to refresh'} />
           <Field label="Role" value={isAdmin ? 'ADMIN' : 'MEMBER'} />
-          <Field label="Workspace" value="SocietyWale" />
+          <Field label="Workspace" value="SocietySimplify" />
         </div>
       </div>
 

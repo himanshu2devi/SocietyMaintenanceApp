@@ -10,13 +10,14 @@ export default function Privacy() {
       updated="13 July 2026"
     >
       <p>
-        SocietyWale respects the privacy of committee users and residents. This policy explains what information we handle
+        SocietySimplify respects the privacy of committee users and residents. This policy explains what information we handle
         and how it is used to operate society workspaces, in line with responsible data practices for Indian organisations
         (including principles under the Digital Personal Data Protection Act, 2023, as applicable).
       </p>
       <h2>Information we process</h2>
       <p>
-        Account details such as name, email, mobile, flat number and society association; operational records like
+        Account details such as name, email, flat number and society association (and any optional resident contact fields
+        your committee stores); operational records like
         maintenance charges, expenses, notices, bank account details published by committee, audit document links and
         payment claims entered by your society.
       </p>
@@ -33,18 +34,18 @@ export default function Privacy() {
       <h2>Retention and security</h2>
       <p>
         Data is retained to support society operations and audit history. Sessions expire after inactivity.
-        Use strong passwords and the forgot-password option when needed. Your connection to SocietyWale is encrypted in production.
+        Use strong passwords and the forgot-password option when needed. Your connection to SocietySimplify is encrypted in production.
       </p>
       <h2>Your choices</h2>
       <p>
         Committee admins can update or deactivate member accounts in their directory. For privacy requests related to
-        your SocietyWale account, contact us using the details below.
+        your SocietySimplify account, contact us using the details below.
       </p>
       <h2>Contact</h2>
       <p>
         Privacy questions? Email{' '}
-        <a className="font-semibold text-orange-600" href={mailtoHref('Privacy enquiry')}>{SITE_EMAIL}</a>
-        {' '}or visit the <Link className="font-semibold text-orange-600" to="/contact">Contact</Link> page.
+        <a className="font-semibold text-teal-700" href={mailtoHref('Privacy enquiry')}>{SITE_EMAIL}</a>
+        {' '}or visit the <Link className="font-semibold text-teal-700" to="/contact">Contact</Link> page.
       </p>
     </LegalPage>
   )

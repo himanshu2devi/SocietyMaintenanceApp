@@ -271,7 +271,7 @@ export default function SocietyAnalytics() {
     <div className="min-w-0 max-w-full space-y-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div className="min-w-0">
-          <p className="break-words text-xs font-bold uppercase tracking-[.14em] text-orange-600">
+          <p className="break-words text-xs font-bold uppercase tracking-[.14em] text-teal-700">
             {user?.societyName || 'Society'} analytics
             {user?.societyCode ? ` · ${user.societyCode}` : ''}
           </p>
@@ -291,7 +291,7 @@ export default function SocietyAnalytics() {
             <button
               type="button"
               className={`rounded-xl px-4 py-2 text-sm font-bold transition ${
-                view === 'monthly' ? 'bg-orange-500 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                view === 'monthly' ? 'bg-teal-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
               }`}
               onClick={() => setView('monthly')}
             >
@@ -300,7 +300,7 @@ export default function SocietyAnalytics() {
             <button
               type="button"
               className={`rounded-xl px-4 py-2 text-sm font-bold transition ${
-                view === 'yearly' ? 'bg-orange-500 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                view === 'yearly' ? 'bg-teal-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
               }`}
               onClick={() => setView('yearly')}
             >
@@ -342,7 +342,7 @@ export default function SocietyAnalytics() {
       <div className="relative overflow-hidden rounded-[28px] bg-[linear-gradient(160deg,#0b1220_0%,#102A43_48%,#0f766e_160%)] p-5 text-white shadow-xl shadow-slate-900/20 sm:p-7">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[.16em] text-orange-300">Committee overview</p>
+            <p className="text-xs font-bold uppercase tracking-[.16em] text-teal-300">Committee overview</p>
             <h2 className="mt-2 text-2xl font-extrabold tracking-tight sm:text-3xl">
               {greeting()}, {firstName(user?.fullName)}
             </h2>
@@ -350,7 +350,7 @@ export default function SocietyAnalytics() {
               {periodLabel} · {user?.societyName || 'Your society'}
             </p>
           </div>
-          <div className="grid h-11 w-11 place-items-center rounded-xl bg-white/10 text-orange-300">⌂</div>
+          <div className="grid h-11 w-11 place-items-center rounded-xl bg-white/10 text-teal-300">⌂</div>
         </div>
 
         <div className="mt-6 grid gap-3 sm:grid-cols-3">
@@ -392,7 +392,7 @@ export default function SocietyAnalytics() {
                 <div key={bar.month} className="group relative flex h-full flex-1 flex-col justify-end">
                   <div
                     className={`w-full rounded-t-md transition ${
-                      isCurrent ? 'bg-orange-500' : 'bg-orange-200 group-hover:bg-orange-300'
+                      isCurrent ? 'bg-teal-600' : 'bg-teal-200 group-hover:bg-teal-300'
                     }`}
                     style={{ height: `${h}px` }}
                     title={`${monthName(bar.month)}: ${inr(bar.income)}`}
@@ -421,7 +421,7 @@ export default function SocietyAnalytics() {
           <div className="mt-5 flex flex-col items-center gap-4 sm:flex-row sm:items-center sm:gap-5">
             <ProgressRing value={loading ? 0 : stats.collectedPct} />
             <div className="min-w-0 w-full flex-1 space-y-2 text-sm">
-              <LegendDot color="bg-orange-500" label="Paid flats" value={loading ? '—' : stats.paidFlats} />
+              <LegendDot color="bg-teal-600" label="Paid flats" value={loading ? '—' : stats.paidFlats} />
               <LegendDot color="bg-slate-200" label="Pending flats" value={loading ? '—' : stats.pendingFlats} />
               <LegendDot
                 color="bg-sky-500"
@@ -440,7 +440,7 @@ export default function SocietyAnalytics() {
             </div>
             <div className="flex gap-3 text-xs font-semibold">
               <span className="inline-flex items-center gap-1.5 text-slate-600">
-                <span className="h-2.5 w-2.5 rounded-sm bg-orange-500" /> Income
+                <span className="h-2.5 w-2.5 rounded-sm bg-teal-600" /> Income
               </span>
               <span className="inline-flex items-center gap-1.5 text-slate-600">
                 <span className="h-2.5 w-2.5 rounded-sm bg-teal-600" /> Expenses
@@ -452,7 +452,7 @@ export default function SocietyAnalytics() {
               <div key={`cmp-${bar.month}`} className="flex h-full flex-1 items-end justify-center gap-0.5">
                 <div
                   className={`w-[45%] max-w-[14px] rounded-t-md ${
-                    view === 'monthly' && bar.month === month ? 'bg-orange-600' : 'bg-orange-500'
+                    view === 'monthly' && bar.month === month ? 'bg-teal-700' : 'bg-teal-600'
                   }`}
                   style={{ height: `${barPx(bar.income, stats.maxBar)}px` }}
                   title={`${monthName(bar.month)} income: ${inr(bar.income)}`}
@@ -481,13 +481,13 @@ export default function SocietyAnalytics() {
           <p className="mt-1 text-sm text-slate-500">Collected, pending dues and expenses</p>
           <div className="mt-5 h-4 overflow-hidden rounded-full bg-slate-100">
             <div className="flex h-full w-full">
-              <div className="bg-orange-500" style={{ width: `${(stats.collectedAmt / stats.mixTotal) * 100}%` }} />
+              <div className="bg-teal-600" style={{ width: `${(stats.collectedAmt / stats.mixTotal) * 100}%` }} />
               <div className="bg-amber-400" style={{ width: `${(stats.pendingAmt / stats.mixTotal) * 100}%` }} />
               <div className="bg-teal-600" style={{ width: `${(stats.expenseAmt / stats.mixTotal) * 100}%` }} />
             </div>
           </div>
           <div className="mt-4 grid gap-2 sm:grid-cols-3">
-            <MiniStat label="Collected" value={loading ? '—' : inr(stats.collectedAmt)} color="bg-orange-500" />
+            <MiniStat label="Collected" value={loading ? '—' : inr(stats.collectedAmt)} color="bg-teal-600" />
             <MiniStat label="Pending" value={loading ? '—' : inr(stats.pendingAmt)} color="bg-amber-400" />
             <MiniStat label="Expenses" value={loading ? '—' : inr(stats.expenseAmt)} color="bg-teal-600" />
           </div>

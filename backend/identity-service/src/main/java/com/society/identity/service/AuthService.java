@@ -42,7 +42,7 @@ public class AuthService {
     public AuthResponse registerSociety(RegisterSocietyRequest req) {
         if (!razorpayPaymentService.isConfigured()) {
             throw new BadRequestException(
-                    "Online payments are not configured yet. Please contact SocietyWale support.");
+                    "Online payments are not configured yet. Please contact SocietySimplify support.");
         }
 
         String societyCode = req.societyCode().trim();
@@ -59,7 +59,7 @@ public class AuthService {
                 || !StringUtils.hasText(req.razorpayPaymentId())
                 || !StringUtils.hasText(req.razorpaySignature())) {
             throw new BadRequestException(
-                    "Complete payment on SocietyWale before creating your workspace.");
+                    "Complete payment on SocietySimplify before creating your workspace.");
         }
 
         // Payment must succeed before any society/admin account is created.
@@ -104,7 +104,7 @@ public class AuthService {
     public AuthResponse renewSubscription(RenewSubscriptionRequest req) {
         if (!razorpayPaymentService.isConfigured()) {
             throw new BadRequestException(
-                    "Online payments are not configured yet. Please contact SocietyWale support.");
+                    "Online payments are not configured yet. Please contact SocietySimplify support.");
         }
 
         String societyCode = req.societyCode().trim();
@@ -237,7 +237,7 @@ public class AuthService {
         }
         if (!society.isSubscriptionActive()) {
             throw new UnauthorizedException(
-                    "Your SocietyWale subscription has expired. Open Renew subscription, pay the agreed amount on SocietyWale (Razorpay), then sign in again.");
+                    "Your SocietySimplify subscription has expired. Open Renew subscription, pay the agreed amount on SocietySimplify (Razorpay), then sign in again.");
         }
     }
 

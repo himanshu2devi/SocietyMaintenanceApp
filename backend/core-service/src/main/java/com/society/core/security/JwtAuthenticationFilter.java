@@ -53,7 +53,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     response.setContentType("application/json");
                     response.getWriter().write(
-                            "{\"status\":401,\"message\":\"Your SocietyWale subscription has expired. Renew on the platform, then sign in again.\"}");
+                            "{\"status\":401,\"message\":\"Your SocietySimplify subscription has expired. Renew on the platform, then sign in again.\"}");
                     return;
                 }
                 AuthenticatedUser principal = new AuthenticatedUser(

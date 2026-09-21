@@ -1,8 +1,8 @@
-# Deploy SocietyWale
+# Deploy SocietySimplify
 
 | Layer | Platform | Notes |
 |-------|----------|--------|
-| Frontend | **Vercel** (keep) | `https://societywale.vercel.app` + later `societywale.in` |
+| Frontend | **Vercel** (keep) | `https://societysimplify.vercel.app` + later `societysimplify.vercel.app` |
 | Backend ×2 | **AWS EC2 + Docker Compose** (recommended) | Always-on, no Render free-tier sleep |
 | Database | **Neon** (keep) | Same `Societywale` DB — no data migration |
 
@@ -38,7 +38,7 @@ Emails need not match. Connect the **GitHub account that owns the repo** inside 
 
 | Setting | Value |
 |---------|--------|
-| Name | `societywale-api` |
+| Name | `societysimplify-api` |
 | AMI | **Ubuntu Server 24.04 LTS** |
 | Instance type | **t3.small** (2 GB) recommended for 2 Spring apps. `t3.micro` (1 GB) is too tight. |
 | Key pair | Create/download `.pem` (keep safe) |
@@ -81,7 +81,7 @@ DB_URL=jdbc:postgresql://ep-….neon.tech/Societywale?sslmode=require
 DB_USER=neondb_owner
 DB_PASSWORD=your_neon_password
 JWT_SECRET=same_long_secret_as_before
-APP_CORS_ORIGINS=https://societywale.vercel.app,https://societywale.in,https://www.societywale.in,http://localhost:5173
+APP_CORS_ORIGINS=https://societysimplify.vercel.app,https://societysimplify.vercel.app,https://societysimplify.vercel.app,http://localhost:5173
 ```
 
 Use the **same Neon DB** as today — existing admins/members stay.
@@ -96,8 +96,8 @@ Create **A records** pointing to the Elastic IP:
 | A | `core` | Elastic IP |
 
 So you get:
-- `https://identity.societywale.in`
-- `https://core.societywale.in`
+- `https://IDENTITY_API_HOST`
+- `https://CORE_API_HOST`
 
 Caddy auto-provisions Let’s Encrypt certificates when ports 80/443 are open and DNS points here.
 
@@ -117,36 +117,36 @@ First build takes several minutes (Maven).
 Health checks:
 
 ```bash
-curl -s https://identity.societywale.in/actuator/health
-curl -s https://core.societywale.in/actuator/health
+curl -s https://IDENTITY_API_HOST/actuator/health
+curl -s https://CORE_API_HOST/actuator/health
 ```
 
 Expect `{"status":"UP",...}`.
 
 ### B6 — Point Vercel frontend at AWS
 
-Vercel → Project **societywale** → **Settings** → **Environment Variables**:
+Vercel → Project **societysimplify** → **Settings** → **Environment Variables**:
 
 ```text
-VITE_IDENTITY_URL=https://identity.societywale.in/api/v1
-VITE_CORE_URL=https://core.societywale.in/api/v1
+VITE_IDENTITY_URL=https://IDENTITY_API_HOST/api/v1
+VITE_CORE_URL=https://CORE_API_HOST/api/v1
 ```
 
 **Redeploy** frontend (env is baked at build time).
 
 ### B7 — Stop / remove Render (optional)
 
-After AWS works, suspend/delete `societywale-identity` and `societywale-core` on Render so you don’t pay/sleep there anymore.
+After AWS works, suspend/delete `societysimplify-identity` and `societysimplify-core` on Render so you don’t pay/sleep there anymore.
 
 ---
 
-## C) Frontend domain SocietyWale.in (Vercel)
+## C) Frontend domain SocietySimplify.in (Vercel)
 
 Keep frontend on Vercel:
 
-1. Vercel → Domains → add `societywale.in` + `www`
+1. Vercel → Domains → add `societysimplify.vercel.app` + `www`
 2. GoDaddy DNS: A/CNAME exactly as Vercel shows
-3. Keep `APP_CORS_ORIGINS` including `https://societywale.in` and `https://www.societywale.in`
+3. Keep `APP_CORS_ORIGINS` including `https://societysimplify.vercel.app` and `https://societysimplify.vercel.app`
 
 ---
 
@@ -195,14 +195,14 @@ DB_URL=jdbc:postgresql://HOST/Societywale?sslmode=require
 DB_USER=neondb_owner
 DB_PASSWORD=***
 JWT_SECRET=***
-APP_CORS_ORIGINS=https://societywale.vercel.app,https://societywale.in,https://www.societywale.in,http://localhost:5173
+APP_CORS_ORIGINS=https://societysimplify.vercel.app,https://societysimplify.vercel.app,https://societysimplify.vercel.app,http://localhost:5173
 ```
 
 ## H) Vercel env (after AWS)
 
 ```text
-VITE_IDENTITY_URL=https://identity.societywale.in/api/v1
-VITE_CORE_URL=https://core.societywale.in/api/v1
+VITE_IDENTITY_URL=https://IDENTITY_API_HOST/api/v1
+VITE_CORE_URL=https://CORE_API_HOST/api/v1
 ```
 
 ---

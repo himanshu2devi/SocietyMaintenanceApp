@@ -1,4 +1,4 @@
-# SocietyWale backends on one AWS EC2 (always-on, no Render cold starts)
+# SocietySimplify backends on one AWS EC2 (always-on, no Render cold starts)
 # Usage on the server (from repo root):
 #   cd deploy/aws
 #   cp .env.example .env   # fill secrets
@@ -9,7 +9,7 @@ services:
     build:
       context: ../../backend/identity-service
       dockerfile: Dockerfile
-    container_name: societywale-identity
+    container_name: societysimplify-identity
     restart: unless-stopped
     environment:
       SPRING_PROFILES_ACTIVE: prod
@@ -22,9 +22,9 @@ services:
       MAIL_ENABLED: ${MAIL_ENABLED:-false}
       MAIL_USERNAME: ${MAIL_USERNAME:-}
       MAIL_APP_PASSWORD: ${MAIL_APP_PASSWORD:-}
-      MAIL_FROM: ${MAIL_FROM:-societywale.in@gmail.com}
-      MAIL_OWNER_INBOX: ${MAIL_OWNER_INBOX:-societywale.in@gmail.com}
-      MAIL_APP_URL: ${MAIL_APP_URL:-https://societywale.in}
+      MAIL_FROM: ${MAIL_FROM:-contact.societysimplify@gmail.com}
+      MAIL_OWNER_INBOX: ${MAIL_OWNER_INBOX:-contact.societysimplify@gmail.com}
+      MAIL_APP_URL: ${MAIL_APP_URL:-https://societysimplify.vercel.app}
       RAZORPAY_KEY_ID: ${RAZORPAY_KEY_ID:-}
       RAZORPAY_KEY_SECRET: ${RAZORPAY_KEY_SECRET:-}
       RAZORPAY_WEBHOOK_SECRET: ${RAZORPAY_WEBHOOK_SECRET:-}
@@ -47,7 +47,7 @@ services:
     build:
       context: ../../backend/core-service
       dockerfile: Dockerfile
-    container_name: societywale-core
+    container_name: societysimplify-core
     restart: unless-stopped
     environment:
       SPRING_PROFILES_ACTIVE: prod
@@ -71,7 +71,7 @@ services:
     mem_limit: 768m
   caddy:
     image: caddy:2.8-alpine
-    container_name: societywale-caddy
+    container_name: societysimplify-caddy
     restart: unless-stopped
     ports:
       - "80:80"

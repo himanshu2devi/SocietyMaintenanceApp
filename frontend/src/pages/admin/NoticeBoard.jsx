@@ -366,7 +366,7 @@ export default function NoticeBoard() {
           <ul className="space-y-3">
             {rules.map((r) => (
               <li key={r.id} className="rounded-xl border border-slate-100 p-4">
-                <span className="badge bg-orange-50 text-orange-700">{r.category}</span>
+                <span className="badge bg-teal-50 text-teal-800">{r.category}</span>
                 <h4 className="mt-2 font-semibold text-slate-950">{r.title}</h4>
                 <p className="mt-1 text-sm leading-6 text-slate-600">{r.ruleText}</p>
                 <div className="mt-3 flex flex-wrap gap-2">

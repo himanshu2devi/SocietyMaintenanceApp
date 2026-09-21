@@ -78,7 +78,7 @@ export default function DuesWhatsAppDraftButton({ row, societyName }) {
       </button>
 
       {open && (
-        <div className="mt-2 min-w-0 max-w-full rounded-xl border border-orange-100 bg-orange-50/60 p-3">
+        <div className="mt-2 min-w-0 max-w-full rounded-xl border border-teal-100 bg-teal-50/60 p-3">
           <p className="text-xs font-semibold text-slate-700">
             Pending reminder · {monthName(row.billingMonth)} {row.billingYear}
           </p>
@@ -94,7 +94,7 @@ export default function DuesWhatsAppDraftButton({ row, societyName }) {
             </div>
             <button
               type="button"
-              className="btn-primary w-full shrink-0 !bg-orange-500 !py-2.5 hover:!bg-orange-600 sm:w-auto"
+              className="btn-primary w-full shrink-0 !bg-teal-600 !py-2.5 hover:!bg-teal-700 sm:w-auto"
               disabled={busy || Number(row.amount || 0) <= 0}
               onClick={generate}
             >

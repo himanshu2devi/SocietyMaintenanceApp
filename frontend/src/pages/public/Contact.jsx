@@ -77,7 +77,7 @@ export default function Contact() {
 
   return (
     <div className="w-full min-w-0">
-      <section className="border-b border-slate-200 bg-[#fff9f6]">
+      <section className="border-b border-slate-200 bg-[#f0fdfa]">
         <div className="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 sm:py-16 lg:py-20">
           <p className="eyebrow">Get in touch</p>
           <h1 className="mt-4 max-w-2xl text-3xl font-extrabold tracking-tight text-slate-950 sm:text-4xl md:text-5xl">
@@ -85,7 +85,7 @@ export default function Contact() {
           </h1>
           <p className="mt-4 max-w-xl text-sm leading-7 text-slate-600 sm:mt-5 sm:text-base">
             Share your details and expectations. Our team will contact you by email to discuss requirements, agree an amount,
-            and whether you want 3 months, 6 months, or 1 year. Payment happens only on SocietyWale after that.
+            and whether you want 3 months, 6 months, or 1 year. Payment happens only on SocietySimplify after that.
           </p>
         </div>
       </section>
@@ -93,10 +93,10 @@ export default function Contact() {
       <section className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-8 px-4 py-10 sm:gap-10 sm:px-6 sm:py-14 lg:grid-cols-[1fr_1.1fr] lg:py-20">
         <div className="min-w-0 space-y-5">
           <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6">
-            <p className="text-xs font-bold uppercase tracking-[.14em] text-orange-600">Email</p>
+            <p className="text-xs font-bold uppercase tracking-[.14em] text-teal-700">Email</p>
             <a
-              className="mt-2 block break-all text-sm font-semibold text-slate-900 transition hover:text-orange-600"
-              href={mailtoHref('SocietyWale pricing enquiry')}
+              className="mt-2 block break-all text-sm font-semibold text-slate-900 transition hover:text-teal-700"
+              href={mailtoHref('SocietySimplify pricing enquiry')}
             >
               {SITE_EMAIL}
             </a>
@@ -104,15 +104,15 @@ export default function Contact() {
           </div>
 
           <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6">
-            <p className="text-xs font-bold uppercase tracking-[.14em] text-orange-600">How it works</p>
+            <p className="text-xs font-bold uppercase tracking-[.14em] text-teal-700">How it works</p>
             <ol className="mt-3 list-decimal space-y-2 pl-4 text-sm leading-6 text-slate-600">
               <li>Send your enquiry below.</li>
               <li>We discuss requirements and agree amount + plan (3 months / 6 months / 1 year).</li>
-              <li>Complete payment on SocietyWale signup/renew pages via Razorpay only.</li>
+              <li>Complete payment on SocietySimplify signup/renew pages via Razorpay only.</li>
             </ol>
             <p className="mt-3 text-sm text-slate-600">
               Ready to pay after discussion?{' '}
-              <Link className="font-semibold text-orange-600" to="/register">
+              <Link className="font-semibold text-teal-700" to="/register">
                 Open payment &amp; signup
               </Link>
             </p>
@@ -122,7 +122,7 @@ export default function Contact() {
         <div className="card min-w-0 w-full">
           <h2 className="text-lg font-extrabold text-slate-950">Request a custom plan</h2>
           <p className="mt-1 break-words text-sm text-slate-500">
-            Your enquiry is emailed to SocietyWale immediately (when mail is enabled).
+            Your enquiry is emailed to SocietySimplify immediately (when mail is enabled).
           </p>
           <div className="mt-4">
             <Alert type="error">{error}</Alert>
@@ -175,7 +175,7 @@ export default function Contact() {
               />
               {fieldErrors.message && <p className="mt-1 text-xs font-medium text-red-600">{fieldErrors.message}</p>}
             </div>
-            <button className="btn-primary w-full !bg-orange-500 hover:!bg-orange-600" disabled={busy}>
+            <button className="btn-primary w-full !bg-teal-600 hover:!bg-teal-700" disabled={busy}>
               {busy ? 'Sending…' : 'Send enquiry'}
             </button>
           </form>

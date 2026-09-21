@@ -10,14 +10,14 @@ export default function RefundPolicy() {
       updated="14 July 2026"
     >
       <p>
-        This Refund &amp; Cancellation Policy applies to paid SocietyWale subscriptions purchased for housing-society
-        workspaces on <strong>societywale.in</strong> (including annual society signup payments collected via Razorpay).
+        This Refund &amp; Cancellation Policy applies to paid SocietySimplify subscriptions purchased for housing-society
+        workspaces on <strong>societysimplify.vercel.app</strong> (including annual society signup payments collected via Razorpay).
         By completing payment, you agree to this policy.
       </p>
 
       <h2>What you are purchasing</h2>
       <p>
-        SocietyWale sells digital software access (SaaS): an annual society workspace for committee administrators and
+        SocietySimplify sells digital software access (SaaS): an annual society workspace for committee administrators and
         residents. Payment unlocks account creation and continued use of the product features available at the time of
         purchase. We are not selling physical goods.
       </p>
@@ -37,7 +37,7 @@ export default function RefundPolicy() {
 
       <h2>Cancellation</h2>
       <p>
-        You may stop using SocietyWale at any time and choose not to renew when your paid period ends. Cancellation of
+        You may stop using SocietySimplify at any time and choose not to renew when your paid period ends. Cancellation of
         future use does <strong>not</strong> entitle you to a refund of amounts already paid for the current subscription
         period.
       </p>
@@ -62,26 +62,26 @@ export default function RefundPolicy() {
       <h2>Payment gateway</h2>
       <p>
         Payments are processed securely by Razorpay. Card/UPI credentials are handled by the payment provider — not
-        stored on SocietyWale servers. Payment receipts for successful society signup are emailed to the paying
+        stored on SocietySimplify servers. Payment receipts for successful society signup are emailed to the paying
         administrator as part of the welcome message.
       </p>
 
       <h2>Contact for billing queries</h2>
       <p>
         For payment confirmation or duplicate-charge queries (not general refund requests after successful signup), email{' '}
-        <a className="font-semibold text-orange-600" href={mailtoHref('Billing / payment enquiry')}>
+        <a className="font-semibold text-teal-700" href={mailtoHref('Billing / payment enquiry')}>
           {SITE_EMAIL}
         </a>{' '}
         with your society name, admin email, and Razorpay payment ID, or use our{' '}
-        <Link className="font-semibold text-orange-600" to="/contact">
+        <Link className="font-semibold text-teal-700" to="/contact">
           Contact
         </Link>{' '}
         page. Also see our{' '}
-        <Link className="font-semibold text-orange-600" to="/terms">
+        <Link className="font-semibold text-teal-700" to="/terms">
           Terms &amp; Conditions
         </Link>{' '}
         and{' '}
-        <Link className="font-semibold text-orange-600" to="/privacy">
+        <Link className="font-semibold text-teal-700" to="/privacy">
           Privacy policy
         </Link>
         .

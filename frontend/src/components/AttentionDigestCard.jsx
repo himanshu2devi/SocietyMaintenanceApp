@@ -51,7 +51,7 @@ export default function AttentionDigestCard({ onNavigate }) {
       <div className="border-b border-slate-100 bg-gradient-to-r from-slate-950 to-teal-900 px-4 py-4 text-white sm:px-5">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0">
-            <p className="text-xs font-bold uppercase tracking-[.14em] text-orange-300">Powered by AI</p>
+            <p className="text-xs font-bold uppercase tracking-[.14em] text-teal-300">Powered by AI</p>
             <h2 className="mt-1 text-lg font-extrabold tracking-tight sm:text-xl">Committee Digest</h2>
             <p className="mt-1 text-sm leading-6 text-slate-300">
               Live priorities from Maintenance Tracker, claims, complaints and notices — refreshed when you open Overview.

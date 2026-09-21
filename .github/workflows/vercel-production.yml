@@ -1,7 +1,7 @@
 # Deploy frontend to Vercel on every push to main.
 #
 # One-time setup (pick one):
-# A) Deploy Hook: Vercel → societywale → Settings → Git → Deploy Hooks → main
+# A) Deploy Hook: Vercel → societysimplify → Settings → Git → Deploy Hooks → main
 #    → GitHub repo → Settings → Secrets → VERCEL_DEPLOY_HOOK
 # B) Vercel token: https://vercel.com/account/tokens → GitHub secret VERCEL_TOKEN
 

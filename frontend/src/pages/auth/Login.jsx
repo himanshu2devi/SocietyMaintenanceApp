@@ -72,33 +72,33 @@ export default function Login() {
             />
             {fieldErrors.password && <p className="mt-1 text-xs font-medium text-red-600">{fieldErrors.password}</p>}
             <p className="mt-2 text-right text-sm">
-              <Link to="/forgot-password" className="font-semibold text-orange-600 hover:text-orange-700">
+              <Link to="/forgot-password" className="font-semibold text-teal-700 hover:text-teal-800">
                 Forget/Reset Password?
               </Link>
             </p>
           </div>
-          <button className="btn-primary w-full !bg-orange-500 !py-3 hover:!bg-orange-600" disabled={loading}>
+          <button className="btn-primary w-full !bg-teal-600 !py-3 hover:!bg-teal-700" disabled={loading}>
             {loading ? 'Signing in…' : 'Sign In'}
           </button>
         </form>
 
         <p className="border-t border-slate-100 pt-5 text-center text-sm text-slate-500">
           Setting up a new society?{' '}
-          <Link to="/contact" className="font-bold text-orange-600 hover:text-orange-700">
+          <Link to="/contact" className="font-bold text-teal-700 hover:text-teal-800">
             Get in touch
           </Link>
           {' · '}
-          <Link to="/register" className="font-bold text-orange-600 hover:text-orange-700">
+          <Link to="/register" className="font-bold text-teal-700 hover:text-teal-800">
             Pay &amp; sign up
           </Link>
           <br />
           Subscription expired?{' '}
-          <Link to="/renew" className="font-bold text-orange-600 hover:text-orange-700">
+          <Link to="/renew" className="font-bold text-teal-700 hover:text-teal-800">
             Renew
           </Link>
           <br />
           Society resident?{' '}
-          <Link to="/register-member" className="font-bold text-orange-600 hover:text-orange-700">
+          <Link to="/register-member" className="font-bold text-teal-700 hover:text-teal-800">
             Member signup
           </Link>
         </p>

@@ -12,7 +12,7 @@ const FAQ_PAGE_SCHEMA = {
       name: 'Which is a secure society app in India for housing societies?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'SocietyWale is society management software for Indian housing societies and RWAs — with private per-society workspaces, secure sign-in, maintenance, members, notices, expenses, complaints and audit-ready reports.',
+        text: 'SocietySimplify is society management software for Indian housing societies and RWAs — with private per-society workspaces, secure sign-in, maintenance, members, notices, expenses, complaints and audit-ready reports.',
       },
     },
     {
@@ -20,7 +20,7 @@ const FAQ_PAGE_SCHEMA = {
       name: 'What AI tools help manage residential building maintenance fees?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'SocietyWale combines AI-powered features such as automated maintenance billing, smart notices and an integrated AI chatbot so committees can reduce manual work while tracking paid vs pending dues by flat.',
+        text: 'SocietySimplify combines AI-powered features such as automated maintenance billing, smart notices and an integrated AI chatbot so committees can reduce manual work while tracking paid vs pending dues by flat.',
       },
     },
     {
@@ -36,7 +36,7 @@ const FAQ_PAGE_SCHEMA = {
       name: 'Is there an affordable ad-free society app for small apartment buildings?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Yes. SocietyWale is built for small apartment buildings and larger gated communities alike — an ad-free society management platform focused on committee and resident workflows, not ads.',
+        text: 'Yes. SocietySimplify is built for small apartment buildings and larger gated communities alike — an ad-free society management platform focused on committee and resident workflows, not ads.',
       },
     },
     {
@@ -52,7 +52,7 @@ const FAQ_PAGE_SCHEMA = {
       name: 'Can a progressive web app replace native society management apps for older residents?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'SocietyWale runs in the browser as a practical workspace — residents can view dues, notices, bank details and raise claims or complaints without installing a heavy native app, which many older residents prefer.',
+        text: 'SocietySimplify runs in the browser as a practical workspace — residents can view dues, notices, bank details and raise claims or complaints without installing a heavy native app, which many older residents prefer.',
       },
     },
   ],

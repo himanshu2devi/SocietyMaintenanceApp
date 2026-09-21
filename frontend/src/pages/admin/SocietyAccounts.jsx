@@ -105,7 +105,7 @@ export default function SocietyAccounts() {
                 <div className="min-w-0">
                   <p className="flex flex-wrap items-center gap-2 font-bold text-slate-950">
                     <span className="break-words">{a.accountName}</span>
-                    {a.primaryAccount && <span className="badge bg-orange-50 text-orange-700">Primary</span>}
+                    {a.primaryAccount && <span className="badge bg-teal-50 text-teal-800">Primary</span>}
                   </p>
                   <p className="mt-1 break-words text-sm text-slate-600">{a.bankName}{a.branchName ? ` · ${a.branchName}` : ''}</p>
                   <p className="mt-2 break-all text-sm"><span className="text-slate-500">A/C</span> {a.accountNumber}</p>

@@ -20,7 +20,7 @@ export default function TermsAgreementCheckbox({
           checked={checked}
           disabled={disabled}
           onChange={(e) => onChange(e.target.checked)}
-          className="mt-0.5 h-4 w-4 shrink-0 rounded border-slate-300 text-orange-600 focus:ring-orange-500 disabled:cursor-not-allowed"
+          className="mt-0.5 h-4 w-4 shrink-0 rounded border-slate-300 text-teal-700 focus:ring-teal-500 disabled:cursor-not-allowed"
           aria-invalid={error ? 'true' : 'false'}
           aria-describedby={error ? `${id}-error` : undefined}
         />
@@ -30,7 +30,7 @@ export default function TermsAgreementCheckbox({
             to="/terms"
             target="_blank"
             rel="noopener noreferrer"
-            className="font-semibold text-orange-600 hover:text-orange-700"
+            className="font-semibold text-teal-700 hover:text-teal-800"
             onClick={(e) => e.stopPropagation()}
           >
             Terms of Use
@@ -40,7 +40,7 @@ export default function TermsAgreementCheckbox({
             to="/privacy"
             target="_blank"
             rel="noopener noreferrer"
-            className="font-semibold text-orange-600 hover:text-orange-700"
+            className="font-semibold text-teal-700 hover:text-teal-800"
             onClick={(e) => e.stopPropagation()}
           >
             Privacy Policy
@@ -53,7 +53,7 @@ export default function TermsAgreementCheckbox({
                 to="/refund-policy"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="font-semibold text-orange-600 hover:text-orange-700"
+                className="font-semibold text-teal-700 hover:text-teal-800"
                 onClick={(e) => e.stopPropagation()}
               >
                 Refund &amp; Cancellation Policy

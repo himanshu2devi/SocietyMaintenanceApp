@@ -116,14 +116,14 @@ export default function ForgotPassword() {
             <input name="confirmPassword" type="password" className="input" value={form.confirmPassword} onChange={update} autoComplete="new-password" />
             {fieldErrors.confirmPassword && <p className="mt-1 text-xs font-medium text-red-600">{fieldErrors.confirmPassword}</p>}
           </div>
-          <button className="btn-primary w-full !bg-orange-500 !py-3 hover:!bg-orange-600" disabled={busy}>
+          <button className="btn-primary w-full !bg-teal-600 !py-3 hover:!bg-teal-700" disabled={busy}>
             {busy ? 'Updating…' : 'Update password'}
           </button>
         </form>
 
         <p className="border-t border-slate-100 pt-5 text-center text-sm text-slate-500">
           Remembered it?{' '}
-          <Link to="/login" className="font-bold text-orange-600 hover:text-orange-700">Sign in</Link>
+          <Link to="/login" className="font-bold text-teal-700 hover:text-teal-800">Sign in</Link>
           <br />
           Need help? Ask your secretary to reset password from Members.
         </p>

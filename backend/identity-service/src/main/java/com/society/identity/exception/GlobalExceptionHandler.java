@@ -57,7 +57,7 @@ public class GlobalExceptionHandler {
             } else if (lower.contains("society_code") || lower.contains("societies_society_code")) {
                 message = "Society code already registered. Choose another code or sign in.";
             } else if (lower.contains("billing_period")) {
-                message = "Selected plan is not accepted by the database yet. Please contact SocietyWale support.";
+                message = "Selected plan is not accepted by the database yet. Please contact SocietySimplify support.";
             } else if (lower.contains("subscription_payments") && lower.contains("razorpay_order")) {
                 message = "This payment order was already recorded. Try Pay and Sign Up again.";
             }

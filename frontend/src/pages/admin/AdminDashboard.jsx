@@ -72,7 +72,7 @@ export default function AdminDashboard() {
           <p className="text-xs font-bold uppercase tracking-[.14em] text-slate-400">Committee workspace</p>
           <p className="mt-2 break-words text-sm font-bold leading-snug text-slate-900">{user?.societyName || 'Your society'}</p>
           {user?.societyCode && (
-            <p className="mt-0.5 break-all text-xs font-semibold text-orange-600">Code · {user.societyCode}</p>
+            <p className="mt-0.5 break-all text-xs font-semibold text-teal-700">Code · {user.societyCode}</p>
           )}
           <p className="mt-1 break-words text-xs leading-snug text-slate-500">{user?.fullName}</p>
           <p className="mt-0.5 text-xs font-semibold text-slate-400">Admin</p>
@@ -87,13 +87,13 @@ export default function AdminDashboard() {
               type="button"
               onClick={() => setActive(tab.id)}
               className={`flex shrink-0 items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm font-semibold transition lg:w-full lg:gap-3 lg:py-3 ${
-                active === tab.id ? 'bg-orange-50 text-orange-700' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-950'
+                active === tab.id ? 'bg-teal-50 text-teal-800' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-950'
               }`}
             >
               <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-white text-base shadow-sm">{tab.icon}</span>
               <span className="whitespace-nowrap lg:min-w-0 lg:flex-1 lg:whitespace-normal lg:break-words">{tab.label}</span>
               {tab.id === 'claims' && pendingClaims > 0 && (
-                <span className="rounded-full bg-orange-600 px-2 py-0.5 text-[11px] font-bold text-white">
+                <span className="rounded-full bg-teal-700 px-2 py-0.5 text-[11px] font-bold text-white">
                   {pendingClaims}
                 </span>
               )}
@@ -104,8 +104,8 @@ export default function AdminDashboard() {
       <section className="min-w-0 max-w-full">
         <div className="mb-5 flex flex-col gap-2 border-b border-slate-200 pb-4 sm:mb-6 sm:flex-row sm:items-end sm:justify-between sm:gap-3 sm:pb-5">
           <div className="min-w-0">
-            <p className="break-words text-xs font-bold uppercase tracking-[.14em] text-orange-600">
-              {user?.societyName || 'SocietyWale admin'}
+            <p className="break-words text-xs font-bold uppercase tracking-[.14em] text-teal-700">
+              {user?.societyName || 'SocietySimplify admin'}
               {user?.societyCode ? ` · ${user.societyCode}` : ''}
             </p>
             <h1 className="mt-1 text-xl font-extrabold tracking-tight text-slate-950 sm:text-2xl">{tabs.find((tab) => tab.id === active).label}</h1>
@@ -153,7 +153,7 @@ function Overview({ onNavigate, pendingClaims = 0 }) {
       )}
 
       <div className="min-w-0 overflow-hidden rounded-2xl bg-[linear-gradient(135deg,#102A43_0%,#173e62_55%,#0f766e_150%)] p-5 text-white sm:rounded-3xl sm:p-7 md:p-9">
-        <p className="text-xs font-bold uppercase tracking-[.15em] text-orange-300">Operations overview</p>
+        <p className="text-xs font-bold uppercase tracking-[.15em] text-teal-300">Operations overview</p>
         <h2 className="mt-3 max-w-2xl text-xl font-extrabold leading-tight break-words sm:text-2xl md:text-3xl">
           Your society command centre for collections, communication and compliance-ready records.
         </h2>
@@ -186,10 +186,10 @@ function Overview({ onNavigate, pendingClaims = 0 }) {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {steps.map(([number, title, copy, target]) => (
           <article key={number} className="card min-w-0">
-            <span className="grid h-9 w-9 place-items-center rounded-xl bg-orange-50 text-sm font-extrabold text-orange-600">{number}</span>
+            <span className="grid h-9 w-9 place-items-center rounded-xl bg-teal-50 text-sm font-extrabold text-teal-700">{number}</span>
             <h3 className="mt-4 font-bold text-slate-950">{title}</h3>
             <p className="mt-2 text-sm leading-6 text-slate-600">{copy}</p>
-            <button onClick={() => onNavigate(target)} className="mt-5 text-sm font-bold text-orange-600 hover:text-orange-700">Open →</button>
+            <button onClick={() => onNavigate(target)} className="mt-5 text-sm font-bold text-teal-700 hover:text-teal-800">Open →</button>
           </article>
         ))}
       </div>

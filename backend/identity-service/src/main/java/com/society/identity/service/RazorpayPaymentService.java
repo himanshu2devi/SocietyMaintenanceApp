@@ -100,7 +100,7 @@ public class RazorpayPaymentService {
                 MIN_AMOUNT_PAISE,
                 MAX_AMOUNT_PAISE,
                 "Custom society workspace",
-                "Choose 3 months, 6 months, or 1 year. Pricing is finalised with SocietyWale after discussion — enter the agreed amount at checkout and pay only on this platform via Razorpay. Never pay agents or individuals directly.",
+                "Choose 3 months, 6 months, or 1 year. Pricing is finalised with SocietySimplify after discussion — enter the agreed amount at checkout and pay only on this platform via Razorpay. Never pay agents or individuals directly.",
                 "/contact"
         );
     }
@@ -150,7 +150,7 @@ public class RazorpayPaymentService {
     public CreateOrderResponse createOrder(CreateOrderRequest req) {
         if (!isConfigured()) {
             throw new BadRequestException(
-                    "Online payments are not configured yet. Please contact SocietyWale support.");
+                    "Online payments are not configured yet. Please contact SocietySimplify support.");
         }
 
         String societyCode = req.societyCode().trim();
@@ -173,7 +173,7 @@ public class RazorpayPaymentService {
                 adminEmail,
                 amountPaise,
                 period,
-                "societywale_signup"
+                "societysimplify_signup"
         );
     }
 
@@ -181,7 +181,7 @@ public class RazorpayPaymentService {
     public CreateOrderResponse createRenewalOrder(CreateRenewalOrderRequest req) {
         if (!isConfigured()) {
             throw new BadRequestException(
-                    "Online payments are not configured yet. Please contact SocietyWale support.");
+                    "Online payments are not configured yet. Please contact SocietySimplify support.");
         }
 
         String societyCode = req.societyCode().trim();
@@ -205,7 +205,7 @@ public class RazorpayPaymentService {
                 adminEmail,
                 amountPaise,
                 period,
-                "societywale_renewal"
+                "societysimplify_renewal"
         );
     }
 

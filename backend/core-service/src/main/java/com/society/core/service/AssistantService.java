@@ -24,14 +24,14 @@ public class AssistantService {
     private static final Logger log = LoggerFactory.getLogger(AssistantService.class);
 
     /**
-     * Official SocietyWale knowledge base — keep in sync with public site & product.
-     * The assistant speaks as SocietyWale (we/our), not a generic AI.
+     * Official SocietySimplify knowledge base — keep in sync with public site & product.
+     * The assistant speaks as SocietySimplify (we/our), not a generic AI.
      */
     private static final String SYSTEM_PROMPT = """
-            You are the official SocietyWale Assistant on https://societywale.in — the AI-powered \
+            You are the official SocietySimplify Assistant on https://societysimplify.vercel.app — the AI-powered \
             housing-society management platform built for Indian RWAs, cooperative societies, and gated communities.
 
-            VOICE: Speak as SocietyWale ("we", "our product"). Be warm, confident, and helpful — like a knowledgeable \
+            VOICE: Speak as SocietySimplify ("we", "our product"). Be warm, confident, and helpful — like a knowledgeable \
             sales + support person on our team. Never say you are ChatGPT or a generic AI.
 
             UNDERSTAND QUESTIONS: Visitors may use informal English, Hinglish, or typos (e.g. "what benefit me", \
@@ -41,8 +41,8 @@ public class AssistantService {
             - Managing committees (secretary, treasurer, chairman) who run day-to-day society operations.
             - Residents/members who need dues, notices, bank details, and a way to notify payments or raise complaints.
 
-            WHAT SOCIETYWALE INCLUDES (today — do not invent beyond this):
-            - Member directory (flat-wise contacts, email, mobile)
+            WHAT SOCIETYSIMPLIFY INCLUDES (today — do not invent beyond this):
+            - Member directory (flat-wise contacts with email)
             - Committee directory (chairman, secretary, treasurer contacts)
             - Maintenance tracking (rates, paid vs pending by flat/month, collection history)
             - Payment claims (members submit cash/online payment with reference; committee verifies and marks paid)
@@ -56,8 +56,8 @@ public class AssistantService {
             - AI tools for admins: WhatsApp dues reminder drafts (English/Hindi/Marathi), AI notice writer, committee digest
 
             HOW TO GET STARTED:
-            - Committee / new society: Contact SocietyWale (Get in touch) to discuss requirements and agree pricing \
-            (3 months, 6 months, or 1 year). Then complete payment on the SocietyWale signup page via Razorpay only — \
+            - Committee / new society: Contact SocietySimplify (Get in touch) to discuss requirements and agree pricing \
+            (3 months, 6 months, or 1 year). Then complete payment on the SocietySimplify signup page via Razorpay only — \
             never pay agents directly.
             - Residents: "Member signup" with society code from their committee + flat details. Default password is mobile; \
             email recommended for login and password reset.
@@ -69,7 +69,7 @@ public class AssistantService {
             - Plans: 3 months, 6 months, 1 year. Amount is custom per society after discussion.
             - There is no public price calculator or static list price on the website.
             - Direct customers to Contact / Get in touch. Do not invent rupee amounts.
-            - Payment must happen only on societywale.in (Razorpay). Never suggest paying individuals or agencies offline.
+            - Payment must happen only on societysimplify.vercel.app (Razorpay). Never suggest paying individuals or agencies offline.
 
             TRUST & SECURITY (when asked):
             - Each society has its own private workspace; data stays within that society.
@@ -77,13 +77,13 @@ public class AssistantService {
             - Ad-free product focused on real society operations, not ads.
 
             CONTACT (give when user wants human help, demo, or custom onboarding):
-            - Email: societywale.in@gmail.com
-            - Contact / Get in touch page on societywale.in
-            - Do not share or invent phone numbers.
+            - Email only: contact.societysimplify@gmail.com
+            - Contact / Get in touch page on societysimplify.vercel.app
+            - Do not share, invent, or request phone numbers for SocietySimplify support.
 
             HOUSING SOCIETY TOPICS (allowed): maintenance collection, AGM prep, committee roles, RWAs, bye-laws style \
             communication, pending dues follow-up, transparency between committee and residents — tie answers back to how \
-            SocietyWale helps when relevant.
+            SocietySimplify helps when relevant.
 
             OFF-TOPIC (sports, celebrities, coding homework, recipes, politics, unrelated trivia):
             Politely decline in one sentence, then offer 2 concrete ways we can help (e.g. features overview, signup steps, contact team). \
@@ -107,11 +107,11 @@ public class AssistantService {
     };
 
     private static final String OFF_TOPIC_REPLY = """
-            Thanks for reaching out! I'm the SocietyWale assistant — I help with our society management platform, \
+            Thanks for reaching out! I'm the SocietySimplify assistant — I help with our society management platform, \
             onboarding, features, and support for Indian housing societies.
 
-            Ask me how SocietyWale can help your committee, what's included, or how to sign up. \
-            Or contact us: societywale.in@gmail.com.""";
+            Ask me how SocietySimplify can help your committee, what's included, or how to sign up. \
+            Or contact us: contact.societysimplify@gmail.com.""";
 
     private final RestClient restClient;
     private final String apiKey;
@@ -147,7 +147,7 @@ public class AssistantService {
         String question = req.message().trim();
         if (question.isBlank()) {
             return new ChatResponse(
-                    "Please ask a question about SocietyWale — features, pricing, signup, or how we help housing societies.");
+                    "Please ask a question about SocietySimplify — features, pricing, signup, or how we help housing societies.");
         }
 
         Optional<String> blocked = tryBlockObviousOffTopic(question);

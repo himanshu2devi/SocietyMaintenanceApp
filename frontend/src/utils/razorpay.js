@@ -11,7 +11,7 @@ export function loadRazorpayScript() {
       resolve(window.Razorpay)
       return
     }
-    const existing = document.querySelector('script[data-societywale-razorpay]')
+    const existing = document.querySelector('script[data-societysimplify-razorpay]')
     if (existing) {
       existing.addEventListener('load', () => resolve(window.Razorpay))
       existing.addEventListener('error', () =>
@@ -22,7 +22,7 @@ export function loadRazorpayScript() {
     const script = document.createElement('script')
     script.src = 'https://checkout.razorpay.com/v1/checkout.js'
     script.async = true
-    script.dataset.societywaleRazorpay = '1'
+    script.dataset.societysimplifyRazorpay = '1'
     script.onload = () => {
       if (window.Razorpay) resolve(window.Razorpay)
       else reject(new Error('Razorpay failed to initialise. Please refresh and try again.'))
@@ -86,7 +86,7 @@ export function openRazorpayCheckout({
         key: keyId,
         amount: amountPaise,
         currency: currency || 'INR',
-        name: 'SocietyWale',
+        name: 'SocietySimplify',
         description: description || 'Annual society workspace',
         order_id: orderId,
         prefill: prefill || {},

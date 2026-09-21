@@ -3,7 +3,7 @@ import { clearSession, getValidToken, TOKEN_KEY } from '../auth/token'
 
 /**
  * Normalize API base URL so Vercel env mistakes like omitting /api/v1 still work.
- * Expected: https://identity.societywale.in/api/v1
+ * Expected: https://YOUR_IDENTITY_API_HOST/api/v1
  */
 function apiBase(envValue, fallback) {
   let url = (envValue || fallback || '').trim().replace(/\/+$/, '')

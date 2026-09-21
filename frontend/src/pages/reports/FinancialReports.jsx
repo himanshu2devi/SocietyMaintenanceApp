@@ -78,7 +78,7 @@ export default function FinancialReports() {
   return (
     <div className="min-w-0 max-w-full space-y-6">
       <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-white to-slate-50 px-4 py-5 sm:px-7 sm:py-6">
-        <p className="text-xs font-bold uppercase tracking-[.14em] text-orange-600">SocietyWale reports</p>
+        <p className="text-xs font-bold uppercase tracking-[.14em] text-teal-700">SocietySimplify reports</p>
         <h1 className="mt-2 text-xl font-extrabold tracking-tight text-slate-950 sm:text-2xl md:text-3xl">Financial Reports</h1>
         <p className="mt-2 max-w-2xl break-words text-sm leading-6 text-slate-500">
           Generate monthly or annual statements for {user?.societyName || 'your society'}, then download a branded PDF. Members can view; committee manages source data in Maintenance and Expenses.
