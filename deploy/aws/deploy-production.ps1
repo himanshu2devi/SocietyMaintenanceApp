@@ -29,9 +29,9 @@ cd deploy/aws
 if grep -q '^OPENAI_API_KEY=' .env 2>/dev/null; then echo 'OPENAI_API_KEY present'; else echo 'WARNING: add OPENAI_API_KEY to deploy/aws/.env on server'; fi
 docker compose up -d --build identity core caddy
 docker compose ps
-curl -sf http://127.0.0.1/identity/actuator/health || true
-curl -sf http://127.0.0.1/core/actuator/health || true
-curl -sf http://127.0.0.1/core/api/v1/assistant/status || true
+curl -sf https://identity.societywale.in/actuator/health || true
+curl -sf https://core.societywale.in/actuator/health || true
+curl -sf https://core.societywale.in/api/v1/assistant/status || true
 echo DEPLOY_DONE
 '@
 
