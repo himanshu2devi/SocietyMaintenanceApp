@@ -17,6 +17,7 @@ import { getApiErrorMessage } from '../../utils/apiError'
 import { inr, monthName, whatsappLink, formatNoticeDate } from '../../utils/share'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import ComplaintBoard from '../shared/ComplaintBoard'
+import MemberCommunity from './MemberCommunity'
 
 const now = new Date()
 
@@ -625,6 +626,8 @@ export default function MemberDashboard() {
           </ul>
         </div>
       </div>
+
+      <MemberCommunity />
 
       <ComplaintBoard />
     </div>

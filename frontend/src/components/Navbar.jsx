@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { Brand } from './Brand'
+import { homeRouteForRole } from './ProtectedRoute'
 import { NoticeService } from '../api/services'
 
 const publicLinks = [
@@ -22,7 +23,7 @@ function initials(name = '') {
 }
 
 export default function Navbar() {
-  const { isAuthenticated, isAdmin, user, logout } = useAuth()
+  const { isAuthenticated, isAdmin, isPlatformAdmin, user, logout } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
   const [open, setOpen] = useState(false)
@@ -39,7 +40,7 @@ export default function Navbar() {
   }, [location.pathname, location.hash])
 
   useEffect(() => {
-    if (!isAuthenticated || isAdmin) {
+    if (!isAuthenticated || isAdmin || isPlatformAdmin) {
       setUnreadNotices(0)
       knownUnread.current = null
       return undefined
@@ -64,7 +65,7 @@ export default function Navbar() {
       cancelled = true
       window.clearInterval(id)
     }
-  }, [isAuthenticated, isAdmin, user?.id])
+  }, [isAuthenticated, isAdmin, isPlatformAdmin, user?.id])
 
   useEffect(() => {
     function onDocClick(e) {
@@ -142,11 +143,11 @@ export default function Navbar() {
           ))}
 
           {isAuthenticated && (
-            <Link to={isAdmin ? '/admin' : '/member'} className={navClass()}>
+            <Link to={homeRouteForRole(user?.role)} className={navClass()}>
               Dashboard
             </Link>
           )}
-          {isAuthenticated && (
+          {isAuthenticated && !isPlatformAdmin && (
             <Link to="/reports" className={navClass()}>
               Reports
             </Link>
@@ -161,7 +162,7 @@ export default function Navbar() {
         <div className="hidden items-center gap-2 lg:flex">
           {isAuthenticated ? (
             <>
-              {!isAdmin && (
+              {!isAdmin && !isPlatformAdmin && (
                 <Link
                   to="/member"
                   state={{ focusNotices: true }}
@@ -199,7 +200,9 @@ export default function Navbar() {
                   >
                     <div className="border-b border-slate-100 px-4 py-3">
                       <p className="truncate text-sm font-bold text-slate-950">{user?.fullName}</p>
-                      <p className="truncate text-xs text-slate-500">{isAdmin ? 'Committee admin' : 'Member'}</p>
+                      <p className="truncate text-xs text-slate-500">
+                        {isPlatformAdmin ? 'Platform admin' : isAdmin ? 'Committee admin' : 'Member'}
+                      </p>
                     </div>
                     <Link
                       to="/profile"
@@ -234,7 +237,7 @@ export default function Navbar() {
         </div>
 
         <div className="flex items-center gap-2 lg:hidden">
-          {isAuthenticated && !isAdmin && (
+          {isAuthenticated && !isAdmin && !isPlatformAdmin && (
             <Link
               to="/member"
               state={{ focusNotices: true }}
@@ -307,12 +310,14 @@ export default function Navbar() {
               <Link to="/profile" onClick={closeMenu} className="rounded-xl px-3 py-3.5 text-sm font-semibold text-slate-700 transition hover:bg-teal-50 hover:text-teal-800">
                 My profile
               </Link>
-              <Link to={isAdmin ? '/admin' : '/member'} onClick={closeMenu} className="rounded-xl px-3 py-3.5 text-sm font-semibold text-slate-700 transition hover:bg-teal-50 hover:text-teal-800">
+              <Link to={homeRouteForRole(user?.role)} onClick={closeMenu} className="rounded-xl px-3 py-3.5 text-sm font-semibold text-slate-700 transition hover:bg-teal-50 hover:text-teal-800">
                 My dashboard
               </Link>
-              <Link to="/reports" onClick={closeMenu} className="rounded-xl px-3 py-3.5 text-sm font-semibold text-slate-700 transition hover:bg-teal-50 hover:text-teal-800">
-                Reports
-              </Link>
+              {!isPlatformAdmin && (
+                <Link to="/reports" onClick={closeMenu} className="rounded-xl px-3 py-3.5 text-sm font-semibold text-slate-700 transition hover:bg-teal-50 hover:text-teal-800">
+                  Reports
+                </Link>
+              )}
               {isAdmin && (
                 <Link to="/analytics" onClick={closeMenu} className="rounded-xl px-3 py-3.5 text-sm font-semibold text-slate-700 transition hover:bg-teal-50 hover:text-teal-800">
                   Analytics

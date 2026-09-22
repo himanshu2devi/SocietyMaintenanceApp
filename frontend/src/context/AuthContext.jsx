@@ -65,6 +65,7 @@ export function AuthProvider({ children }) {
       loading,
       isAuthenticated: !!user && !!getValidToken(),
       isAdmin: user?.role === 'ADMIN',
+      isPlatformAdmin: user?.role === 'PLATFORM_ADMIN',
       login,
       registerSociety,
       registerMember,

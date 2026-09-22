@@ -187,6 +187,13 @@ public class AuthService {
         if (!passwordEncoder.matches(req.password(), user.getPasswordHash())) {
             throw new UnauthorizedException("Invalid email or password");
         }
+        if (user.getRole() == Role.PLATFORM_ADMIN) {
+            String token = jwtService.generateToken(user, null);
+            return new AuthResponse(token, "Bearer", toView(user, null));
+        }
+        if (user.getSocietyId() == null) {
+            throw new UnauthorizedException("Account is misconfigured. Contact support.");
+        }
         Society society = societyRepository.findById(user.getSocietyId()).orElse(null);
         requireActiveSubscription(society);
         String token = jwtService.generateToken(user, society);
@@ -227,7 +234,9 @@ public class AuthService {
     }
 
     private UserView toView(User u) {
-        Society society = societyRepository.findById(u.getSocietyId()).orElse(null);
+        Society society = u.getSocietyId() == null
+                ? null
+                : societyRepository.findById(u.getSocietyId()).orElse(null);
         return toView(u, society);
     }
 
@@ -244,7 +253,7 @@ public class AuthService {
     private static UserView toView(User u, Society society) {
         return new UserView(
                 u.getId().toString(),
-                u.getSocietyId().toString(),
+                u.getSocietyId() == null ? null : u.getSocietyId().toString(),
                 society != null ? society.getName() : null,
                 society != null ? society.getSocietyCode() : null,
                 u.getFullName(),

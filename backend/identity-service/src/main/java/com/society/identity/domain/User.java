@@ -17,7 +17,8 @@ public class User {
     @GeneratedValue
     private UUID id;
 
-    @Column(name = "society_id", nullable = false)
+    /** Null only for PLATFORM_ADMIN (no society tenant). */
+    @Column(name = "society_id")
     private UUID societyId;
 
     @Column(nullable = false, length = 150)

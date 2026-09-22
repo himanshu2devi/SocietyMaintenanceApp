@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { Alert } from '../../components/ui/Feedback'
 import AuthShell from '../../components/AuthShell'
+import { homeRouteForRole } from '../../components/ProtectedRoute'
 import { collectErrors, email, firstError, hasErrors, password } from '../../utils/validation'
 
 export default function Login() {
@@ -30,7 +31,7 @@ export default function Login() {
     }
     try {
       const user = await login(form.email.trim(), form.password)
-      navigate(user.role === 'ADMIN' ? '/admin' : '/member')
+      navigate(homeRouteForRole(user.role))
     } catch (err) {
       if (!err.response) {
         setError('The authentication service is offline. Please try again shortly.')

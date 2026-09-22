@@ -42,7 +42,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/assistant/chat", "/api/v1/assistant/status").permitAll()
                         .requestMatchers("/api/v1/ai/**").hasRole("ADMIN")
                         .requestMatchers("/api/admin/**", "/api/v1/admin/**").hasRole("ADMIN")
-                        .anyRequest().authenticated()
+                        // Tenant APIs only for society roles (PLATFORM_ADMIN has no societyId)
+                        .anyRequest().hasAnyRole("ADMIN", "MEMBER")
                 )
                 .exceptionHandling(exceptions -> exceptions
                         .authenticationEntryPoint((request, response, exception) -> {

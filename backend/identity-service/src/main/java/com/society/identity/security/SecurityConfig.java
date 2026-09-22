@@ -50,8 +50,10 @@ public class SecurityConfig {
                         .requestMatchers("/actuator/health", "/actuator/health/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/societies").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/societies/*/exists").permitAll()
+                        .requestMatchers("/api/v1/platform/**").hasRole("PLATFORM_ADMIN")
                         .requestMatchers("/api/admin/**", "/api/v1/admin/**").hasRole("ADMIN")
-                        .anyRequest().authenticated()
+                        // Society-tenant APIs: platform operators must not use null societyId here
+                        .anyRequest().hasAnyRole("ADMIN", "MEMBER")
                 )
                 .exceptionHandling(exceptions -> exceptions
                         .authenticationEntryPoint((request, response, exception) -> {

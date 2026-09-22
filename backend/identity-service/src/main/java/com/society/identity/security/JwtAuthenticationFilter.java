@@ -22,7 +22,7 @@ import java.util.UUID;
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private static final Set<String> ALLOWED_ROLES = Set.of("ADMIN", "MEMBER");
+    private static final Set<String> ALLOWED_ROLES = Set.of("ADMIN", "MEMBER", "PLATFORM_ADMIN");
 
     private final JwtService jwtService;
 
@@ -48,7 +48,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     filterChain.doFilter(request, response);
                     return;
                 }
-                if (!JwtService.isSocietySubscriptionClaimActive(claims)) {
+                boolean platformAdmin = "PLATFORM_ADMIN".equals(role);
+                if (!platformAdmin && !JwtService.isSocietySubscriptionClaimActive(claims)) {
                     SecurityContextHolder.clearContext();
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     response.setContentType("application/json");
@@ -56,9 +57,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                             "{\"status\":401,\"message\":\"Your SocietySimplify subscription has expired. Renew on the platform, then sign in again.\"}");
                     return;
                 }
+                String societyRaw = claims.get("societyId", String.class);
+                UUID societyId = (societyRaw == null || societyRaw.isBlank())
+                        ? null
+                        : UUID.fromString(societyRaw);
                 AuthenticatedUser principal = new AuthenticatedUser(
                         UUID.fromString(claims.getSubject()),
-                        UUID.fromString(claims.get("societyId", String.class)),
+                        societyId,
                         role,
                         claims.get("name", String.class),
                         claims.get("flatNumber", String.class)

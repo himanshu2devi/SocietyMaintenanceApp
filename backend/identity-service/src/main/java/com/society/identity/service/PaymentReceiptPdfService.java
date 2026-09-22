@@ -69,7 +69,7 @@ public class PaymentReceiptPdfService {
 
             Paragraph brandLine = new Paragraph();
             brandLine.add(new Phrase("Society", brand));
-            brandLine.add(new Phrase("Wale", brandAccent));
+            brandLine.add(new Phrase("Simplify", brandAccent));
             brandLine.setSpacingAfter(4f);
             document.add(brandLine);
 

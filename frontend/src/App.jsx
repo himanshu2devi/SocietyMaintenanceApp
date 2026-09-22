@@ -19,6 +19,7 @@ import ForgotPassword from './pages/auth/ForgotPassword'
 import RenewSubscription from './pages/auth/RenewSubscription'
 import AdminDashboard from './pages/admin/AdminDashboard'
 import MemberDashboard from './pages/member/MemberDashboard'
+import PlatformDashboard from './pages/platform/PlatformDashboard'
 import FinancialReports from './pages/reports/FinancialReports'
 import SocietyAnalytics from './pages/admin/SocietyAnalytics'
 import Profile from './pages/Profile'
@@ -62,6 +63,17 @@ export default function App() {
               <AppPage>
                 <ProtectedRoute requireRole="ADMIN">
                   <AdminDashboard />
+                </ProtectedRoute>
+              </AppPage>
+            }
+          />
+
+          <Route
+            path="/platform/*"
+            element={
+              <AppPage>
+                <ProtectedRoute requireRole="PLATFORM_ADMIN">
+                  <PlatformDashboard />
                 </ProtectedRoute>
               </AppPage>
             }

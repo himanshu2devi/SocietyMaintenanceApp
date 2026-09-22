@@ -3,7 +3,7 @@ import { Navigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { useToast } from '../../context/ToastContext'
 import { getValidToken } from '../../auth/token'
-import { PaymentClaimService } from '../../api/services'
+import { MemberAnnouncementService, PaymentClaimService } from '../../api/services'
 import MemberDirectory from './MemberDirectory'
 import MaintenanceTracker from './MaintenanceTracker'
 import ExpenseLogger from './ExpenseLogger'
@@ -12,6 +12,12 @@ import CommitteeDirectory from './CommitteeDirectory'
 import SocietyAccounts from './SocietyAccounts'
 import AuditDocuments from './AuditDocuments'
 import PaymentClaims from './PaymentClaims'
+import PaymentQrPanel from './PaymentQrPanel'
+import EventsPanel from './EventsPanel'
+import AnnouncementModerationPanel from './AnnouncementModerationPanel'
+import ParkingPanel from './ParkingPanel'
+import MeetingsPanel from './MeetingsPanel'
+import ElectionsPanel from './ElectionsPanel'
 import ComplaintBoard from '../shared/ComplaintBoard'
 import AttentionDigestCard from '../../components/AttentionDigestCard'
 
@@ -26,6 +32,12 @@ const tabs = [
   { id: 'expenses', label: 'Expenses', icon: '▣', component: ExpenseLogger },
   { id: 'notices', label: 'Notices & rules', icon: '◉', component: NoticeBoard },
   { id: 'complaints', label: 'Complaints', icon: '⚠', component: ComplaintBoard },
+  { id: 'paymentQr', label: 'Payment QR', icon: '▦', component: PaymentQrPanel },
+  { id: 'events', label: 'Events', icon: '✦', component: EventsPanel },
+  { id: 'announcements', label: 'Member posts', icon: '✎', component: AnnouncementModerationPanel },
+  { id: 'parking', label: 'Parking', icon: '🅿', component: ParkingPanel },
+  { id: 'meetings', label: 'Meetings', icon: '⌸', component: MeetingsPanel },
+  { id: 'elections', label: 'Elections', icon: '☑', component: ElectionsPanel },
 ]
 
 export default function AdminDashboard() {
@@ -33,6 +45,7 @@ export default function AdminDashboard() {
   const toast = useToast()
   const [active, setActive] = useState('overview')
   const [pendingClaims, setPendingClaims] = useState(0)
+  const [pendingAnnouncements, setPendingAnnouncements] = useState(0)
   const knownCount = useRef(null)
 
   async function refreshClaimBadge() {
@@ -50,14 +63,28 @@ export default function AdminDashboard() {
     }
   }
 
+  async function refreshAnnouncementBadge() {
+    try {
+      const res = await MemberAnnouncementService.pendingCount()
+      setPendingAnnouncements(Number(res?.pending || 0))
+    } catch {
+      // Keep last known badge if refresh fails
+    }
+  }
+
   useEffect(() => {
     refreshClaimBadge()
-    const id = window.setInterval(refreshClaimBadge, 30000)
+    refreshAnnouncementBadge()
+    const id = window.setInterval(() => {
+      refreshClaimBadge()
+      refreshAnnouncementBadge()
+    }, 30000)
     return () => window.clearInterval(id)
   }, [])
 
   useEffect(() => {
     if (active === 'claims') refreshClaimBadge()
+    if (active === 'announcements') refreshAnnouncementBadge()
   }, [active])
 
   if (!getValidToken()) return <Navigate to="/login" replace />
@@ -97,6 +124,11 @@ export default function AdminDashboard() {
                   {pendingClaims}
                 </span>
               )}
+              {tab.id === 'announcements' && pendingAnnouncements > 0 && (
+                <span className="rounded-full bg-teal-700 px-2 py-0.5 text-[11px] font-bold text-white">
+                  {pendingAnnouncements}
+                </span>
+              )}
             </button>
           ))}
         </nav>
@@ -118,6 +150,7 @@ export default function AdminDashboard() {
           onNavigate={setActive}
           pendingClaims={pendingClaims}
           onClaimsChanged={refreshClaimBadge}
+          onAnnouncementsChanged={refreshAnnouncementBadge}
         />
       </section>
     </div>

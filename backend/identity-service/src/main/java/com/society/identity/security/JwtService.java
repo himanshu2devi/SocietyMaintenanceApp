@@ -37,10 +37,15 @@ public class JwtService {
         Map<String, Object> claims = new HashMap<>();
         claims.put("email", user.getEmail() == null ? "" : user.getEmail());
         claims.put("role", user.getRole().name());
-        claims.put("societyId", user.getSocietyId().toString());
+        if (user.getSocietyId() != null) {
+            claims.put("societyId", user.getSocietyId().toString());
+        }
         claims.put("name", user.getFullName());
         claims.put("flatNumber", user.getFlatNumber() == null ? "" : user.getFlatNumber());
-        if (society != null && society.getSubscriptionExpiresAt() != null) {
+        // Platform operators are not bound to a society subscription claim.
+        if (user.getRole() != com.society.identity.domain.Role.PLATFORM_ADMIN
+                && society != null
+                && society.getSubscriptionExpiresAt() != null) {
             claims.put("subExp", society.getSubscriptionExpiresAt().toEpochMilli());
         }
         return Jwts.builder()

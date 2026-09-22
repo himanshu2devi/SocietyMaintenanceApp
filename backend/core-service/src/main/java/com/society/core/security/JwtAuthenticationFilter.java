@@ -22,7 +22,9 @@ import java.util.UUID;
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private static final Set<String> ALLOWED_ROLES = Set.of("ADMIN", "MEMBER");
+    private static final String PLATFORM_ADMIN = "PLATFORM_ADMIN";
+
+    private static final Set<String> ALLOWED_ROLES = Set.of("ADMIN", "MEMBER", PLATFORM_ADMIN);
 
     private final JwtService jwtService;
 
@@ -48,7 +50,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     filterChain.doFilter(request, response);
                     return;
                 }
-                if (!JwtService.isSocietySubscriptionClaimActive(claims)) {
+                boolean platformAdmin = PLATFORM_ADMIN.equals(role);
+                // Platform operators are not billed through a society subscription.
+                if (!platformAdmin && !JwtService.isSocietySubscriptionClaimActive(claims)) {
                     SecurityContextHolder.clearContext();
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     response.setContentType("application/json");
@@ -58,7 +62,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
                 AuthenticatedUser principal = new AuthenticatedUser(
                         UUID.fromString(claims.getSubject()),
-                        UUID.fromString(claims.get("societyId", String.class)),
+                        parseUuidOrNull(claims.get("societyId", String.class)),
                         role,
                         claims.get("name", String.class),
                         claims.get("flatNumber", String.class)
@@ -73,5 +77,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         }
         filterChain.doFilter(request, response);
+    }
+
+    /**
+     * Platform-level tokens carry no society. Society-scoped endpoints reject a null tenant via
+     * {@link SocietyScope}, so a missing claim never widens access.
+     */
+    private static UUID parseUuidOrNull(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+        return UUID.fromString(value);
     }
 }

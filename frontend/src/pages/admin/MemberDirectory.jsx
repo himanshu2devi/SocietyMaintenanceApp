@@ -16,6 +16,14 @@ import {
 
 const emptyForm = { fullName: '', flatNumber: '', mobile: '', email: '' }
 
+/** tel: links only help when the stored number is actually dialable. */
+function dialableNumber(value) {
+  const digits = String(value || '').replace(/\D/g, '')
+  if (digits.length === 10) return `+91${digits}`
+  if (digits.length === 12 && digits.startsWith('91')) return `+${digits}`
+  return ''
+}
+
 function formatOutstandingMessage(outstanding) {
   const periods = Array.isArray(outstanding?.periods) ? outstanding.periods : []
   const lines = periods
@@ -228,6 +236,15 @@ export default function MemberDirectory() {
                     </td>
                     <td className="py-3 pr-4">
                       <div className="flex flex-wrap gap-2">
+                        {dialableNumber(m.mobile) && (
+                          <a
+                            href={`tel:${dialableNumber(m.mobile)}`}
+                            className="btn-secondary !py-1.5 !text-xs"
+                            aria-label={`Call ${m.fullName}`}
+                          >
+                            Call
+                          </a>
+                        )}
                         <button
                           type="button"
                           className="btn-secondary !py-1.5 !text-xs"
